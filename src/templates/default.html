@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="$lang$">
+  <head>
+    <title>$title$</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="$desc$">
+    $if(author)$
+    <meta name="author" content="$author$">
+    $endif$
+    $if(keywords)$
+    <meta name="keywords" content="$keywords$">
+    $endif$
+
+    <meta property="og:site_name" content="$siteName$">
+    <meta property="og:title" content="$title$">
+    <meta property="og:url" content="$root$$url$">
+    <meta property="og:description" content="$desc$">
+    $if(image)$
+    <meta property="og:image" content="$root$$image$">
+    $endif$
+    $if(type)$
+    <meta property="og:type" content="$type$">
+    $else$
+    <meta property="og:type" content="website">
+    $endif$
+
+    $if(image)$
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:image" content="$root$$image$">
+    $endif$
+    <meta property="twitter:site" content="$siteName$">
+    <meta property="twitter:title" content="$title$">
+    <meta property="twitter:description" content="$desc$">
+    $if(authorTwitter)$
+    <meta property="twitter:creator" content="$authorTwitter$">
+    $endif$
+
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="canonical" href="$root$$url$">
+    <link rel="stylesheet" href="./css/default.css" />
+    <link rel="stylesheet" href="./css/code.css" />
+  </head>
+  <body>
+    $body$
+    <script defer src="./js/script.js"></script>
+  </body>
+</html>
