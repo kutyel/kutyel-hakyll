@@ -1,29 +1,44 @@
 ---
-desc: "This is the first page of my new blog! (built with Haskell)"
-image: "./images/PAT_7380.JPG"
-lang: "en"
-stylesheet: "default"
-title: "Flavio's Blog"
+title: Flavio Corpa – Senior Software Developer
+desc: Functional programming! Web Development! CLI tooling! Remote working! Travel!
+lang: en
+stylesheet: default
+image: ./images/PAT_7380.JPG
 ---
 
-<header>
-  <h1>Flavio Corpa's Blog</h1>
-  <img
-    alt="Me playing chess!"
-    src="./images/PAT_7380.JPG"
-    height="300"
-  />
-</header>
 <main>
-  <section>
-    <h2>Blog Posts</h2>
-    <ul>
-      $for(posts)$
-        <li>
-          <div><a href=".$url$">$title$</a></div>
-          <small>$date$</small>
-        </li>
-      $endfor$
-    </ul>
+  <header class="author">
+    <div class="layout--constrained">
+      <img
+        alt="me playing chess!"
+        class="author__image"
+        decoding="async"
+        height="300"
+        loading="lazy"
+        src="./images/PAT_7380.JPG"
+      />
+      <h1 class="author__name">Flavio Corpa</h1>
+      <h2 class="author__title">Senior Software Developer</h2>
+      <div class="author__links">
+        <a href="https://github.com/kutyel">GitHub</a>
+        <a href="https://www.linkedin.com/in/flaviocorpa">LinkedIn</a>
+        <a href="./atom.xml">RSS</a>
+        <a href="https://github.com/sponsors/kutyel/">Sponsor my work</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="posts">
+    <div class="layout--constrained">
+      <h2 class="posts__header">Blog Posts</h2>
+      <ul class="posts__list">
+        $for(posts)$
+          <li>
+            <div><a href="$url$">$title$</a></div>
+            <small>$date$</small>
+          </li>
+        $endfor$
+      </ul>
+    </div>
   </section>
 </main>

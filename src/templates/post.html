@@ -1,18 +1,31 @@
-<main>
+$partial("templates/nav.html")$
+
+<main id="content" tabindex="-1">
   <article>
     <header>
-      <h1>
-        <a href=".$url$">$title$</a>
-      </h1>
-      <div>
-        <small>$date$</small>
+      <h1>$title$</h1>
+      <div class="info">
+        <small class="italic">$date$</small>
         $if(updated)$
-        <small>(updated: $updated$)</small>
+        <small class="italic">(updated: $updated$)</small>
         $endif$
       </div>
     </header>
-    <section>
-      $body$
-    </section>
+    <section class="layout--constrained">$body$</section>
   </article>
 </main>
+
+<footer class="section--padded">
+  <div class="layout--constrained">
+    <ul role="list">
+      <li role="listitem">
+        <span aria-hidden="true">♥</span>
+        <a href="https://github.com/sponsors/kutyel/">Sponsor my work</a>
+        <span aria-hidden="true">♥</span>
+      </li>
+      <li role="listitem">
+        <a href="./atom.xml">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>
