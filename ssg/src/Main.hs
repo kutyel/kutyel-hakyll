@@ -3,42 +3,42 @@
 import Control.Monad (forM_)
 import Data.List (isPrefixOf, isSuffixOf)
 import Data.Maybe (fromMaybe)
+import Data.Text qualified as T
+import Data.Text.Slugger qualified as Slugger
 import Hakyll
-import qualified Data.Text as T
-import qualified Data.Text.Slugger as Slugger
 import System.FilePath (takeFileName)
-import Text.Pandoc
-  ( Extension (Ext_fenced_code_attributes, Ext_footnotes, Ext_gfm_auto_identifiers, Ext_implicit_header_references, Ext_smart),
-    Extensions,
-    ReaderOptions,
-    WriterOptions (writerHighlightStyle),
-    extensionsFromList,
-    githubMarkdownExtensions,
-    readerExtensions,
-    writerExtensions,
-  )
+import Text.Pandoc (
+  Extension (Ext_fenced_code_attributes, Ext_footnotes, Ext_gfm_auto_identifiers, Ext_implicit_header_references, Ext_smart),
+  Extensions,
+  ReaderOptions,
+  WriterOptions (writerHighlightStyle),
+  extensionsFromList,
+  githubMarkdownExtensions,
+  readerExtensions,
+  writerExtensions,
+ )
 import Text.Pandoc.Highlighting (Style, breezeDark, styleToCss)
 
 --------------------------------------------------------------------------------
 -- PERSONALIZATION
 
 mySiteName :: String
-mySiteName = "My Site Name"
+mySiteName = "flaviocorpa.com"
 
 mySiteRoot :: String
-mySiteRoot = "https://my-site.com"
+mySiteRoot = "https://flaviocorpa.com"
 
 myFeedTitle :: String
-myFeedTitle = "My Site"
+myFeedTitle = "Flavio Corpa's feed"
 
 myFeedDescription :: String
-myFeedDescription = "My Site Description"
+myFeedDescription = "Feed for Flavio's website"
 
 myFeedAuthorName :: String
-myFeedAuthorName = "My Name"
+myFeedAuthorName = "Flavio Corpa"
 
 myFeedAuthorEmail :: String
-myFeedAuthorEmail = "me@myemail.com"
+myFeedAuthorEmail = "flaviocorpa@gmail.com"
 
 myFeedRoot :: String
 myFeedRoot = mySiteRoot
@@ -58,15 +58,16 @@ config =
     , storeDirectory = "ssg/_cache"
     , tmpDirectory = "ssg/_tmp"
     }
-  where
-    ignoreFile' path
-      | "."    `isPrefixOf` fileName = False
-      | "#"    `isPrefixOf` fileName = True
-      | "~"    `isSuffixOf` fileName = True
-      | ".swp" `isSuffixOf` fileName = True
-      | otherwise = False
-      where
-        fileName = takeFileName path
+ where
+  ignoreFile' path
+    | ".DS_Store" == fileName = True
+    | "." `isPrefixOf` fileName = False
+    | "#" `isPrefixOf` fileName = True
+    | "~" `isSuffixOf` fileName = True
+    | ".swp" `isSuffixOf` fileName = True
+    | otherwise = False
+   where
+    fileName = takeFileName path
 
 --------------------------------------------------------------------------------
 -- BUILD
