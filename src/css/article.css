@@ -13,10 +13,6 @@ body.dark {
   --headerBgColor: var(--deepBgColor);
 }
 
-body {
-  overflow-y: auto;
-}
-
 /* NAV */
 
 .nav {

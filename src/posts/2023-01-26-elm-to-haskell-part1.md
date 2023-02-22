@@ -2,7 +2,7 @@
 author: "Flavio Corpa"
 authorTwitter: "@FlavioCorpa"
 desc: "A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!"
-image: "https://dev-to-uploads.s3.amazonaws.com/uploads/articles/lkkdsuhjfr83bo55gwwn.png"
+image: ./images/haskell-elm.png
 keywords: "haskell,elm,functional,programming"
 lang: "en"
 title: "Haskell for Elm developers: giving names to stuff (Part 1 - Functors)"
