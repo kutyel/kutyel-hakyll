@@ -40,10 +40,13 @@
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="canonical" href="$root$$url$">
     <link rel="stylesheet" href="./css/default.css" />
+    $if(type)$
+      <link rel="stylesheet" href="/css/$type$.css" />
+    $else$
     <link rel="stylesheet" href="./css/home.css" />
     <link rel="stylesheet" href="./css/code.css" />
   </head>
-  <body>
+  <body class="dark">
     $body$
     <script defer src="./js/script.js"></script>
   </body>

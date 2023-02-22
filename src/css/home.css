@@ -49,6 +49,7 @@
 .reviews__header,
 .posts__header {
   margin-bottom: 0.75em;
+  margin-top: 8rem;
   font-size: 1.643rem;
   font-weight: 400;
   line-height: 1.2;
