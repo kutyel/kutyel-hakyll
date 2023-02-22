@@ -1,7 +1,7 @@
-(() => {
+;(() => {
   const state = {
     isActive: false,
-  };
+  }
 
   const cn = {
     dark: `dark`,
@@ -11,63 +11,59 @@
     toggleNight: `toggle__night`,
     toggleOff: `toggle--off`,
     toggleOn: `toggle--on`,
-  };
+  }
 
   const updateBodyClass = () => {
     document.body.classList.replace(
       state.isActive ? cn.light : cn.dark,
       state.isActive ? cn.dark : cn.light
-    );
-  };
+    )
+  }
 
   const createToggleNightBtn = () => {
-    const toggleBtn = document.createElement(`button`);
+    const toggleBtn = document.createElement(`button`)
 
-    toggleBtn.type = `button`;
-    toggleBtn.setAttribute(`role`, `switch`);
-    toggleBtn.setAttribute(`aria-checked`, String(state.isActive));
-    toggleBtn.className = `${cn.toggle} ${
-      state.isActive ? cn.toggleOn : cn.toggleOff
-    }`;
+    toggleBtn.type = `button`
+    toggleBtn.setAttribute(`role`, `switch`)
+    toggleBtn.setAttribute(`aria-checked`, String(state.isActive))
+    toggleBtn.className = `${cn.toggle} ${state.isActive ? cn.toggleOn : cn.toggleOff}`
 
     toggleBtn.addEventListener(`click`, () => {
-      const isActive = !state.isActive;
-      state.isActive = isActive;
+      const isActive = !state.isActive
+      state.isActive = isActive
 
-      localStorage.setItem(`isActive`, String(isActive));
-      updateBodyClass();
+      localStorage.setItem(`isActive`, String(isActive))
+      updateBodyClass()
 
-      toggleBtn.setAttribute(`aria-checked`, String(isActive));
-      toggleBtn.className = `${cn.toggle} ${
-        isActive ? cn.toggleOn : cn.toggleOff
-      }`;
-    });
+      toggleBtn.setAttribute(`aria-checked`, String(isActive))
+      toggleBtn.className = `${cn.toggle} ${isActive ? cn.toggleOn : cn.toggleOff}`
+    })
 
-    const dayEl = document.createElement(`span`);
-    dayEl.innerText = `🌞`;
-    dayEl.className = cn.toggleDay;
-    dayEl.setAttribute(`aria-label`, `Day Mode`);
+    const dayEl = document.createElement(`span`)
+    dayEl.innerText = `🌞`
+    dayEl.className = cn.toggleDay
+    dayEl.setAttribute(`aria-label`, `Day Mode`)
 
-    const nightEl = document.createElement(`span`);
-    nightEl.innerText = `🌙`;
-    nightEl.className = cn.toggleNight;
-    nightEl.setAttribute(`aria-label`, `Night Mode`);
+    const nightEl = document.createElement(`span`)
+    nightEl.innerText = `🌙`
+    nightEl.className = cn.toggleNight
+    nightEl.setAttribute(`aria-label`, `Night Mode`)
 
-    toggleBtn.appendChild(dayEl);
-    toggleBtn.appendChild(nightEl);
+    toggleBtn.appendChild(dayEl)
+    toggleBtn.appendChild(nightEl)
 
-    return toggleBtn;
-  };
+    return toggleBtn
+  }
 
   const init = () => {
-    state.isActive = window.localStorage.getItem(`isActive`) === `true`;
-    updateBodyClass();
-    const el = document.querySelector(`[data-nav-wrap]`) || document.body;
+    state.isActive = window.localStorage.getItem(`isActive`) === `true`
+    updateBodyClass()
+    const el = document.querySelector(`[data-nav-wrap]`) || document.body
 
     if (el) {
-      el.appendChild(createToggleNightBtn());
+      el.appendChild(createToggleNightBtn())
     }
-  };
+  }
 
-  init();
-})();
+  init()
+})()

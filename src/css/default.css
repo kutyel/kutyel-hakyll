@@ -36,10 +36,10 @@ body.light {
 }
 body.dark {
   --separatorColor: #424857;
-  --authorTitleColor: hsla(0,0%,100%,0.65);
+  --authorTitleColor: hsla(0, 0%, 100%, 0.65);
   --bgColor: #282c35;
   --blockquoteBorderColor: var(--separatorColor);
-  --btnBgColor: #0047E2;
+  --btnBgColor: #0047e2;
   --btnTextColor: #fff;
   --iframeBorderColor: var(--separatorColor);
   --inlineCodeBgColor: rgba(115, 124, 153, 0.2);

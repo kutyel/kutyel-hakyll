@@ -3,7 +3,7 @@ body.light {
   --footerBgColor: #f5f5f5;
   --footerLinkColor: #2676ac;
   --h1Color: currentColor;
-  --headerBgColor: #C4DFFF;
+  --headerBgColor: #c4dfff;
 }
 body.dark {
   --deepBgColor: #011627;
@@ -11,6 +11,10 @@ body.dark {
   --footerLinkColor: #ffa7c4;
   --h1Color: var(--textColor);
   --headerBgColor: var(--deepBgColor);
+}
+
+body {
+  overflow-y: auto;
 }
 
 /* NAV */
@@ -51,7 +55,7 @@ h1 {
 h1 > a[href],
 h1 > a[href]:hover,
 h1 > a[href]:focus,
-h1> a[href]:visited {
+h1 > a[href]:visited {
   color: inherit;
 }
 h1,
@@ -167,7 +171,6 @@ iframe {
   }
 }
 
-
 /* CODE */
 
 /**
@@ -256,12 +259,20 @@ pre.sourceCode ::selection {
   background-color: hsla(0, 0%, 100%, 0.15);
 }
 
-pre.sourceCode:not(.numberSource) > code > span > a { display: none; }
+pre.sourceCode:not(.numberSource) > code > span > a {
+  display: none;
+}
 
 /* ENABLE FOR SOURCE LINES */
-pre.numberSource.sourceCode > code { counter-reset: source-line 0; }
-pre.numberSource.sourceCode > code > span { counter-increment: source-line; }
-pre.numberSource.sourceCode > code > span > a { box-shadow: none; }
+pre.numberSource.sourceCode > code {
+  counter-reset: source-line 0;
+}
+pre.numberSource.sourceCode > code > span {
+  counter-increment: source-line;
+}
+pre.numberSource.sourceCode > code > span > a {
+  box-shadow: none;
+}
 pre.numberSource.sourceCode > code > span > a:first-child::before {
   content: counter(source-line) "|";
   position: relative;
@@ -277,7 +288,7 @@ pre.numberSource.sourceCode > code > span > a:first-child::before {
   -ms-user-select: none;
   user-select: none;
   width: 2.5em;
-  color: rgb(128,147,147);
+  color: rgb(128, 147, 147);
 }
 
 /* Inline code */
@@ -303,68 +314,49 @@ h5 code,
 h6 code {
   font-size: inherit;
 }
-.co { /* Comment */
+.co {
+  /* Comment */
   color: rgb(128, 147, 147);
 }
 .ch,  /* Char */
 .st,  /* String */
-.vs { /* ??? */
+.vs {
+  /* ??? */
   color: rgb(173, 219, 103);
 }
-.va { /* Variable */
+.va {
+  /* Variable */
   color: rgb(214, 222, 235);
 }
 .dv,  /* DecVal */
 .bn,  /* BaseN */
-.fl { /* Float */
+.fl {
+  /* Float */
   color: rgb(247, 140, 108);
 }
 .bu,  /* BuiltIn */
 .cn,  /* Constant */
 .at,  /* Attribute (function) */
 .fu,  /* Function */
-.dt { /* DataType */
+.dt {
+  /* DataType */
   color: rgb(130, 170, 255);
 }
 .im,  /* Import */
 .op,  /* Operator */
 .kw,  /* Keyword */
 .ot,  /* Other */
-.cf { /* ControlFlow */
+.cf {
+  /* ControlFlow */
   color: #ffa7c4;
 }
-/*.token.attr-name {*/
-/*  color: rgb(173, 219, 103);*/
-/*  font-style: italic;*/
-/*}*/
-/*.token.punctuation {*/
-/*  color: rgb(199, 146, 234);*/
-/*}*/
-/*.token.selector,*/
-/*.token.doctype {*/
-/*  color: rgb(199, 146, 234);*/
-/*  font-style: 'italic';*/
-/*}*/
-/*.token.class-name {*/
-/*  color: rgb(255, 203, 139);*/
-/*}*/
-/*.token.tag,*/
-/*.token.boolean {*/
-/*  color: rgb(255, 88, 116);*/
-/*}*/
-/*.token.property {*/
-/*  color: rgb(128, 203, 196);*/
-/*}*/
-/*.token.namespace {*/
-/*  color: rgb(178, 204, 214);*/
-/*}*/
 
 code.sourceCode > a.sourceLine:before {
   display: inline-block;
   content: attr(title);
   text-align: right;
-  border-right: 1px solid rgba(128,147,147, 0.4);
-  color: rgb(128,147,147);
+  border-right: 1px solid rgba(128, 147, 147, 0.4);
+  color: rgb(128, 147, 147);
   width: 30px;
   padding-right: 10px;
   margin-right: 10px;
@@ -377,24 +369,6 @@ code.sourceCode > a.sourceLine:before {
     display: none;
   }
 }
-
-/*table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode, table.sourceCode pre*/
-/*   { margin: 0; padding: 0; border: 0; vertical-align: baseline; border: none; }*/
-/*td.lineNumbers { border-right: 1px solid #AAAAAA; text-align: right; color: #AAAAAA; padding-right: 5px; padding-left: 5px; }*/
-/*td.sourceCode { padding-left: 5px; }*/
-/*.sourceCode span.kw { color: #007020; font-weight: bold; }*/
-/*.sourceCode span.dt { color: #902000; }*/
-/*.sourceCode span.dv { color: #40a070; }*/
-/*.sourceCode span.bn { color: #40a070; }*/
-/*.sourceCode span.fl { color: #40a070; }*/
-/*.sourceCode span.ch { color: #4070a0; }*/
-/*.sourceCode span.st { color: #4070a0; }*/
-/*.sourceCode span.co { color: #60a0b0; }*/
-/*.sourceCode span.ot { color: #007020; }*/
-/*.sourceCode span.al { color: red; font-weight: bold; }*/
-/*.sourceCode span.fu { color: #06287e; }*/
-/*.sourceCode span.re { }*/
-/*.sourceCode span.er { color: red; font-weight: bold; }*/
 
 /* Utils */
 
