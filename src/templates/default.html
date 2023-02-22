@@ -1,29 +1,25 @@
 <!DOCTYPE html>
-<html lang="$lang$">
+<html lang="en">
   <head>
     <title>$title$</title>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="$desc$">
-    $if(author)$
-    <meta name="author" content="$author$">
-    $endif$
-    $if(keywords)$
-    <meta name="keywords" content="$keywords$">
-    $endif$
+    $if(author)$<meta name="author" content="$author$">$endif$
+    $if(keywords)$<meta name="keywords" content="$keywords$">$endif$
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU">
+    <meta http-equiv="origin-trial" content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ==">
 
     <meta property="og:site_name" content="$siteName$">
     <meta property="og:title" content="$title$">
     <meta property="og:url" content="$root$$url$">
     <meta property="og:description" content="$desc$">
-    $if(image)$
-    <meta property="og:image" content="$root$$image$">
-    $endif$
+    $if(image)$<meta property="og:image" content="$root$$image$">$endif$
     $if(type)$
-    <meta property="og:type" content="$type$">
+      <meta property="og:type" content="$type$">
     $else$
-    <meta property="og:type" content="website">
+      <meta property="og:type" content="website">
     $endif$
 
     $if(image)$
@@ -33,21 +29,19 @@
     <meta property="twitter:site" content="$siteName$">
     <meta property="twitter:title" content="$title$">
     <meta property="twitter:description" content="$desc$">
-    $if(authorTwitter)$
-    <meta property="twitter:creator" content="$authorTwitter$">
-    $endif$
+    $if(authorTwitter)$<meta property="twitter:creator" content="$authorTwitter$">$endif$
 
-    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💾</text></svg>'>
     <link rel="canonical" href="$root$$url$">
-    <link rel="stylesheet" href="./css/default.css" />
+    <link rel="stylesheet" href="/css/default.css" />
     $if(type)$
       <link rel="stylesheet" href="/css/$type$.css" />
     $else$
-    <link rel="stylesheet" href="./css/home.css" />
-    <link rel="stylesheet" href="./css/code.css" />
+      <link rel="stylesheet" href="/css/home.css" />
+    $endif$
   </head>
-  <body class="dark">
+  <body class="light">
     $body$
-    <script defer src="./js/script.js"></script>
+    <script async src="/js/script.js"></script>
   </body>
 </html>

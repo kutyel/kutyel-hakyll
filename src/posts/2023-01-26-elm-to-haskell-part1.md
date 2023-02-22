@@ -71,7 +71,7 @@ What you haven't been told is that **Elm does actually have typeclasses**! 😱 
 
 This part is a little rant and totally subjective to how I view programming, but some time ago I tweeted this:
 
-{% embed https://twitter.com/FlavioCorpa/status/1570739010322169856?s=20&t=0WdBRNHGyEkcZz6_dsIung %}
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Are you sure we don&#39;t need typeclasses? 😅 <a href="https://t.co/grL1GUH4K4">pic.twitter.com/grL1GUH4K4</a></p>&mdash; フラビオ🥷🏼 (@FlavioCorpa) <a href="https://twitter.com/FlavioCorpa/status/1570739010322169856?ref_src=twsrc%5Etfw">September 16, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 Now it is the perfect time to explain myself in more detail! (And without trying to offend anyone 😉).
 
@@ -139,10 +139,10 @@ And here is a mini point in favor of Elm, the operators chosen for the language 
 
 ## Acknowledgements
 
-I had the initial idea for this blogpost on a plane ✈️ back to Spain but what really motivated me was to try and share my love for Haskell with some very special Elm engineers that had to put up with me for some time and to which I would like to give special thanks: [@tomaslatal](https://twitter.com/TomasLatal), @janiczek and [@janjelinek](https://twitter.com/kurnick). 🙌🏻
+I had the initial idea for this blogpost on a plane ✈️ back to Spain but what really motivated me was to try and share my love for Haskell with some very special Elm engineers that had to put up with me for some time and to which I would like to give special thanks: [@tomaslatal](https://twitter.com/TomasLatal), [@janiczek](https://twitter.com/janiczek) and [@janjelinek](https://twitter.com/kurnick). 🙌🏻
 
 I hope you all enjoyed this post, learned a thing or two and enticed you to learn a little more of Haskell. 😉
 
-Also I want to give a huge kudos to @serras for proofreading this post 😘.
+Also I want to give a huge kudos to [@serras](https://twitter.com/trupill) for proofreading this post 😘.
 
 If you enjoyed this post and would like to see this turned into a series (_I have ideas in my head already for posts about Applicatives, Monads, IO, parser combinators, etc._), please share it in your social networks and **follow me on [Twitter](https://twitter.com/FlavioCorpa)!** 🙌🏻
