@@ -12,6 +12,7 @@ html,
 body {
   min-height: 100vh;
   font-size: 16px;
+  overflow-y: hidden;
 }
 body.light {
   --authorTitleColor: #767676;
