@@ -18,6 +18,7 @@
       state.isActive ? cn.light : cn.dark,
       state.isActive ? cn.dark : cn.light
     )
+    document.body.classList.remove("preload")
   }
 
   const createToggleNightBtn = () => {

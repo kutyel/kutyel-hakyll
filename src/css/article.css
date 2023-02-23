@@ -8,7 +8,7 @@ body.light {
 body.dark {
   --deepBgColor: #011627;
   --footerBgColor: #373c49;
-  --footerLinkColor: #ffa7c4;
+  --footerLinkColor: #c693ea;
   --h1Color: var(--textColor);
   --headerBgColor: var(--deepBgColor);
 }
@@ -317,8 +317,7 @@ h6 code {
 .ch,  /* Char */
 .st,  /* String */
 .vs {
-  /* ??? */
-  color: rgb(173, 219, 103);
+  color: rgb(236, 196, 141);
 }
 .va {
   /* Variable */
@@ -344,7 +343,7 @@ h6 code {
 .ot,  /* Other */
 .cf {
   /* ControlFlow */
-  color: #ffa7c4;
+  color: #c693ea;
 }
 
 code.sourceCode > a.sourceLine:before {

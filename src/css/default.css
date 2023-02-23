@@ -39,7 +39,7 @@ body.dark {
   --authorTitleColor: hsla(0, 0%, 100%, 0.65);
   --bgColor: #282c35;
   --blockquoteBorderColor: var(--separatorColor);
-  --btnBgColor: #0047e2;
+  --btnBgColor: #001627;
   --btnTextColor: #fff;
   --iframeBorderColor: var(--separatorColor);
   --inlineCodeBgColor: rgba(115, 124, 153, 0.2);
@@ -47,14 +47,14 @@ body.dark {
   --inputBgColor: #282c35;
   --inputBorderColorFocus: #82aaff;
   --inputColor: #fff;
-  --secretGraphicBorderLeftColor: #ffa7c4;
-  --secretGraphicBorderLeftColor: #ffa7c4;
+  --secretGraphicBorderLeftColor: #c693ea;
+  --secretGraphicBorderLeftColor: #c693ea;
   --secretGraphicColor: hsla(0, 0%, 100%, 0.88);
   --secretGraphicHoverColor: rgba(255, 167, 196, 0.75);
   --textColor: hsla(0, 0%, 100%, 0.88);
-  --textLinkBorderColor: #ffa7c4;
-  --textLinkColor: rgb(255, 167, 196);
-  --textLinkHoverColor: rgba(255, 167, 196, 0.8);
+  --textLinkBorderColor: #c693ea;
+  --textLinkColor: #c693ea;
+  --textLinkHoverColor: rgba(198, 147, 234, 0.8);
 }
 body {
   font-family: Verdana, Helvetica, Arial, sans-serif;
@@ -179,4 +179,12 @@ figcaption {
     margin-left: 1.3125rem;
     margin-right: 1.3125rem;
   }
+}
+
+.preload * {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -ms-transition: none !important;
+  -o-transition: none !important;
+  transition: none !important;
 }
