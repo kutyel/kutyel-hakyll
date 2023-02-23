@@ -25,7 +25,7 @@ The first thing we can notice is that the typeclass definition has itself a type
 
 **What are the implications of this?** Well, as you might have already guessed, it just means one simple thing: _every_ Applicative Functor must be first a _valid Functor_, not a very big surprise, right? 😉
 
-The second thing we can notice is that, contrary to the `Functor` typeclass declaration that specified only a function to be implemented (fmap), now we have 2 functions every Applicative Functor must have to satisfy the instance: `pure`, and the mysterious `<*>` operator, which we will call the TIE fighter operator from now on (because I love the name and yes, I'm a big STAR WARS fan 🤓).
+The second thing we can notice is that, contrary to the `Functor` typeclass declaration that specified only a function to be implemented (`fmap`), now we have 2 functions every Applicative Functor must have to satisfy the instance: `pure`, and the mysterious `<*>` operator, which we will call the TIE fighter operator from now on (because I love the name and yes, I'm a big STAR WARS fan 🤓).
 
 Let's talk about each of them separately but first, spoiler alert ⚠️, in Elm, some examples of Applicative Functors you use every day are: `List`, `Maybe`, `Result` and `Task`.
 
@@ -138,7 +138,9 @@ The `id` function is the silliest function in Haskell: `id :: a -> a` and in Elm
 <function> : a -> a
 ```
 
-But, how come this is possible (that two functions are defined in terms of each other)? 😱 Well, the answer is that Haskell is a [lazy evaluated language](https://wiki.haskell.org/Lazy_evaluation), but leaving that behind us, does not the type declaration of `liftA2` look familiar to us Elm developers? 👀
+**But, how come this is possible (that two functions are defined in terms of each other)!?** 😱
+
+Well, the answer is that Haskell is a [lazily evaluated language](https://wiki.haskell.org/Lazy_evaluation), but leaving that behind us, does not the type declaration of `liftA2` look familiar to us Elm developers? 👀
 
 ```haskell
 liftA2 :: (a -> b -> c) -> f a -> f b -> f c
@@ -175,7 +177,7 @@ liftA2     :: (a -> b -> value) -> f a     -> f b     -> f c
 Maybe.map2  : (a -> b -> value) -> Maybe a -> Maybe b -> Maybe value
 ```
 
-You guessed it correctly: the `liftA2` equivalent in elm are all the `*.map2` functions we can find!
+You guessed it correctly: the `liftA2` equivalent in Elm are all the `*.map2` functions we can find!
 
 So, when we said before that `List`, `Maybe`, `Result` and `Task` were **Applicative Functors in Elm**, is because we have `List.map2`, `Maybe.map2`, `Result.map2` and `Task.map2`.
 
@@ -239,6 +241,12 @@ This means two things:
 
 ---
 
-Enough bad puns for today, hope you learned something new!
+## Acknowledgements
 
-If you enjoyed this post and would like me to continue the series (_next up would probably be MOOONAAAAAADSSSS 👻🦇🦇🦇_), please share it in your social networks and **follow me on [Twitter](https://twitter.com/FlavioCorpa)!** 🙌🏻
+Many people has made possible the production of this blogpost, I want to personally thank [Robert Pearce](https://twitter.com/RobertWPearce) for his excellent [Hakyll + Nix tutorial](https://robertwpearce.com/the-hakyll-nix-template-tutorial.html), and [Domen Kožar](https://twitter.com/domenkozar), for all his work with [Cachix](https://www.cachix.org/) and the [Nix](https://nixos.org/) ecosystem in general (and for his infinite patience 😇).
+
+I would also like to thank [Chris Allen](https://twitter.com/bitemyapp) and [Julie Moronukie](https://twitter.com/argumatronic), because together they created the [Haskell Book™️](https://haskellbook.com/), which is still in my opinion **the best possible way to learn Haskell** and it is actually the reason I am today working with Haskell.
+
+Could not be more grateful to all of them! 😍
+
+Enough bad puns for today, hope you learned something new! If you enjoyed this post and would like me to continue the series (_next up would probably be MOOONAAAAAADSSSS 👻🦇🦇🦇_), please share it in your social networks and **follow me on [Twitter](https://twitter.com/FlavioCorpa)!** 🙌🏻
