@@ -239,8 +239,6 @@ This means two things:
 1. You have been using Applicative Functors all along for a very long time probably without notice! 🥁🥁🥁
 2. Of course, this also means that [Json.Decode.Decoder](https://package.elm-lang.org/packages/elm-community/json-extra/latest/Json-Decode-Extra#andMap) is also an Applicative Functor!! 👏🏻
 
----
-
 ## Acknowledgements
 
 Many people has made possible the production of this blogpost, I want to personally thank [Robert Pearce](https://twitter.com/RobertWPearce) for his excellent [Hakyll + Nix tutorial](https://robertwpearce.com/the-hakyll-nix-template-tutorial.html), and [Domen Kožar](https://twitter.com/domenkozar), for all his work with [Cachix](https://www.cachix.org/) and the [Nix](https://nixos.org/) ecosystem in general (and for his infinite patience 😇).
