@@ -98,21 +98,20 @@ Well, let's have a peek at the actual implementation of the `Applicative` typecl
 
 ```haskell
 class Functor f => Applicative f where
-    {-# MINIMAL pure, ((<*>) | liftA2) #-}
-    -- | Lift a value.
-    pure :: a -> f a
+  {-# MINIMAL pure, ((<*>) | liftA2) #-}
+  -- | Lift a value.
+  pure :: a -> f a
 
-    -- | Sequential application.
-    (<*>) :: f (a -> b) -> f a -> f b
-    (<*>) = liftA2 id
+  -- | Sequential application.
+  (<*>) :: f (a -> b) -> f a -> f b
+  (<*>) = liftA2 id
 
-    -- | Lift a binary function to actions.
-    -- ==== __Example__
-    -- >>> liftA2 (,) (Just 3) (Just 5)
-    -- Just (3,5)
-
-    liftA2 :: (a -> b -> c) -> f a -> f b -> f c
-    liftA2 f x = (<*>) (fmap f x)
+  -- | Lift a binary function to actions.
+  -- ==== __Example__
+  -- >>> liftA2 (,) (Just 3) (Just 5)
+  -- Just (3,5)
+  liftA2 :: (a -> b -> c) -> f a -> f b -> f c
+  liftA2 f x = (<*>) (fmap f x)
 ```
 
 First thing we notice is that there is a [MINIMAL pragma](https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/pragmas.html#minimal-pragma), this tells GHC (the main compiler of Haskell) that the required functions that a type needs to implement in order to have a valid `Applicative` instance are `pure` and `<*>` OR `liftA2`.
@@ -227,11 +226,11 @@ The exact same code in Haskell, using our beloved infix operators, would look li
 decoder :: Decoder Document
 decoder =
   Document
-    <$> (decodeStringField "id")
-    <*> (decodeStringField "title")
+    <$> decodeStringField "id"
+    <*> decodeStringField "title"
     <*> documentTypeDecoder
-    <*> (decodeIso8601Field "ctime")
-    <*> (decodeIso8601Field "mtime")
+    <*> decodeIso8601Field "ctime"
+    <*> decodeIso8601Field "mtime"
 ```
 
 This means two things:
