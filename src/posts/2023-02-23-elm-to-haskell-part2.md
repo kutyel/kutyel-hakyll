@@ -137,9 +137,7 @@ The `id` function is the silliest function in Haskell: `id :: a -> a` and in Elm
 <function> : a -> a
 ```
 
-**But, how come this is possible (that two functions are defined in terms of each other)!?** 😱
-
-Well, the answer is that Haskell is a [lazily evaluated language](https://wiki.haskell.org/Lazy_evaluation), but leaving that behind us, does not the type declaration of `liftA2` look familiar to us Elm developers? 👀
+The fact that these two functions are defined in terms of each other, just means that you need to implement one of them, and you will [get the other one for free](https://www.reddit.com/r/haskell/comments/11a54oh/comment/j9szz9k/?utm_source=share&utm_medium=web2x&context=3). But, leaving that behind us, does not the type declaration of `liftA2` look familiar to us Elm developers? 👀
 
 ```haskell
 liftA2 :: (a -> b -> c) -> f a -> f b -> f c
