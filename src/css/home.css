@@ -25,10 +25,10 @@
   color: var(--authorTitleColor);
 }
 .author__links {
+  display: flex;
   margin-top: 20px;
-}
-.author__links > a {
-  margin-right: 20px;
+  max-width: 450px;
+  align-content: space-between;
 }
 .posts {
   margin-top: 20px;
