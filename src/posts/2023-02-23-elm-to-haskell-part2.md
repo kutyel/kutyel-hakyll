@@ -19,7 +19,7 @@ class Functor f => Applicative f where
   (<*>) :: f (a -> b) -> f a -> f b
 ```
 
-This looks a bit scarier 👻 at the beginning, but do not worry, we will explain ever bit at a time.
+This looks a bit scarier 👻 at the beginning, but do not worry, we will explain every bit at a time.
 
 The first thing we can notice is that the typeclass definition has itself a typeclass constraint! This is new for us, we did not know that could happen (until now), and this is what the `class Functor f =>` bit means.
 
