@@ -15,5 +15,6 @@ executable hakyll-site
                    , pandoc >= 2.11
                    , slugger >= 0.1.0.1
                    , text >= 1.2 && < 1.3
+                   , tagsoup
   ghc-options:       -Wall -threaded
   default-language:  Haskell2010

@@ -1,13 +1,13 @@
 {-# LANGUAGE ImportQualifiedPost #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-import Control.Monad (forM_)
 import Data.List (isPrefixOf, isSuffixOf)
 import Data.Maybe (fromMaybe)
 import Data.Text qualified as T
 import Data.Text.Slugger qualified as Slugger
 import Hakyll
 import System.FilePath (takeFileName)
+import Text.HTML.TagSoup (Tag (..))
 import Text.Pandoc (
   Extension (Ext_fenced_code_attributes, Ext_footnotes, Ext_gfm_auto_identifiers, Ext_implicit_header_references, Ext_smart),
   Extensions,
@@ -44,6 +44,9 @@ myFeedAuthorEmail = "flaviocorpa@gmail.com"
 myFeedRoot :: String
 myFeedRoot = mySiteRoot
 
+blogSnapshot :: String
+blogSnapshot = "content"
+
 --------------------------------------------------------------------------------
 -- CONFIG
 
@@ -75,7 +78,11 @@ config =
 
 main :: IO ()
 main = hakyllWith config $ do
-  forM_
+  mapM_
+    ( \f -> match f $ do
+        route idRoute
+        compile copyFileCompiler
+    )
     [ "CNAME"
     , "favicon.ico"
     , "robots.txt"
@@ -84,9 +91,6 @@ main = hakyllWith config $ do
     , "js/*"
     , "fonts/*"
     ]
-    $ \f -> match f $ do
-      route idRoute
-      compile copyFileCompiler
 
   match "css/*" $ do
     route idRoute
@@ -99,7 +103,7 @@ main = hakyllWith config $ do
     compile $
       pandocCompilerCustom
         >>= loadAndApplyTemplate "templates/post.html" ctx
-        >>= saveSnapshot "content"
+        >>= saveSnapshot blogSnapshot
         >>= loadAndApplyTemplate "templates/default.html" ctx
 
   match "index.html" $ do
@@ -108,7 +112,7 @@ main = hakyllWith config $ do
       posts <- recentFirst =<< loadAll "posts/*"
 
       let indexCtx =
-            listField "posts" postCtx (return posts)
+            listField "posts" postCtx (pure posts)
               <> constField "root" mySiteRoot
               <> constField "siteName" mySiteName
               <> defaultContext
@@ -129,7 +133,7 @@ main = hakyllWith config $ do
           sitemapCtx =
             constField "root" mySiteRoot
               <> constField "siteName" mySiteName
-              <> listField "pages" postCtx (return pages)
+              <> listField "pages" postCtx (pure pages)
 
       makeItem ("" :: String)
         >>= loadAndApplyTemplate "templates/sitemap.xml" sitemapCtx
@@ -167,6 +171,7 @@ postCtx =
   constField "root" mySiteRoot
     <> constField "siteName" mySiteName
     <> dateField "date" "%Y-%m-%d"
+    <> readingTimeField "readingtime" blogSnapshot
     <> defaultContext
 
 titleCtx :: Context String
@@ -240,7 +245,7 @@ feedCompiler :: FeedRenderer -> Compiler (Item String)
 feedCompiler renderer =
   renderer feedConfiguration feedCtx
     =<< recentFirst
-    =<< loadAllSnapshots "posts/*" "content"
+    =<< loadAllSnapshots "posts/*" blogSnapshot
 
 feedConfiguration :: FeedConfiguration
 feedConfiguration =
@@ -262,3 +267,19 @@ fileNameFromTitle =
 titleRoute :: Metadata -> Routes
 titleRoute =
   constRoute . fileNameFromTitle
+
+--------------------------------------------------------------------------------
+-- ESTIMATE READING TIME CALCULATION
+
+readingTimeField :: String -> Snapshot -> Context String
+readingTimeField key snapshot =
+  field key calculate
+ where
+  calculate :: Item String -> Compiler String
+  calculate item = do
+    body <- loadSnapshotBody (itemIdentifier item) snapshot
+    return $ withTagList acc body
+  acc ts = [TagText (show (time ts))]
+  time ts = foldr count 0 ts `div` 265
+  count (TagText s) n = n + length (words s)
+  count _ n = n
