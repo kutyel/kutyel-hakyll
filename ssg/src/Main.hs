@@ -278,7 +278,7 @@ readingTimeField key snapshot =
   calculate :: Item String -> Compiler String
   calculate item = do
     body <- loadSnapshotBody (itemIdentifier item) snapshot
-    return $ withTagList acc body
+    pure $ withTagList acc body
   acc ts = [TagText (show (time ts))]
   time ts = foldr count 0 ts `div` 265
   count (TagText s) n = n + length (words s)
