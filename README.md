@@ -1,33 +1,36 @@
 # hakyll-nix-template
 
+[![Github Actions](https://github.com/kutyel/kutyel-hakyll/actions/workflows/main.yml/badge.svg)](https://github.com/kutyel/kutyel-hakyll/actions/workflows/main.yml)
+
 [Hakyll](https://jaspervdj.be/hakyll/) + [Nix](https://nixos.org) template
 
 ## Features
 
-* Build your site into the `./result/dist` folder:
+- Build your site into the `./result/dist` folder:
   ```
   λ nix build
   ```
-* Start hakyll's dev server that reloads when changes are made:
+- Start hakyll's dev server that reloads when changes are made:
   ```
   λ nix run . watch
   Listening on http://127.0.0.1:8000
   ...more logs
   ```
-* Run any hakyll command through `nix run .`!
+- Run any hakyll command through `nix run .`!
   ```
   λ nix run . clean
   Removing dist...
   Removing ssg/_cache...
   Removing ssg/_tmp...
   ```
-* Start a development environment that
-  * has your shell environment
-  * has `hakyll-site` (for building/watching/cleaning hakyll projects)
-  * has `hakyll-init` (for generating new projects)
-  * can have anything else you put in the `shell.buildInputs` of the
+- Start a development environment that
+
+  - has your shell environment
+  - has `hakyll-site` (for building/watching/cleaning hakyll projects)
+  - has `hakyll-init` (for generating new projects)
+  - can have anything else you put in the `shell.buildInputs` of the
     `hakyllProject` in `flake.nix`
-  * is set up to run `ghci` with some defaults and the modules loaded so you can
+  - is set up to run `ghci` with some defaults and the modules loaded so you can
     make your own changes and test them out in the ghci REPL
 
   ```
@@ -50,13 +53,13 @@
 All of this is custmomizable, and here are some things that are already done for
 you:
 
-* [pandoc](https://github.com/jgm/pandoc/) markdown customization to make it as
+- [pandoc](https://github.com/jgm/pandoc/) markdown customization to make it as
   close to GitHub's markdown style as possible
-* [`slugger`](https://hackage.haskell.org/package/slugger) module is included that makes nice link URIs based on post titles
-* RSS & Atom XML feed generation
-* Sitemap generation
-* Code syntax highlighting customization
-* ...other reasonable defaults
+- [`slugger`](https://hackage.haskell.org/package/slugger) module is included that makes nice link URIs based on post titles
+- RSS & Atom XML feed generation
+- Sitemap generation
+- Code syntax highlighting customization
+- ...other reasonable defaults
 
 Configure the dev server, cache & tmp directories, and more in
 `./ssg/src/Main.hs`.
