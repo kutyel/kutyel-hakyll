@@ -1,12 +1,12 @@
 ---
-author: "Flavio Corpa"
-authorTwitter: "@FlavioCorpa"
-desc: "A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!"
+author: 'Flavio Corpa'
+authorTwitter: '@FlavioCorpa'
+desc: 'A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!'
 image: ./images/haskell-elm.png
-keywords: "haskell,elm,functional,programming"
-lang: "en"
-title: "Haskell for Elm developers: giving names to stuff (Part 3 - Monads!)"
-date: "2023-03-01T17:22:00Z"
+keywords: 'haskell,elm,functional,programming'
+lang: 'en'
+title: 'Haskell for Elm developers: giving names to stuff (Part 3 - Monads!)'
+date: '2023-03-01T17:22:00Z'
 ---
 
 It is finally time, I did not think I would ever write a [`Monad` tutorial](https://byorgey.wordpress.com/2009/01/12/abstraction-intuition-and-the-monad-tutorial-fallacy/), but here it is! 😅 Let us have a look at the way `Monad`s are defined in Haskell:
@@ -190,7 +190,7 @@ Doesn't it just look beautiful!? 💜
 
 ## Acknowledgements
 
-Special thanks to [@forensor](https://twitter.com/Forensor) and other readers that have encouraged me to continue the series.
+Special thanks to [@forensor](https://twitter.com/Forensor) and other readers that have encouraged me to continue the series. Kudos to [Aaron VonderHaar](https://twitter.com/avh4) and to [Mark Karpov](https://markkarpov.com/about.html) for creating and maintaining `elm-format` and `ormolu` respectively! 🙌🏻
 
 Thanks again to [@serras](https://twitter.com/trupill) for technical proofreading this post again (he single-handedly wrote an [entire book](https://leanpub.com/book-of-monads) exclusively about `Monad`s after all 🫡) and remember! **Always be nice** to each other online and have in mind that we are all in different learning paths in our lives and that we can help each other out by giving _constructive feedback_, rather than trying to [destroy people's hopes and dreams](https://twitter.com/FlavioCorpa/status/1629225727852789762?s=20). 😅
 

@@ -4,13 +4,13 @@
   }
 
   const cn = {
-    dark: `dark`,
-    light: `light`,
-    toggle: `toggle`,
-    toggleDay: `toggle__day`,
-    toggleNight: `toggle__night`,
-    toggleOff: `toggle--off`,
-    toggleOn: `toggle--on`,
+    dark: 'dark',
+    light: 'light',
+    toggle: 'toggle',
+    toggleDay: 'toggle__day',
+    toggleNight: 'toggle__night',
+    toggleOff: 'toggle--off',
+    toggleOn: 'toggle--on',
   }
 
   const updateBodyClass = () =>
@@ -20,33 +20,31 @@
     )
 
   const createToggleNightBtn = () => {
-    const toggleBtn = document.createElement(`button`)
-
-    toggleBtn.type = `button`
-    toggleBtn.setAttribute(`role`, `switch`)
-    toggleBtn.setAttribute(`aria-checked`, String(state.isActive))
+    const toggleBtn = document.createElement('button')
+    toggleBtn.type = 'button'
+    toggleBtn.setAttribute('role', 'switch')
+    toggleBtn.setAttribute('aria-checked', String(state.isActive))
     toggleBtn.className = `${cn.toggle} ${state.isActive ? cn.toggleOn : cn.toggleOff}`
-
-    toggleBtn.addEventListener(`click`, () => {
+    toggleBtn.addEventListener('click', () => {
       const isActive = !state.isActive
       state.isActive = isActive
 
-      localStorage.setItem(`isActive`, String(isActive))
+      localStorage.setItem('isActive', String(isActive))
       updateBodyClass()
 
-      toggleBtn.setAttribute(`aria-checked`, String(isActive))
+      toggleBtn.setAttribute('aria-checked', String(isActive))
       toggleBtn.className = `${cn.toggle} ${isActive ? cn.toggleOn : cn.toggleOff}`
     })
 
-    const dayEl = document.createElement(`span`)
-    dayEl.innerText = `🌞`
+    const dayEl = document.createElement('span')
+    dayEl.innerText = '🌞'
     dayEl.className = cn.toggleDay
-    dayEl.setAttribute(`aria-label`, `Day Mode`)
+    dayEl.setAttribute('aria-label', 'Day Mode')
 
-    const nightEl = document.createElement(`span`)
-    nightEl.innerText = `🌙`
+    const nightEl = document.createElement('span')
+    nightEl.innerText = '🌙'
     nightEl.className = cn.toggleNight
-    nightEl.setAttribute(`aria-label`, `Night Mode`)
+    nightEl.setAttribute('aria-label', 'Night Mode')
 
     toggleBtn.appendChild(dayEl)
     toggleBtn.appendChild(nightEl)
@@ -55,9 +53,9 @@
   }
 
   const init = () => {
-    state.isActive = window.localStorage.getItem(`isActive`) === `true`
+    state.isActive = window.localStorage.getItem('isActive') === 'true'
     updateBodyClass()
-    const el = document.querySelector(`[data-nav-wrap]`) || document.body
+    const el = document.querySelector('[data-nav-wrap]') || document.body
 
     if (el) {
       el.appendChild(createToggleNightBtn())
