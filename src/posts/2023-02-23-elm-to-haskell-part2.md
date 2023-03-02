@@ -1,13 +1,13 @@
 ---
-author: "Flavio Corpa"
-authorTwitter: "@FlavioCorpa"
-desc: "A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!"
+author: 'Flavio Corpa'
+authorTwitter: '@FlavioCorpa'
+desc: 'A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!'
 image: ./images/haskell-elm.png
-keywords: "haskell,elm,functional,programming"
-lang: "en"
-title: "Haskell for Elm developers: giving names to stuff (Part 2 - Applicative Functors)"
-date: "2023-02-23T12:22:00Z"
-updated: "2023-02-24T12:22:00Z"
+keywords: 'haskell,elm,functional,programming'
+lang: 'en'
+title: 'Haskell for Elm developers: giving names to stuff (Part 2 - Applicative Functors)'
+date: '2023-02-23T12:22:00Z'
+updated: '2023-02-24T12:22:00Z'
 ---
 
 Since the previous post had some measure of success, I decided to continue the series! 🎉
@@ -15,7 +15,7 @@ Since the previous post had some measure of success, I decided to continue the s
 Without much preamble, let's look at the typeclass definition in Haskell for Applicative Functors:
 
 ```haskell
-class Functor f => Applicative f where
+class (Functor f) => Applicative f where
   pure :: a -> f a
   (<*>) :: f (a -> b) -> f a -> f b
 ```
@@ -98,8 +98,9 @@ This is an _infix operator_ that takes a lifted function `f (a -> b)` and a lift
 Well, let's have a peek at the actual implementation of the `Applicative` typeclass in `GHC.Base`:
 
 ```haskell
-class Functor f => Applicative f where
+class (Functor f) => Applicative f where
   {-# MINIMAL pure, ((<*>) | liftA2) #-}
+
   -- | Lift a value.
   pure :: a -> f a
 

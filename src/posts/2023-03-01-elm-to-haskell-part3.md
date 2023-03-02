@@ -140,7 +140,7 @@ map5 func taskA taskB taskC taskD taskE =
             )
 ```
 
-This, however, is _not an issue_ that `elm-format` is responsible for (as a matter of fact, I love `elm-format` and think it is a **modern masterpiece** of software engineering! 😍), but it is rather a _consequence_ of the language design decision _NOT_ to have something like `do` notation in Elm. For example, the above code would be really similar **without** `do` notation in Haskell (if you use a formatter like [`ormolu`](<(https://ormolu-live.tweag.io/)>)):
+This, however, is _not an issue_ that `elm-format` is responsible for (as a matter of fact, I love `elm-format` and think it is a **modern masterpiece** of software engineering! 😍), but it is rather a _consequence_ of the language design decision _NOT_ to have something like `do` notation in Elm. For example, the above code would be really similar **without** `do` notation in Haskell (if you use a formatter like [`ormolu`](https://ormolu-live.tweag.io/):
 
 ```haskell
 map5 ::

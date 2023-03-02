@@ -1,12 +1,12 @@
 ---
-author: "Flavio Corpa"
-authorTwitter: "@FlavioCorpa"
-desc: "A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!"
+author: 'Flavio Corpa'
+authorTwitter: '@FlavioCorpa'
+desc: 'A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!'
 image: ./images/haskell-elm.png
-keywords: "haskell,elm,functional,programming"
-lang: "en"
-title: "Haskell for Elm developers: giving names to stuff (Part 1 - Functors)"
-date: "2023-01-27T15:01:00Z"
+keywords: 'haskell,elm,functional,programming'
+lang: 'en'
+title: 'Haskell for Elm developers: giving names to stuff (Part 1 - Functors)'
+date: '2023-01-27T15:01:00Z'
 ---
 
 This post is targeted towards all those Elm developers (and functional programmers in general) who are curious about Haskell and would like to learn how what they already know and love from Elm maps directly to Haskell.
@@ -25,7 +25,7 @@ For example, the Functor typeclass in Haskell is defined like this:
 
 ```haskell
 class Functor f where
-    fmap :: (a -> b) -> f a -> f b
+  fmap :: (a -> b) -> f a -> f b
 ```
 
 This typeclass declaration in Haskell just means that for a general type `f`, it will "be a Functor" if it has a map function. As you can see, any map function (or fmap) needs to have the signature `(a -> b) -> f a -> f b`. More accurately, we can say that any custom type that implements a function with this type signature **does have an instance of the Functor typeclass**.
