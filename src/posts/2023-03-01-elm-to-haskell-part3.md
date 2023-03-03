@@ -7,6 +7,7 @@ keywords: 'haskell,elm,functional,programming'
 lang: 'en'
 title: 'Haskell for Elm developers: giving names to stuff (Part 3 - Monads!)'
 date: '2023-03-01T17:22:00Z'
+updated: '03/03/2023 12:57'
 ---
 
 It is finally time, I did not think I would ever write a [`Monad` tutorial](https://byorgey.wordpress.com/2009/01/12/abstraction-intuition-and-the-monad-tutorial-fallacy/), but here it is! 😅 Let us have a look at the way `Monad`s are defined in Haskell:
@@ -49,18 +50,18 @@ I did not come up with the name, I swear, I read it in the [Haskell Book™️](
 
 The only thing the Mr. Pointy operator does is sequencing two actions while discarding any result value of the first action.
 
-Let’s have another peek at the actual implementation of the `Monad` typeclass in `GHC.Base` and see what we can learn this time from it:
+Let’s have another peek at the implementation of the `Monad` typeclass in `GHC.Base` and see what we can learn this time from it:
 
 ```haskell
 class (Applicative m) => Monad m where
   -- | Sequentially compose two actions, passing any value produced
   -- by the first as an argument to the second.
-  (>>=) :: forall a b. m a -> (a -> m b) -> m b
+  (>>=) :: m a -> (a -> m b) -> m b
 
   -- | Sequentially compose two actions, discarding any value produced
   -- by the first, like sequencing operators (such as the semicolon)
   -- in imperative languages.
-  (>>) :: forall a b. m a -> m b -> m b
+  (>>) :: m a -> m b -> m b
   m >> k = m >>= \_ -> k
   {-# INLINE (>>) #-}
 
@@ -69,14 +70,10 @@ class (Applicative m) => Monad m where
   return = pure
 ```
 
-First thing we can notice is hey! Another language pragma, this time called [`INLINE pragma`](https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/pragmas.html#inline-pragma), do not worry too much about it, all it is doing is performing a little optimization on the compiler level to tell GHC that it can go ahead and _inline_ that function.
-
-Second thing we can notice is the presence of new `forall` keywords used in the type declaration, it goes beyond the scope of this post to explain those in Haskell but if you really want to know what they are doing, check out [this blogpost](https://wasp-lang.dev/blog/2021/09/01/haskell-forall-tutorial).
-
-A third thing we can notice is that Mr. Pointy (`>>`) is defined in terms of `>>=`:
+First thing we can notice is hey! Another language pragma, this time called [`INLINE pragma`](https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/pragmas.html#inline-pragma), do not worry too much about it, all it is doing is performing a little optimization on the compiler level to tell GHC that it can go ahead and _inline_ that function. A second thing we can notice is that Mr. Pointy (`>>`) is defined in terms of `>>=`:
 
 ```haskell
-  (>>) :: forall a b. m a -> m b -> m b
+  (>>) :: m a -> m b -> m b
   m >> k = m >>= \_ -> k
 ```
 
@@ -97,7 +94,7 @@ By looking at the type signature of the bind operator, does it not look familiar
 <function> : (a -> List b) -> List a -> List b
 ```
 
-As you can see, `List.concatMap` is just a flipped implementation of the `>>=` operator for Elm, but what about `Maybe`, `Result` and `Task`?
+As you can see, `List.concatMap` is just a flipped version of the `>>=` operator for Elm, but what about `Maybe`, `Result` and `Task`?
 
 ```elm
 > Maybe.andThen
@@ -140,7 +137,7 @@ map5 func taskA taskB taskC taskD taskE =
             )
 ```
 
-This, however, is _not an issue_ that `elm-format` is responsible for (as a matter of fact, I love `elm-format` and think it is a **modern masterpiece** of software engineering! 😍), but it is rather a _consequence_ of the language design decision _NOT_ to have something like `do` notation in Elm. For example, the above code would be really similar **without** `do` notation in Haskell (if you use a formatter like [`ormolu`](https://ormolu-live.tweag.io/):
+This, however, is _not an issue_ that `elm-format` is responsible for (as a matter of fact, I love `elm-format` and think it is a **modern masterpiece** of software engineering! 😍), but it is rather a _consequence_ of the language design decision _NOT_ to have something like `do` notation in Elm. For example, the above code would be really similar **without** `do` notation in Haskell (if you use a formatter like [`ormolu`](https://ormolu-live.tweag.io/)):
 
 ```haskell
 map5 ::
@@ -187,6 +184,8 @@ map5 func taskA taskB taskC taskD taskE = do
 Doesn't it just look beautiful!? 💜
 
 > Funnily enough, [**ormolu**](https://github.com/tweag/ormolu) is the closest we can get to something like `elm-format` in Haskell (which I also love 🤩 and am using to format every code sample in this blogpost) and many Haskellers hate it for no reason at all! 🤷🏼‍♂️
+
+> EDIT: As pointed out by [@TankorSmash on Twitter](https://twitter.com/TankorSmash/status/1631347082274512897?s=20), the actual closest to `elm-format` would probably be [`hindent-elm`](https://github.com/cjoach/hindent-elm), but it might not work 100% correctly or as complete as other Haskell formatters.
 
 ## Acknowledgements
 

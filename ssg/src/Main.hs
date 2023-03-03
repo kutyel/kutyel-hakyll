@@ -170,7 +170,7 @@ postCtx :: Context String
 postCtx =
   constField "root" mySiteRoot
     <> constField "siteName" mySiteName
-    <> dateField "date" "%Y-%m-%d"
+    <> dateField "date" "%d/%m/%Y"
     -- <> readingTimeField "readingtime" blogSnapshot
     <> defaultContext
 
