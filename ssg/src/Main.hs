@@ -189,7 +189,7 @@ readingTimeField key snapshot =
   acc ts = [TagText $ show $ time ts]
   -- M. Brysbaert, Journal of Memory and Language (2009) vol 109. DOI: 10.1016/j.jml.2019.104047
   time ts = foldr count 0 ts `div` 238
-  count (TagText s) n = n + length $ words s
+  count (TagText s) n = n + length (words s)
   count _ n = n
 
 --------------------------------------------------------------------------------
