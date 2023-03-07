@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Flavio Corpa's feed</title>
+        <link>https://flaviocorpa.com</link>
+        <description><![CDATA[Feed for Flavio's website]]></description>
+        <atom:link href="https://flaviocorpa.com/rss.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>03/03/2023 12:57</lastBuildDate>
+        <item>
+    <title>Haskell for Elm developers: giving names to stuff (Part 3 - Monads!)</title>
+    <link>https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-3-monads.html</link>
+    <description><![CDATA[<nav class="nav">
+  <div class="layout--constrained" data-nav-wrap>
+    <a class="nav__link nav__skip" href="#content">Skip to content</a>
+    <a class="nav__link" href="./">Home</a>
+    <a class="nav__link" href="https://github.com/sponsors/kutyel">Sponsor me</a>
+    <a class="nav__link" href="./atom.xml">RSS</a>
+  </div>
+</nav>
+
+
+<main id="content" tabindex="-1">
+  <article>
+    <header>
+      <h1>Haskell for Elm developers: giving names to stuff (Part 3 - Monads!)</h1>
+      <div class="info">
+        <small class="italic">01/03/2023</small>
+        <small class="italic"> | <span id="time">X</span> min read</small>
+        
+        <small class="italic"> (updated: 03/03/2023 12:57)</small>
+        
+      </div>
+    </header>
+    <section class="layout--constrained"><p>It is finally time, I did not think I would ever write a <a href="https://byorgey.wordpress.com/2009/01/12/abstraction-intuition-and-the-monad-tutorial-fallacy/"><code>Monad</code> tutorial</a>, but here it is! 😅 Let us have a look at the way <code>Monad</code>s are defined in Haskell:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Applicative</span> m) <span class="ot">=&gt;</span> <span class="dt">Monad</span> m <span class="kw">where</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  return ::</span> a <span class="ot">-&gt;</span> m a</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&gt;&gt;) ::</span> m a <span class="ot">-&gt;</span> m b <span class="ot">-&gt;</span> m b</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&gt;&gt;=) ::</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b</span></code></pre></div>
+<p>The first thing we can notice again is that the typeclass definition has itself a typeclass constraint, implied by the <code>class Applicative m =&gt;</code> bit, just like in our previous post about Applicative Functors.</p>
+<p>Needless to say, this means that every <code>Monad</code> instance must satisfy the <code>Applicative</code> instance first, and that one, in return, the <code>Functor</code> instance. 😵‍💫 By the way, if you have not already, to understand this whole post and gain more intuition about <code>Monad</code>s, you better read the previous two posts I made:</p>
+<ol>
+<li><a href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-1-functors.html">Haskell for Elm developers: giving names to stuff (Part 1 - Functors)</a></li>
+<li><a href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-2-applicative-functors.html">Haskell for Elm developers: giving names to stuff (Part 2 - Applicative Functors)</a></li>
+</ol>
+<p>SPOILER ALERT ⚠️! In Elm, some examples of <code>Monad</code>s you use every day are… 🥁🥁🥁 (<em>drum rolls…</em>) again: <code>List</code>, <code>Maybe</code>, <code>Result</code> and <code>Task</code>!!! 🤯</p>
+<h2 id="the-return-function">The <code>return</code> function</h2>
+<p>If you have good memory, you might be asking yourself right now: what is the difference between <code>pure :: a -&gt; m a</code> and <code>return</code>?</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span><span class="ot"> ::</span> a <span class="ot">-&gt;</span> m a</span></code></pre></div>
+<p>And the answer is: there is <strong>none</strong>.</p>
+<p>If you want to find out the <a href="https://stackoverflow.com/a/32788607/2834553">historical reasons</a> why we ended up with two functions called different that basically do the same thing, please check this <a href="https://www.reddit.com/r/haskell/comments/4tu9qf/is_there_any_pure_return/">Reddit thread</a> from 7 years go. 👴🏻 There is a modern <a href="https://github.com/search?o=desc&amp;q=use+pure+instead+of+return&amp;s=&amp;type=Commits">Haskell trend</a> to prefer <code>pure</code> over <code>return</code> in code (I contributed to this trend a fair bit myself), but it is totally up to you!</p>
+<h2 id="the-mr-pointy--operator-">The Mr. Pointy (🤣) operator (<code>&gt;&gt;</code>)</h2>
+<p>I did not come up with the name, I swear, I read it in the <a href="https://haskellbook.com/">Haskell Book™️</a>. Some people refer to it as the <em>sequencing operator</em>, but it does not have an “official” English-language name:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;) ::</span> m a <span class="ot">-&gt;</span> m b <span class="ot">-&gt;</span> m b</span></code></pre></div>
+<p>The only thing the Mr. Pointy operator does is sequencing two actions while discarding any result value of the first action.</p>
+<p>Let’s have another peek at the implementation of the <code>Monad</code> typeclass in <code>GHC.Base</code> and see what we can learn this time from it:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Applicative</span> m) <span class="ot">=&gt;</span> <span class="dt">Monad</span> m <span class="kw">where</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Sequentially compose two actions, passing any value produced</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- by the first as an argument to the second.</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&gt;&gt;=) ::</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Sequentially compose two actions, discarding any value produced</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- by the first, like sequencing operators (such as the semicolon)</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- in imperative languages.</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&gt;&gt;) ::</span> m a <span class="ot">-&gt;</span> m b <span class="ot">-&gt;</span> m b</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  m <span class="op">&gt;&gt;</span> k <span class="ot">=</span> m <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> k</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="ot">{-# INLINE (&gt;&gt;) #-}</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Inject a value into the monadic type.</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="ot">  return ::</span> a <span class="ot">-&gt;</span> m a</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="ot">=</span> <span class="fu">pure</span></span></code></pre></div>
+<p>First thing we can notice is hey! Another language pragma, this time called <a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/pragmas.html#inline-pragma"><code>INLINE pragma</code></a>, do not worry too much about it, all it is doing is performing a little optimization on the compiler level to tell GHC that it can go ahead and <em>inline</em> that function. A second thing we can notice is that Mr. Pointy (<code>&gt;&gt;</code>) is defined in terms of <code>&gt;&gt;=</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&gt;&gt;) ::</span> m a <span class="ot">-&gt;</span> m b <span class="ot">-&gt;</span> m b</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  m <span class="op">&gt;&gt;</span> k <span class="ot">=</span> m <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> k</span></code></pre></div>
+<p>Because of this, we are not going to waste any time trying to find the definition of Mr. Pointy in Elm (because if you define <code>&gt;&gt;=</code> for your type, you again get <em>for free</em> the definition of <code>&gt;&gt;</code>), but rather cut right to the meat!</p>
+<h2 id="the-monadic-bind-operator-">The Monadic bind operator (<code>&gt;&gt;=</code>)</h2>
+<p>I am going to try my best to give you the simplest explanation about this operator, but since I assume you know Elm, the explanation is going to be quite trivial: 😉</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;=) ::</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b</span></code></pre></div>
+<p>By looking at the type signature of the bind operator, does it not look familiar to you, dear Elm developer? Have you ever tried to <code>flatMap</code> a <code>List</code>? <code>flatMap</code> is the name chosen by JavaScript and many other languages, but Elm chose a couple of interesting ones, let us begin first with the <code>List</code> Monad. 🙊</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">List</span><span class="op">.</span><span class="fu">concatMap</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">b</span></span></code></pre></div>
+<p>As you can see, <code>List.concatMap</code> is just a flipped version of the <code>&gt;&gt;=</code> operator for Elm, but what about <code>Maybe</code>, <code>Result</code> and <code>Task</code>?</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">Maybe</span><span class="op">.</span><span class="fu">andThen</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">b</span></span></code></pre></div>
+<p>Yes! We can say with confidence that those types satisfy the <code>Monad</code> instance because we have <code>Maybe.andThen</code>, <code>Result.andThen</code> and <code>Task.andThen</code> and all of those functions allow us to <strong>chain computations</strong>! 👏🏻 Hope that was not so scary after all! 👻😘</p>
+<h2 id="the-infamous-do-notation">The infamous <code>do</code> notation</h2>
+<p><a href="https://github.com/avh4/elm-format/issues/568">Famously</a>, the issue with the <code>|&gt; andThen</code> approach, is that <a href="https://github.com/avh4/elm-format"><strong>elm-format</strong></a> (the <em>de facto standard</em> for all Elm applications) formats everything in a rather <a href="https://github.com/avh4/elm-format/issues/352">ugly manner</a>:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map5</span> :</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">c</span> <span class="op">-&gt;</span> <span class="fu">d</span> <span class="op">-&gt;</span> <span class="fu">e</span> <span class="op">-&gt;</span> <span class="fu">result</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="fu">x</span> <span class="fu">a</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="fu">x</span> <span class="fu">b</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="fu">x</span> <span class="fu">c</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="fu">x</span> <span class="fu">d</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="fu">x</span> <span class="fu">e</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="fu">x</span> <span class="fu">result</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">map5</span> <span class="fu">func</span> <span class="fu">taskA</span> <span class="fu">taskB</span> <span class="fu">taskC</span> <span class="fu">taskD</span> <span class="fu">taskE</span> <span class="op">=</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">taskA</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">|&gt;</span> <span class="fu">andThen</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>            (\<span class="fu">a</span> <span class="op">-&gt;</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                <span class="fu">taskB</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>                    <span class="op">|&gt;</span> <span class="fu">andThen</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>                        (\<span class="fu">b</span> <span class="op">-&gt;</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">taskC</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>                                <span class="op">|&gt;</span> <span class="fu">andThen</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>                                    (\<span class="fu">c</span> <span class="op">-&gt;</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>                                        <span class="fu">taskD</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                                            <span class="op">|&gt;</span> <span class="fu">andThen</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>                                                (\<span class="fu">d</span> <span class="op">-&gt;</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>                                                    <span class="fu">taskE</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>                                                        <span class="op">|&gt;</span> <span class="fu">andThen</span> (\<span class="fu">e</span> <span class="op">-&gt;</span> <span class="fu">succeed</span> (<span class="fu">func</span> <span class="fu">a</span> <span class="fu">b</span> <span class="fu">c</span> <span class="fu">d</span> <span class="fu">e</span>))</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>                                                )</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>                                    )</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>                        )</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>            )</span></code></pre></div>
+<p>This, however, is <em>not an issue</em> that <code>elm-format</code> is responsible for (as a matter of fact, I love <code>elm-format</code> and think it is a <strong>modern masterpiece</strong> of software engineering! 😍), but it is rather a <em>consequence</em> of the language design decision <em>NOT</em> to have something like <code>do</code> notation in Elm. For example, the above code would be really similar <strong>without</strong> <code>do</code> notation in Haskell (if you use a formatter like <a href="https://ormolu-live.tweag.io/"><code>ormolu</code></a>):</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">map5 ::</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c <span class="ot">-&gt;</span> d <span class="ot">-&gt;</span> e <span class="ot">-&gt;</span> result) <span class="ot">-&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x a <span class="ot">-&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x b <span class="ot">-&gt;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x c <span class="ot">-&gt;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x d <span class="ot">-&gt;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x e <span class="ot">-&gt;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x result</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>map5 func taskA taskB taskC taskD taskE <span class="ot">=</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  taskA</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">&gt;&gt;=</span> \a <span class="ot">-&gt;</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>      taskB</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \b <span class="ot">-&gt;</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>          taskC</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>            <span class="op">&gt;&gt;=</span> \c <span class="ot">-&gt;</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>              taskD</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>                <span class="op">&gt;&gt;=</span> \d <span class="ot">-&gt;</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>                  taskE</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>                    <span class="op">&gt;&gt;=</span> \e <span class="ot">-&gt;</span> <span class="fu">pure</span> (func a b c d e)</span></code></pre></div>
+<p>Yes, there are Haskellers that still to this very day <strong>format their code by hand</strong> (😅), and so they would use less indentation in the aforementioned code, but we are not gonna let humans get in the way of the machine (thank God we have formatters 😍). Nevertheless, thanks to <code>do</code> notation, we can write it in the following manner:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">map5 ::</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c <span class="ot">-&gt;</span> d <span class="ot">-&gt;</span> e <span class="ot">-&gt;</span> result) <span class="ot">-&gt;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x a <span class="ot">-&gt;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x b <span class="ot">-&gt;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x c <span class="ot">-&gt;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x d <span class="ot">-&gt;</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x e <span class="ot">-&gt;</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x result</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>map5 func taskA taskB taskC taskD taskE <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> taskA</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  b <span class="ot">&lt;-</span> taskB</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  c <span class="ot">&lt;-</span> taskC</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> taskD</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  e <span class="ot">&lt;-</span> taskE</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> <span class="op">$</span> func a b c d e</span></code></pre></div>
+<p>Doesn’t it just look beautiful!? 💜</p>
+<blockquote>
+<p>Funnily enough, <a href="https://github.com/tweag/ormolu"><strong>ormolu</strong></a> is the closest we can get to something like <code>elm-format</code> in Haskell (which I also love 🤩 and am using to format every code sample in this blogpost) and many Haskellers hate it for no reason at all! 🤷🏼‍♂️</p>
+</blockquote>
+<blockquote>
+<p>EDIT: As pointed out by <a href="https://twitter.com/TankorSmash/status/1631347082274512897?s=20">@TankorSmash on Twitter</a>, the actual closest to <code>elm-format</code> would probably be <a href="https://github.com/cjoach/hindent-elm"><code>hindent-elm</code></a>, but it might not work 100% correctly or as complete as other Haskell formatters.</p>
+</blockquote>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>Special thanks to <a href="https://twitter.com/Forensor">@forensor</a> and other readers that have encouraged me to continue the series. Kudos to <a href="https://twitter.com/avh4">Aaron VonderHaar</a> and to <a href="https://markkarpov.com/about.html">Mark Karpov</a> for creating and maintaining <code>elm-format</code> and <code>ormolu</code> respectively! 🙌🏻</p>
+<p>Thanks again to <a href="https://twitter.com/trupill">@serras</a> for technical proofreading this post again (he single-handedly wrote an <a href="https://leanpub.com/book-of-monads">entire book</a> exclusively about <code>Monad</code>s after all 🫡) and remember! <strong>Always be nice</strong> to each other online and have in mind that we are all in different learning paths in our lives and that we can help each other out by giving <em>constructive feedback</em>, rather than trying to <a href="https://twitter.com/FlavioCorpa/status/1629225727852789762?s=20">destroy people’s hopes and dreams</a>. 😅</p>
+<p>Hope <code>Monad</code>s finally clicked for you ✨ (if they had not already) and you learned something new! If you enjoyed this post and would like me to continue the series (<em>next up would probably be maybe <strong>parser combinators</strong>?</em>, let me know what you would like to hear next!), please share it in your social networks and <strong>follow me on <a href="https://twitter.com/FlavioCorpa">Twitter</a>!</strong> 🙌🏻</p></section>
+  </article>
+</main>
+
+<footer class="section--padded">
+  <div class="layout--constrained">
+    <ul role="list">
+      <li role="listitem">
+        <a href="./">Home</a>
+      </li>
+      <li role="listitem">
+        <a href="https://github.com/sponsors/kutyel/">Sponsor my work</a>
+        <span aria-hidden="true">❤️</span>
+      </li>
+      <li role="listitem">
+        <a href="./atom.xml">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+]]></description>
+    <pubDate>Wed, 01 Mar 2023 17:22:00 UT</pubDate>
+    <guid>https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-3-monads.html</guid>
+    <dc:creator>Flavio Corpa</dc:creator>
+</item>
+<item>
+    <title>Declarative UIs without CSS with elm-ui</title>
+    <link>https://flaviocorpa.com/declarative-uis-without-css-with-elm-ui.html</link>
+    <description><![CDATA[<nav class="nav">
+  <div class="layout--constrained" data-nav-wrap>
+    <a class="nav__link nav__skip" href="#content">Skip to content</a>
+    <a class="nav__link" href="./">Home</a>
+    <a class="nav__link" href="https://github.com/sponsors/kutyel">Sponsor me</a>
+    <a class="nav__link" href="./atom.xml">RSS</a>
+  </div>
+</nav>
+
+
+<main id="content" tabindex="-1">
+  <article>
+    <header>
+      <h1>Declarative UIs without CSS with elm-ui</h1>
+      <div class="info">
+        <small class="italic">24/02/2023</small>
+        <small class="italic"> | <span id="time">X</span> min read</small>
+        
+      </div>
+    </header>
+    <section class="layout--constrained"><p><a href="https://egghead.io/courses/declarative-uis-without-css-with-elm-ui-93bd?af=e68v38">Check out my <code>elm-ui</code> course on egghead.io!</a></p>
+<p><a href="(https://egghead.io/courses/declarative-uis-without-css-with-elm-ui-93bd?af=e68v38)"><img src="./images/elm-ui-course.webp" alt="course-img" /></a></p>
+<p><code>elm-ui</code> is a package for layout and interface design. This is a novel iteration on declarative styling where you can use Elm types and functions to define your UI in a declarative way.</p>
+<p>The novel part is that it <strong>does not require you to know CSS</strong> to be used. The API is very simple and can be learned quickly! 💅🏻</p>
+<p>The approach taken by <code>elm-ui</code> is based on two big ideas: Getting the compiler to verify as much of the layout and styling as possible by defining them in Elm code Enabling refactoring capabilities of Elm for UI code.</p>
+<h2 id="future-new-eggheadio-elm-course">Future new egghead.io Elm course!?</h2>
+<p>If you would like me to work on a <a href="https://egghead.io/q?access_state=free">free community egghead.io resource</a> to learn Elm from scratch, you can please <a href="https://github.com/sponsors/kutyel/">sponsor my work on Github Sponsors</a> or just reach out to me on <a href="https://twitter.com/FlavioCorpa">Twitter</a> and let me know!</p>
+<p>The more requests I get the more motivation I will have to put in the time and effort to create the next ultimate Elm learning resource! 🙌🏻</p></section>
+  </article>
+</main>
+
+<footer class="section--padded">
+  <div class="layout--constrained">
+    <ul role="list">
+      <li role="listitem">
+        <a href="./">Home</a>
+      </li>
+      <li role="listitem">
+        <a href="https://github.com/sponsors/kutyel/">Sponsor my work</a>
+        <span aria-hidden="true">❤️</span>
+      </li>
+      <li role="listitem">
+        <a href="./atom.xml">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+]]></description>
+    <pubDate>Fri, 24 Feb 2023 12:07:00 UT</pubDate>
+    <guid>https://flaviocorpa.com/declarative-uis-without-css-with-elm-ui.html</guid>
+    <dc:creator>Flavio Corpa</dc:creator>
+</item>
+<item>
+    <title>Haskell for Elm developers: giving names to stuff (Part 2 - Applicative Functors)</title>
+    <link>https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-2-applicative-functors.html</link>
+    <description><![CDATA[<nav class="nav">
+  <div class="layout--constrained" data-nav-wrap>
+    <a class="nav__link nav__skip" href="#content">Skip to content</a>
+    <a class="nav__link" href="./">Home</a>
+    <a class="nav__link" href="https://github.com/sponsors/kutyel">Sponsor me</a>
+    <a class="nav__link" href="./atom.xml">RSS</a>
+  </div>
+</nav>
+
+
+<main id="content" tabindex="-1">
+  <article>
+    <header>
+      <h1>Haskell for Elm developers: giving names to stuff (Part 2 - Applicative Functors)</h1>
+      <div class="info">
+        <small class="italic">23/02/2023</small>
+        <small class="italic"> | <span id="time">X</span> min read</small>
+        
+        <small class="italic"> (updated: 24/02/2023 12:22)</small>
+        
+      </div>
+    </header>
+    <section class="layout--constrained"><p>Since the previous post had some measure of success, I decided to continue the series! 🎉</p>
+<p>Without much preamble, let’s look at the typeclass definition in Haskell for Applicative Functors:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Functor</span> f) <span class="ot">=&gt;</span> <span class="dt">Applicative</span> f <span class="kw">where</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  pure ::</span> a <span class="ot">-&gt;</span> f a</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&lt;*&gt;) ::</span> f (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span></code></pre></div>
+<p>This looks a bit scarier 👻 at the beginning, but do not worry, we will explain every bit at a time.</p>
+<p>The first thing we can notice is that the typeclass definition has itself a typeclass constraint! This is new for us, we did not know that could happen (until now), and this is what the <code>class Functor f =&gt;</code> bit means.</p>
+<p><strong>What are the implications of this?</strong> Well, as you might have already guessed, it just means one simple thing: <em>every</em> Applicative Functor must be first a <em>valid Functor</em>, not a very big surprise, right? 😉</p>
+<p>The second thing we can notice is that, contrary to the <code>Functor</code> typeclass declaration that specified only a function to be implemented (<code>fmap</code>), now we have 2 functions every Applicative Functor must have to satisfy the instance: <code>pure</code>, and the mysterious <code>&lt;*&gt;</code> operator, which we will call the TIE fighter operator from now on (because I love the name and yes, I’m a big STAR WARS fan 🤓).</p>
+<p>Let’s talk about each of them separately but first, spoiler alert ⚠️, in Elm, some examples of Applicative Functors you use every day are: <code>List</code>, <code>Maybe</code>, <code>Result</code> and <code>Task</code>.</p>
+<h2 id="the-pure-function">The <code>pure</code> function</h2>
+<p>Out of the two needed functions, <code>pure</code> is probably the easiest to explain: it just “lifts” any value <code>a</code> into an Applicative Functor context <code>f</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pure</span><span class="ot"> ::</span> a <span class="ot">-&gt;</span> f a</span></code></pre></div>
+<p>What are some examples of this in Elm? For example, the <code>List.singleton</code> function!</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">List</span><span class="op">.</span><span class="fu">singleton</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">a</span></span></code></pre></div>
+<p>Okay, what about <code>Maybe</code>?</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">Just</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">a</span></span></code></pre></div>
+<p>This might be new for you, but <strong>type Constructors are also functions!</strong> 🤯</p>
+<p>This means that for <code>Maybe</code> we just have <em>one</em> <code>pure</code> function (<code>Nothing</code> is just a value, not a function), and you probably can guess what is the <code>pure</code> implementation for <code>Result</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">Ok</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : <span class="fu">value</span> <span class="op">-&gt;</span> <span class="dt">Result</span> <span class="fu">error</span> <span class="fu">value</span></span></code></pre></div>
+<p>This example is a little harder to understand, because the <code>f</code> Applicative Functor <em>structure</em> is actually <code>Result error</code>, so that this matches:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pure</span><span class="ot"> ::</span> value <span class="ot">-&gt;</span> f            value</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Ok</span> <span class="op">:</span>    value <span class="ot">-&gt;</span> <span class="dt">Result</span> <span class="fu">error</span> value</span></code></pre></div>
+<p>Note that, because of this, the <code>Err</code> contructor/function is <em>not</em> a correct implementation, since the Applicative Functor structure is not preserved:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">Err</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : <span class="fu">error</span> <span class="op">-&gt;</span> <span class="dt">Result</span> <span class="fu">error</span> <span class="fu">value</span></span></code></pre></div>
+<p>You can probably see here that there is no <code>f a</code> structure, so only <code>Ok</code> could be considered the correct implementation of <code>pure</code> for <code>Result</code>.</p>
+<p>To keep with the Elm explanations, <code>Task.succeed</code> is the <code>pure</code> equivalent for the <code>Task</code> Applicative Functor:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="kw">import</span> <span class="dt">Task</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">Task</span><span class="op">.</span><span class="fu">succeed</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Task</span><span class="op">.</span><span class="dt">Task</span> <span class="fu">x</span> <span class="fu">a</span></span></code></pre></div>
+<h2 id="the-tie-fighter-operator-">The TIE fighter operator (<code>&lt;*&gt;</code>)</h2>
+<p>Now let us begin with the fun part:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&lt;*&gt;) ::</span> f (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span></code></pre></div>
+<p>This is an <em>infix operator</em> that takes a lifted function <code>f (a -&gt; b)</code> and a lifted value <code>f a</code> and somehow magically <em>applies</em> (that’s why sometimes this function is also refered to as <code>apply</code> or just <code>ap</code>) the lifted function to the lifted <code>a</code> to finally return a lifted <code>b</code> value (<code>f b</code>). But by now you should be wondering: <strong>how on Earth is this actually useful!? 🤔</strong></p>
+<p>Well, let’s have a peek at the actual implementation of the <code>Applicative</code> typeclass in <code>GHC.Base</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Functor</span> f) <span class="ot">=&gt;</span> <span class="dt">Applicative</span> f <span class="kw">where</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">{-# MINIMAL pure, ((&lt;*&gt;) | liftA2) #-}</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Lift a value.</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ot">  pure ::</span> a <span class="ot">-&gt;</span> f a</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Sequential application.</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&lt;*&gt;) ::</span> f (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&lt;*&gt;</span>) <span class="ot">=</span> liftA2 <span class="fu">id</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Lift a binary function to actions.</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ==== __Example__</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- &gt;&gt;&gt; liftA2 (,) (Just 3) (Just 5)</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Just (3,5)</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="ot">  liftA2 ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b <span class="ot">-&gt;</span> f c</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  liftA2 f x <span class="ot">=</span> (<span class="op">&lt;*&gt;</span>) (<span class="fu">fmap</span> f x)</span></code></pre></div>
+<p>First thing we notice is that there is a <a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/pragmas.html#minimal-pragma">MINIMAL pragma</a>, this tells GHC (the main compiler of Haskell) that the required functions that a type needs to implement in order to have a valid <code>Applicative</code> instance are <code>pure</code> and <code>&lt;*&gt;</code> OR <code>liftA2</code>.</p>
+<p>Second thing we can notice, is that <code>&lt;*&gt;</code> and <code>liftA2</code> are almost identical: they are defined in terms of each other! 🤯</p>
+<p>So, <code>liftA2</code> is basically:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>liftA2 f x <span class="ot">=</span> (<span class="op">&lt;*&gt;</span>) (<span class="fu">fmap</span> f x)</span></code></pre></div>
+<p>And, the TIE fighter operator is just:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">&lt;*&gt;</span>) <span class="ot">=</span> liftA2 <span class="fu">id</span></span></code></pre></div>
+<p>The <code>id</code> function is the silliest function in Haskell: <code>id :: a -&gt; a</code> and in Elm is properly called <code>identity</code>:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">identity</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : <span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">a</span></span></code></pre></div>
+<p>The fact that these two functions are defined in terms of each other, just means that you need to implement one of them, and you will <a href="https://www.reddit.com/r/haskell/comments/11a54oh/comment/j9szz9k/?utm_source=share&amp;utm_medium=web2x&amp;context=3">get the other one for free</a>. But, leaving that behind us, does not the type declaration of <code>liftA2</code> look familiar to us Elm developers? 👀</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ot">liftA2 ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b <span class="ot">-&gt;</span> f c</span></code></pre></div>
+<p>Besides, looking at the example code given, can we achieve something similar in Elm?</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- ==== __Example__</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- &gt;&gt;&gt; liftA2 (,) (Just 3) (Just 5)</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- Just (3,5)</span></span></code></pre></div>
+<p>The answer is: yes, we can! 🚀</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">Maybe</span><span class="op">.</span><span class="fu">map2</span> <span class="dt">Tuple</span><span class="op">.</span><span class="fu">pair</span> (<span class="dt">Just</span> <span class="dv">3</span>) (<span class="dt">Just</span> <span class="dv">5</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Just</span> (<span class="dv">3</span><span class="op">,</span><span class="dv">5</span>) : <span class="dt">Maybe</span> ( <span class="fu">number</span><span class="op">,</span> <span class="fu">number1</span> )</span></code></pre></div>
+<p>Remember how I told you on the previous post that infix operators were just superior in Haskell? We are not able to do this <code>(,)</code> in Elm, so we need to resign ourselves to just use <code>Tuple.pair : a -&gt; b -&gt; ( a, b )</code>, which does basically the same.</p>
+<p>If we query the Elm REPL for the type of <code>Maybe.map2</code>, we get:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">Maybe</span><span class="op">.</span><span class="fu">map2</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">value</span>) <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">value</span></span></code></pre></div>
+<p>Compare this to the type of <code>liftA2</code> again:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">liftA2</span>     <span class="op">::</span> (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">value</span>) <span class="op">-&gt;</span> <span class="fu">f</span> <span class="fu">a</span>     <span class="op">-&gt;</span> <span class="fu">f</span> <span class="fu">b</span>     <span class="op">-&gt;</span> <span class="fu">f</span> <span class="fu">c</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Maybe</span><span class="op">.</span><span class="fu">map2</span>  : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">value</span>) <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">value</span></span></code></pre></div>
+<p>You guessed it correctly: the <code>liftA2</code> equivalent in Elm are all the <code>*.map2</code> functions we can find!</p>
+<p>So, when we said before that <code>List</code>, <code>Maybe</code>, <code>Result</code> and <code>Task</code> were <strong>Applicative Functors in Elm</strong>, is because we have <code>List.map2</code>, <code>Maybe.map2</code>, <code>Result.map2</code> and <code>Task.map2</code>.</p>
+<p>This ties in nicely with an excellent article published by <a href="https://twitter.com/joelquen">Joël Quenneville</a> some time ago, called <a href="https://thoughtbot.com/blog/running-out-of-maps">“Running Out of Maps”</a> (very nice pun btw 😜).</p>
+<p>In that post, he explains that if anytime you run out of <code>mapN</code> functions, you can define this simple combinator:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">andMap</span> <span class="op">=</span> <span class="dt">Maybe</span><span class="op">.</span><span class="fu">map2</span> (<span class="op">|&gt;</span>)</span></code></pre></div>
+<p>And if we query again the Elm REPL for the type of <code>andMap</code> we get the following:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">andMap</span> <span class="op">=</span> <span class="dt">Maybe</span><span class="op">.</span><span class="fu">map2</span> (<span class="op">|&gt;</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : <span class="dt">Maybe</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">value</span>) <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">value</span></span></code></pre></div>
+<p>Am gonna casually remind you right now about the type declaration of the TIE fighter operator, in case you forgot:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&lt;*&gt;) ::</span> f (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span></code></pre></div>
+<p><strong>What can we draw from all this crazyness?</strong></p>
+<p>We just FOUND THE TIE FIGHTER OPERATOR IN ELM! It is just <code>flip andMap</code>!! 😎</p>
+<p><strong>So why all of this is important again and when the heck am I going to use Applicative Functors (I hear your mind saying 🧠💭)???</strong></p>
+<p>Well, if you have ever used the <code>Json.Decode.Extra</code> package, you might have probably written code like this:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">decoder</span> : <span class="dt">Decoder</span> <span class="dt">Document</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decoder</span> <span class="op">=</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Decode</span><span class="op">.</span><span class="fu">succeed</span> <span class="dt">Document</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">|&gt;</span> <span class="dt">Decode</span><span class="op">.</span><span class="fu">andMap</span> (<span class="dt">Decode</span><span class="op">.</span><span class="fu">field</span> <span class="st">&quot;id&quot;</span> <span class="dt">Decode</span><span class="op">.</span><span class="fu">string</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">|&gt;</span> <span class="dt">Decode</span><span class="op">.</span><span class="fu">andMap</span> (<span class="dt">Decode</span><span class="op">.</span><span class="fu">field</span> <span class="st">&quot;title&quot;</span> <span class="dt">Decode</span><span class="op">.</span><span class="fu">string</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">|&gt;</span> <span class="dt">Decode</span><span class="op">.</span><span class="fu">andMap</span> <span class="fu">documentTypeDecoder</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">|&gt;</span> <span class="dt">Decode</span><span class="op">.</span><span class="fu">andMap</span> (<span class="dt">Decode</span><span class="op">.</span><span class="fu">field</span> <span class="st">&quot;ctime&quot;</span> <span class="dt">Iso8601</span><span class="op">.</span><span class="fu">decoder</span>)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">|&gt;</span> <span class="dt">Decode</span><span class="op">.</span><span class="fu">andMap</span> (<span class="dt">Decode</span><span class="op">.</span><span class="fu">field</span> <span class="st">&quot;mtime&quot;</span> <span class="dt">Iso8601</span><span class="op">.</span><span class="fu">decoder</span>)</span></code></pre></div>
+<p>The exact same code in Haskell, using our beloved infix operators, would look like this:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ot">decoder ::</span> <span class="dt">Decoder</span> <span class="dt">Document</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>decoder <span class="ot">=</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Document</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;$&gt;</span> decodeStringField <span class="st">&quot;id&quot;</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;*&gt;</span> decodeStringField <span class="st">&quot;title&quot;</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;*&gt;</span> documentTypeDecoder</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;*&gt;</span> decodeIso8601Field <span class="st">&quot;ctime&quot;</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;*&gt;</span> decodeIso8601Field <span class="st">&quot;mtime&quot;</span></span></code></pre></div>
+<p>This means two things:</p>
+<ol>
+<li>You have been using Applicative Functors all along for a very long time probably without notice! 🥁🥁🥁</li>
+<li>Of course, this also means that <a href="https://package.elm-lang.org/packages/elm-community/json-extra/latest/Json-Decode-Extra#andMap">Json.Decode.Decoder</a> is also an Applicative Functor!! 👏🏻</li>
+</ol>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>Many people has made possible the production of this blogpost, I want to personally thank <a href="https://twitter.com/RobertWPearce">Robert Pearce</a> for his excellent <a href="https://robertwpearce.com/the-hakyll-nix-template-tutorial.html">Hakyll + Nix tutorial</a>, and <a href="https://twitter.com/domenkozar">Domen Kožar</a>, for all his work with <a href="https://www.cachix.org/">Cachix</a> and the <a href="https://nixos.org/">Nix</a> ecosystem in general (and for his infinite patience 😇).</p>
+<p>I would also like to thank <a href="https://twitter.com/bitemyapp">Chris Allen</a> and <a href="https://twitter.com/argumatronic">Julie Moronukie</a>, because together they created the <a href="https://haskellbook.com/">Haskell Book™️</a>, which is still in my opinion <strong>the best possible way to learn Haskell</strong> and it is actually the reason I am today working with Haskell.</p>
+<p>Could not be more grateful to all of them! 😍</p>
+<p>Enough bad puns for today, hope you learned something new! If you enjoyed this post and would like me to continue the series (<em>next up would probably be MOOONAAAAAADSSSS 👻🦇🦇🦇</em>), please share it in your social networks and <strong>follow me on <a href="https://twitter.com/FlavioCorpa">Twitter</a>!</strong> 🙌🏻</p></section>
+  </article>
+</main>
+
+<footer class="section--padded">
+  <div class="layout--constrained">
+    <ul role="list">
+      <li role="listitem">
+        <a href="./">Home</a>
+      </li>
+      <li role="listitem">
+        <a href="https://github.com/sponsors/kutyel/">Sponsor my work</a>
+        <span aria-hidden="true">❤️</span>
+      </li>
+      <li role="listitem">
+        <a href="./atom.xml">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+]]></description>
+    <pubDate>Thu, 23 Feb 2023 12:22:00 UT</pubDate>
+    <guid>https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-2-applicative-functors.html</guid>
+    <dc:creator>Flavio Corpa</dc:creator>
+</item>
+<item>
+    <title>Haskell for Elm developers: giving names to stuff (Part 1 - Functors)</title>
+    <link>https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-1-functors.html</link>
+    <description><![CDATA[<nav class="nav">
+  <div class="layout--constrained" data-nav-wrap>
+    <a class="nav__link nav__skip" href="#content">Skip to content</a>
+    <a class="nav__link" href="./">Home</a>
+    <a class="nav__link" href="https://github.com/sponsors/kutyel">Sponsor me</a>
+    <a class="nav__link" href="./atom.xml">RSS</a>
+  </div>
+</nav>
+
+
+<main id="content" tabindex="-1">
+  <article>
+    <header>
+      <h1>Haskell for Elm developers: giving names to stuff (Part 1 - Functors)</h1>
+      <div class="info">
+        <small class="italic">27/01/2023</small>
+        <small class="italic"> | <span id="time">X</span> min read</small>
+        
+      </div>
+    </header>
+    <section class="layout--constrained"><p>This post is targeted towards all those Elm developers (and functional programmers in general) who are curious about Haskell and would like to learn how what they already know and love from Elm maps directly to Haskell.</p>
+<p>Also, since Haskell’s feature set and syntax are wider than Elm’s, of course I’ll need to try and fill the gaps and explain certain things that just do not exist in Elm. 😉</p>
+<p>If this first post gets enough attention, I might consider adding more follow up posts and turn this into a series (hopefully).</p>
+<h2 id="lets-talk-about-functors">Let’s talk about <code>Functor</code>s!</h2>
+<p>If you have ever seen Haskell code before, you can really tell it has greatly influenced Elm syntax, one of the biggest differences is that in Haskell type declarations are preceded by <code>::</code>, whereas in Elm only by <code>:</code>.</p>
+<p>Another big difference is that in Haskell there is a concept called <strong>typeclasses</strong>, which we can explain more or less saying that they group a class of types and help us define interfaces that a certain data type need to fulfil to be considered “an instance of that specific typeclass”.</p>
+<p>For example, the Functor typeclass in Haskell is defined like this:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Functor</span> f <span class="kw">where</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  fmap ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span></code></pre></div>
+<p>This typeclass declaration in Haskell just means that for a general type <code>f</code>, it will “be a Functor” if it has a map function. As you can see, any map function (or fmap) needs to have the signature <code>(a -&gt; b) -&gt; f a -&gt; f b</code>. More accurately, we can say that any custom type that implements a function with this type signature <strong>does have an instance of the Functor typeclass</strong>.</p>
+<p>I probably do not need to explain what the (f)map function does, as you are already using Functors in Elm every single day! 🤯 To list some of them: <code>List</code>, <code>Maybe</code>, <code>Result</code>, <code>Dict</code>, <code>Task</code>, etc…</p>
+<p>Why is that typeclass called <strong>Functor</strong> instead of <strong>Mappable</strong>? 🤷🏼‍♂️</p>
+<p><strong>Why is this important?</strong> Well, I think one of the design decisions for Elm was to be simple from the beginning and not bother people with buzzwords, just let them use the code and gain intuition about how things work and that will do. But unfortunately if we want to learn Haskell after Elm we need to start putting random names on things! 😉</p>
+<h2 id="infix-operators-are-nice-actually">Infix operators are nice, actually</h2>
+<p>Yet another big difference between Haskell and Elm is obviously Haskellers love for <em>infix operators</em>. For example, instead of using fmap you could use the <code>&lt;$&gt;</code> operator. Consider the following mundane Elm code:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span><span class="op">,</span><span class="dv">2</span><span class="op">,</span><span class="dv">3</span><span class="op">,</span><span class="dv">4</span>] <span class="op">|&gt;</span> <span class="dt">List</span><span class="op">.</span><span class="fu">map</span> ((<span class="op">*</span>) <span class="dv">2</span>) <span class="co">-- &gt; [2,4,6,8] : List number</span></span></code></pre></div>
+<p>This would be possible to write in many different styles in Haskell:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> (<span class="op">*</span><span class="dv">2</span>) [<span class="dv">1</span><span class="op">..</span><span class="dv">4</span>]    <span class="co">-- &gt; [2,4,6,8]</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span> (<span class="op">*</span><span class="dv">2</span>) [<span class="dv">1</span><span class="op">..</span><span class="dv">4</span>]     <span class="co">-- &gt; [2,4,6,8]</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>(<span class="op">*</span><span class="dv">2</span>) <span class="op">&lt;$&gt;</span> [<span class="dv">1</span><span class="op">..</span><span class="dv">4</span>]     <span class="co">-- &gt; [2,4,6,8]</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span><span class="op">..</span><span class="dv">4</span>] <span class="op">&lt;&amp;&gt;</span> (<span class="op">*</span><span class="dv">2</span>)     <span class="co">-- &gt; [2,4,6,8]</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>(<span class="op">*</span><span class="dv">2</span>) <span class="ot">`fmap`</span> [<span class="dv">1</span><span class="op">..</span><span class="dv">4</span>]  <span class="co">-- &gt; [2,4,6,8]</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>(<span class="op">*</span><span class="dv">2</span>) <span class="ot">`map`</span> [<span class="dv">1</span><span class="op">..</span><span class="dv">4</span>]   <span class="co">-- &gt; [2,4,6,8]</span></span></code></pre></div>
+<p>There are quite a few things to learn from this snippet alone:</p>
+<ol>
+<li>Notice that <code>map</code> is just a more specific implementation of <code>fmap</code> that in Haskell only works with <code>List</code>s!</li>
+<li>In Haskell we have some nice syntax sugar for ranges of things, where <code>[1..4]</code> is equivalent to <code>List.range 1 4</code> in Elm.</li>
+<li>It is easier to work with infix operators and partially applied functions in Haskell generally speaking, where adding a parameter to either side of the operator would mean completely different things if that operation is not commutative (<code>2^</code> vs <code>^2</code>).</li>
+<li>Any function in Haskell can be used as an infix operator with backticks (like in lines 5 and 6 of the Haskell snippet, this feels weird at the beginning, but sometimes it actually helps readability!).</li>
+<li>If you need a flipped version of <code>&lt;$&gt;</code> for some reason, you can import it from <code>Data.Functor</code> and it is called <code>&lt;&amp;&gt;</code> 🙈.</li>
+</ol>
+<p><strong>Why is this nice?</strong> I won’t argue if this is better or worse, but at least we have more options in the language to express things!</p>
+<p>What you haven’t been told is that <strong>Elm does actually have typeclasses</strong>! 😱 Noticed that <code>number</code> type in the previous snippet? <code>comparable</code> and <code>appendable</code> are other examples of typeclasses used in <code>elm/core</code>, so typeclasses exist in the language but we as users of Elm can’t define them, only its creator… 😜</p>
+<h2 id="why-haskell-and-typeclasses-are-correct">Why Haskell and typeclasses are correct!</h2>
+<p>This part is a little rant and totally subjective to how I view programming, but some time ago I tweeted this:</p>
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Are you sure we don&#39;t need typeclasses? 😅 <a href="https://t.co/grL1GUH4K4">pic.twitter.com/grL1GUH4K4</a></p>&mdash; フラビオ🥷🏼 (@FlavioCorpa) <a href="https://twitter.com/FlavioCorpa/status/1570739010322169856?ref_src=twsrc%5Etfw">September 16, 2022</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p>Now it is the perfect time to explain myself in more detail! (And without trying to offend anyone 😉).</p>
+<p>I think the fact that we have to write such boilerplate code is a <em>mistake</em>, if <code>Result</code> is a functor, and <code>Cmd</code> too, <strong>we should not need to have to write</strong> that mapping function manually! In Haskell, you could achieve this easily like this:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# language DeriveFunctor #-}</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- ...</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">HttpCmd</span> err a</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">HttpCmd</span> (<span class="dt">Cmd</span> (<span class="dt">Result</span> (<span class="dt">Error</span> err) a))</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> (<span class="dt">Functor</span>)</span></code></pre></div>
+<p>By creating a <strong>newtype</strong> instead of a type alias and using some special Haskell magic, now we could just use <code>fmap</code> or <code>&lt;$&gt;</code> and never have to write such function by hand!</p>
+<p>Of course you could still write the <code>fmap</code> function for this custom type by hand, but one of the nicest things about Haskell in my opinion is that it provides <em>deriving mechanisms</em> to implement things for free for us. One such mechanism is the <code>DeriveFunctor</code> language extension.</p>
+<p>If we chose to keep the type alias approach we could have written the same function in Haskell this way:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">httpCmdMap ::</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  (<span class="dt">Functor</span> f1, <span class="dt">Functor</span> f2) <span class="ot">=&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  f1 (f2 a) <span class="ot">-&gt;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  f1 (f2 b)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>httpCmdMap f <span class="ot">=</span> <span class="fu">fmap</span> (<span class="fu">fmap</span> f)</span></code></pre></div>
+<p>This is another difference with Elm: whatever we see to the left of the fat arrow (<code>=&gt;</code>) in the type declaration, are called <strong>typeclass constraints</strong>, and what they mean in this specific case is that whatever type we use for <code>f1</code> and <code>f2</code>, they need to <em>have an instance of the <code>Functor</code> typeclass</em>.</p>
+<p>As you might have noticed, Haskell has a compiler extension system that allow us to toggle additional features to the language, this is exactly what <code>{-# language DeriveFunctor #-}</code> does.</p>
+<p>I am not saying we should have this in Elm (in fact, many complains about Haskell lie in the fact that we have probably <strong>too many language extensions</strong> already! 🙈) but, having types of classes that share common interfaces and being able to re-use functions and infix operators in many different types is a win-win from my perspective! 🚀</p>
+<h2 id="a-small-note-on-function-composition">A small note on function composition</h2>
+<p>I’ve seen many Elm developers (specially people learning the language, or new to functional programming in general) use the following pattern, which feels a bit wrong to me:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">someListOfAs</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">|&gt;</span> <span class="dt">List</span><span class="op">.</span><span class="fu">map</span> <span class="fu">turnAtoB</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|&gt;</span> <span class="dt">List</span><span class="op">.</span><span class="fu">map</span> <span class="fu">turnBtoC</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">|&gt;</span> <span class="dt">List</span><span class="op">.</span><span class="fu">map</span> <span class="fu">turnCtoD</span> <span class="co">-- &gt; List d</span></span></code></pre></div>
+<p>Whenever you map something multiple times, we can make use of the fact that we can always <em>map once</em>, and <strong>compose N functions</strong> together!</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- please do this instead 🙏🏻</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">someListOfAs</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|&gt;</span> <span class="dt">List</span><span class="op">.</span><span class="fu">map</span> (<span class="fu">turnAtoB</span> <span class="op">&gt;&gt;</span> <span class="fu">turnBtoC</span> <span class="op">&gt;&gt;</span> <span class="fu">turnCtoD</span>)</span></code></pre></div>
+<p>Since piping stuff with <code>|&gt;</code> is the bread and butter of Elm, people do not really stop and think that they can combine multiple operations at once, but hey! That’s why we have function composition and everything is curried by default in Elm, so let’s make use of it! 🤓</p>
+<p>And here is a mini point in favor of Elm, the operators chosen for the language are <strong>much more readable</strong> in my opinion than the ones in Haskell, mainly:</p>
+<ol>
+<li>left to right composition: <code>&gt;&gt;</code> in Elm, <code>Control.Arrow.&gt;&gt;&gt;</code> in Haskell (not even in the Prelude! 😭).</li>
+<li>right to left composition: <code>&lt;&lt;</code> in Elm, just <code>.</code> in Haskell, which is very weird for newcomers. 😕</li>
+<li>left to right function application: <code>|&gt;</code> in Elm (the beloved pipe), <code>&amp;</code> in Haskell, absolutely terrible, no wonder it is not as commonly used as in Elm. 🥲</li>
+<li>right to left function application: <code>&lt;|</code> in Elm, <code>$</code> in Haskell, which is probably one of the <a href="https://www.fpcomplete.com/haskell/tutorial/operators/">most widely used operators</a> and not very readable when you are learning Haskell at all! 🫢</li>
+</ol>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>I had the initial idea for this blogpost on a plane ✈️ back to Spain but what really motivated me was to try and share my love for Haskell with some very special Elm engineers that had to put up with me for some time and to which I would like to give special thanks: <a href="https://twitter.com/TomasLatal">@tomaslatal</a>, <a href="https://twitter.com/janiczek">@janiczek</a> and <a href="https://twitter.com/kurnick">@janjelinek</a>. 🙌🏻</p>
+<p>I hope you all enjoyed this post, learned a thing or two and enticed you to learn a little more of Haskell. 😉</p>
+<p>Also I want to give a huge kudos to <a href="https://twitter.com/trupill">@serras</a> for proofreading this post 😘.</p>
+<p>If you enjoyed this post and would like to see this turned into a series (<em>I have ideas in my head already for posts about Applicatives, Monads, IO, parser combinators, etc.</em>), please share it in your social networks and <strong>follow me on <a href="https://twitter.com/FlavioCorpa">Twitter</a>!</strong> 🙌🏻</p></section>
+  </article>
+</main>
+
+<footer class="section--padded">
+  <div class="layout--constrained">
+    <ul role="list">
+      <li role="listitem">
+        <a href="./">Home</a>
+      </li>
+      <li role="listitem">
+        <a href="https://github.com/sponsors/kutyel/">Sponsor my work</a>
+        <span aria-hidden="true">❤️</span>
+      </li>
+      <li role="listitem">
+        <a href="./atom.xml">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+]]></description>
+    <pubDate>Fri, 27 Jan 2023 15:01:00 UT</pubDate>
+    <guid>https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-1-functors.html</guid>
+    <dc:creator>Flavio Corpa</dc:creator>
+</item>
+
+    </channel>
+</rss>
