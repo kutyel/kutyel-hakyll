@@ -171,7 +171,7 @@ postCtx =
   constField "root" mySiteRoot
     <> constField "siteName" mySiteName
     <> dateField "date" "%d/%m/%Y"
-    <> readingTimeField "readingtime" blogSnapshot
+    -- <> readingTimeField "readingtime" blogSnapshot
     <> defaultContext
 
 titleCtx :: Context String

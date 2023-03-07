@@ -6,7 +6,7 @@ $partial("templates/nav.html")$
       <h1>$title$</h1>
       <div class="info">
         <small class="italic">$date$</small>
-        <small class="italic"> | $readingtime$ min read</small>
+        <small class="italic"> | <span id="time">X</span> min read</small>
         $if(updated)$
         <small class="italic"> (updated: $updated$)</small>
         $endif$
