@@ -171,12 +171,26 @@ postCtx =
   constField "root" mySiteRoot
     <> constField "siteName" mySiteName
     <> dateField "date" "%d/%m/%Y"
-    -- <> readingTimeField "readingtime" blogSnapshot
+    <> readingTimeField "readingtime" blogSnapshot
     <> defaultContext
 
 titleCtx :: Context String
 titleCtx =
   field "title" updatedTitle
+
+readingTimeField :: String -> Snapshot -> Context String
+readingTimeField key snapshot =
+  field key calculate
+ where
+  calculate :: Item String -> Compiler String
+  calculate item = do
+    body <- loadSnapshotBody (itemIdentifier item) snapshot
+    pure $ withTagList acc body
+  acc ts = [TagText $ show $ time ts]
+  -- M. Brysbaert, Journal of Memory and Language (2009) vol 109. DOI: 10.1016/j.jml.2019.104047
+  time ts = foldr count 0 ts `div` 238
+  count (TagText s) n = n + length $ words s
+  count _ n = n
 
 --------------------------------------------------------------------------------
 -- TITLE HELPERS
@@ -267,19 +281,3 @@ fileNameFromTitle =
 titleRoute :: Metadata -> Routes
 titleRoute =
   constRoute . fileNameFromTitle
-
---------------------------------------------------------------------------------
--- ESTIMATE READING TIME CALCULATION
-
-readingTimeField :: String -> Snapshot -> Context String
-readingTimeField key snapshot =
-  field key calculate
- where
-  calculate :: Item String -> Compiler String
-  calculate item = do
-    body <- loadSnapshotBody (itemIdentifier item) snapshot
-    pure $ withTagList acc body
-  acc ts = [TagText (show (time ts))]
-  time ts = foldr count 0 ts `div` 265
-  count (TagText s) n = n + length (words s)
-  count _ n = n

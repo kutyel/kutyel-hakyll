@@ -52,20 +52,11 @@
     return toggleBtn
   }
 
-  const readingTime = () => {
-    const words = document.getElementById('content').innerText.trim().split(/\s+/).length
-    // M. Brysbaert, Journal of Memory and Language (2009) vol 109. DOI: 10.1016/j.jml.2019.104047
-    const WORDS_PER_MINUTE = 238
-    document.getElementById('time').innerText = Math.ceil(words / WORDS_PER_MINUTE)
-  }
-
   const init = () => {
     state.isActive = window.localStorage.getItem('isActive') === 'true'
     updateBodyClass()
     const el = document.querySelector('[data-nav-wrap]') || document.body
     el && el.appendChild(createToggleNightBtn())
-    // we only want the reading time calculation to run on the post.html template
-    document.getElementById('time') && readingTime()
   }
 
   init()
