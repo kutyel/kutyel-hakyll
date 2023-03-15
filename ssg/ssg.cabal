@@ -9,7 +9,7 @@ executable hakyll-site
   main-is:          Main.hs
   hs-source-dirs:   src
   build-depends:
-    , base      ^>=4.16.4
+    , base      ^>=4.17
     , filepath  ^>=1.4.1
     , hakyll    ^>=4.15
     , pandoc    >=2.11    && <2.20

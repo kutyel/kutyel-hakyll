@@ -21,12 +21,13 @@
   outputs = { self, nixpkgs, flake-utils, haskellNix }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        overlays = [ haskellNix.overlay
+        overlays = [
+          haskellNix.overlay
           (final: prev: {
             hakyllProject = final.haskell-nix.project' {
               src = ./ssg;
               index-state = "2023-03-07T00:00:00Z";
-              compiler-nix-name = "ghc926";
+              compiler-nix-name = "ghc944";
               shell.buildInputs = [
                 hakyll-site
               ];
@@ -44,13 +45,13 @@
           inherit (haskellNix) config;
         };
 
-        flake = pkgs.hakyllProject.flake {};
+        flake = pkgs.hakyllProject.flake { };
 
         hakyll-site = flake.packages."ssg:exe:hakyll-site";
 
         website = pkgs.stdenv.mkDerivation {
           name = "website";
-          buildInputs = [];
+          buildInputs = [ ];
           src = pkgs.nix-gitignore.gitignoreSourcePure [
             ./.gitignore
             ".git"
@@ -76,7 +77,8 @@
           '';
         };
 
-      in flake // rec {
+      in
+      flake // rec {
         apps = {
           default = flake-utils.lib.mkApp {
             drv = hakyll-site;

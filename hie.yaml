@@ -1,0 +1,4 @@
+cradle:
+  cabal:
+    - path: "ssg/src"
+      component: "exe:hakyll-site"
