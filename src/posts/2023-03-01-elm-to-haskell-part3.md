@@ -10,6 +10,8 @@ date: '2023-03-01T17:22:00Z'
 updated: '03/03/2023 12:57'
 ---
 
+<img src="./images/haskell-elm.svg" alt="logo" width="300px">
+
 It is finally time, I did not think I would ever write a [`Monad` tutorial](https://byorgey.wordpress.com/2009/01/12/abstraction-intuition-and-the-monad-tutorial-fallacy/), but here it is! 😅 Let us have a look at the way `Monad`s are defined in Haskell:
 
 ```haskell

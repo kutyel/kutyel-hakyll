@@ -9,6 +9,8 @@ title: 'Haskell for Elm developers: giving names to stuff (Part 1 - Functors)'
 date: '2023-01-27T15:01:00Z'
 ---
 
+<img src="./images/haskell-elm.svg" alt="logo" width="300px">
+
 This post is targeted towards all those Elm developers (and functional programmers in general) who are curious about Haskell and would like to learn how what they already know and love from Elm maps directly to Haskell.
 
 Also, since Haskell's feature set and syntax are wider than Elm's, of course I'll need to try and fill the gaps and explain certain things that just do not exist in Elm. 😉

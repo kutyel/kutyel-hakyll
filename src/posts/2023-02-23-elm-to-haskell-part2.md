@@ -10,6 +10,8 @@ date: '2023-02-23T12:22:00Z'
 updated: '24/02/2023 12:22'
 ---
 
+<img src="./images/haskell-elm.svg" alt="logo" width="300px">
+
 Since the previous post had some measure of success, I decided to continue the series! 🎉
 
 Without much preamble, let's look at the typeclass definition in Haskell for Applicative Functors:
