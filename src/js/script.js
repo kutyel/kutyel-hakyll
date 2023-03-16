@@ -66,6 +66,7 @@
     el && el.appendChild(createToggleNightBtn())
     // we only want the reading time calculation to run on the post.html template
     document.getElementById('time') && readingTime()
+    setTimeout(() => document.body.classList.remove('preload'), 100)
   }
 
   init()

@@ -57,7 +57,7 @@
 }
 .reviews__header::before,
 .posts__header::before {
-  content: "";
+  content: '';
   display: block;
   height: 0;
   border-top: 5px solid var(--separatorColor);
@@ -104,6 +104,9 @@ a[href].secret__link:focus .secret__graphicG {
   }
   .author__image {
     display: none;
+  }
+  .posts__header {
+    margin-top: 0;
   }
   .reviews {
     margin-top: 0;
