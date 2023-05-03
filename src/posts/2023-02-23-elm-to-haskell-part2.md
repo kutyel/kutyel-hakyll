@@ -7,7 +7,7 @@ keywords: 'haskell,elm,functional,programming'
 lang: 'en'
 title: 'Haskell for Elm developers: giving names to stuff (Part 2 - Applicative Functors)'
 date: '2023-02-23T12:22:00Z'
-updated: '24/02/2023 12:22'
+updated: '03/05/2023 15:22'
 ---
 
 <img src="./images/haskell-elm.svg" alt="logo" width="300px">
@@ -54,7 +54,7 @@ Okay, what about `Maybe`?
 <function> : a -> Maybe a
 ```
 
-This might be new for you, but **type Constructors are also functions!** 🤯
+This might be new for you, but **data constructors are also functions!** 🤯
 
 This means that for `Maybe` we just have _one_ `pure` function (`Nothing` is just a value, not a function), and you probably can guess what is the `pure` implementation for `Result`:
 
