@@ -164,8 +164,8 @@ There are a few things to say about this snippet:
 
 ---
 
-Nothing else to say, this all worked out in the end and I suffered so much I just wanted to skip some of my it to the next generation of Elm developers! 😘
+Nothing else to say, this all worked out in the end and I suffered so much I just wanted to skip some of it to the next generation of Elm developers! 😘
 
-If you enjoying reading this, please share it in your social networks and **follow me on [Twitter](https://twitter.com/FlavioCorpa)!** 🙌🏻
+If you enjoyed reading this, please share it in your social networks and **follow me on [Twitter](https://twitter.com/FlavioCorpa)!** 🙌🏻
 
 Happy coding! 😎🖖🏻
