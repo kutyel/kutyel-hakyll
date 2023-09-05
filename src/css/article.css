@@ -119,6 +119,11 @@ article > header small {
   }
 }
 
+.giscus {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
 /* FOOTER */
 
 footer {
