@@ -22,7 +22,7 @@
     toggleBtn.addEventListener('click', () => {
       const isActive = !state.isActive
       state.isActive = isActive
-      window.site.setTheme(isActive ? cn.dark : cn.light)
+      window.site.setTheme(isActive ? cn.light : cn.dark)
       toggleBtn.setAttribute('aria-checked', String(isActive))
       toggleBtn.className = `${cn.toggle} ${isActive ? cn.toggleOn : cn.toggleOff}`
     })
