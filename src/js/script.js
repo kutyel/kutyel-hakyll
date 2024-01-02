@@ -13,12 +13,6 @@
     toggleOn: 'toggle--on',
   }
 
-  const updateBodyClass = () =>
-    document.body.classList.replace(
-      state.isActive ? cn.light : cn.dark,
-      state.isActive ? cn.dark : cn.light
-    )
-
   const createToggleNightBtn = () => {
     const toggleBtn = document.createElement('button')
     toggleBtn.type = 'button'
@@ -28,10 +22,7 @@
     toggleBtn.addEventListener('click', () => {
       const isActive = !state.isActive
       state.isActive = isActive
-
-      localStorage.setItem('isActive', String(isActive))
-      updateBodyClass()
-
+      window.site.setTheme(isActive ? cn.dark : cn.light)
       toggleBtn.setAttribute('aria-checked', String(isActive))
       toggleBtn.className = `${cn.toggle} ${isActive ? cn.toggleOn : cn.toggleOff}`
     })
@@ -60,13 +51,10 @@
   }
 
   const init = () => {
-    state.isActive = window.localStorage.getItem('isActive') === 'true'
-    updateBodyClass()
     const el = document.querySelector('[data-nav-wrap]') || document.body
     el && el.appendChild(createToggleNightBtn())
     // we only want the reading time calculation to run on the post.html template
     document.getElementById('time') && readingTime()
-    setTimeout(() => document.body.classList.remove('preload'), 100)
   }
 
   init()

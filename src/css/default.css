@@ -14,7 +14,7 @@ body {
   font-size: 16px;
   overflow-y: auto;
 }
-body.light {
+body[data-theme="light"]{
   --authorTitleColor: #767676;
   --bgColor: #fff;
   --blockquoteBorderColor: #eee;
@@ -34,7 +34,8 @@ body.light {
   --textLinkColor: #287cb4;
   --textLinkHoverColor: #206592;
 }
-body.dark {
+body,
+body[data-theme="dark"] {
   --separatorColor: #424857;
   --authorTitleColor: hsla(0, 0%, 100%, 0.65);
   --bgColor: #282c35;
@@ -179,12 +180,4 @@ figcaption {
     margin-left: 1.3125rem;
     margin-right: 1.3125rem;
   }
-}
-
-.preload * {
-  -webkit-transition: none !important;
-  -moz-transition: none !important;
-  -ms-transition: none !important;
-  -o-transition: none !important;
-  transition: none !important;
 }
