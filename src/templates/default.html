@@ -39,30 +39,7 @@
       <link rel="stylesheet" href="./css/home.css" />
     $endif$
   </head>
-  <body data-theme="dark">
-    <script>
-      ;(() => {
-        window.site = {
-          prefTheme: getPrefTheme(),
-          setTheme: (name) => {
-            document.body.setAttribute('data-theme', name)
-            localStorage.setItem('prefTheme', name)
-          },
-        }
-  
-        function getPrefTheme() {
-          const localPrefTheme = localStorage.getItem('prefTheme')
-  
-          return ['dark', 'light'].includes(localPrefTheme)
-            ? localPrefTheme
-            : matchMedia('(prefers-color-scheme: dark)').matches
-              ? 'dark'
-              : 'light'
-        }
-  
-        window.site.setTheme(window.site.prefTheme)
-      })()
-    </script>
+  <body class="dark preload">
     $body$
     <script async src="./js/script.js"></script>
     <!-- Cloudflare Web Analytics -->
