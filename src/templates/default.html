@@ -39,9 +39,57 @@
       <link rel="stylesheet" href="./css/home.css" />
     $endif$
   </head>
-  <body class="dark preload">
+  <body data-theme="dark">
+    <script>
+      ;(() => {
+        window.site = {
+          theme: localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          setTheme: (name) => {
+            document.body.setAttribute('data-theme', name)
+            localStorage.setItem('theme', name);
+            window.site.theme = name;
+            window.site.refreshThemeSwitch();
+
+            document.querySelector('iframe.giscus-frame')?.contentWindow.postMessage(
+              { giscus: { setConfig: { theme: name === 'dark' ? 'dark_dimmed' : 'light' } } },
+              'https://giscus.app'
+            );
+          },
+          refreshThemeSwitch: () => {
+            const isLight = window.site.theme === 'light';
+            const themeSwitch = document.querySelector('[data-theme-switch]');
+
+            themeSwitch?.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true');
+          },
+        };
+
+        window.site.setTheme(window.site.theme);
+      })();
+    </script>
+
+    <button
+      aria-label="Switch to light mode"
+      aria-checked="true"
+      data-theme-switch
+      role="switch"
+      type="button"
+    >
+      <span aria-hidden="true" data-theme-switch-icon="dark">🌙</span>
+      <span aria-hidden="true" data-theme-switch-icon="light">🌞</span>
+    </button>
+
     $body$
-    <script async src="./js/script.js"></script>
+
+    <script async>
+      ;(() => {
+        window.site.refreshThemeSwitch();
+        document.querySelector('[data-theme-switch]').addEventListener('click', e => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light');
+        });
+      })();
+     </script>
+
     <!-- Cloudflare Web Analytics -->
     <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'></script>
     <!-- End Cloudflare Web Analytics -->

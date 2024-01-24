@@ -1,3 +1,6 @@
+:root {
+  color-scheme: light, dark;
+}
 html {
   box-sizing: border-box;
   -ms-text-size-adjust: 100%;
@@ -14,7 +17,7 @@ body {
   font-size: 16px;
   overflow-y: auto;
 }
-body.light {
+body[data-theme="light"] {
   --authorTitleColor: #767676;
   --bgColor: #fff;
   --blockquoteBorderColor: #eee;
@@ -34,7 +37,7 @@ body.light {
   --textLinkColor: #287cb4;
   --textLinkHoverColor: #206592;
 }
-body.dark {
+body[data-theme="dark"] {
   --separatorColor: #424857;
   --authorTitleColor: hsla(0, 0%, 100%, 0.65);
   --bgColor: #282c35;
@@ -62,7 +65,6 @@ body {
   background-color: var(--bgColor);
   color: var(--textColor);
   margin: 0;
-  transition: color 0.2s ease-out, background 0.2s ease-out;
   word-wrap: break-word;
   font-kerning: normal;
   -moz-font-feature-settings: 'kern', 'liga', 'clig', 'calt';
@@ -133,43 +135,39 @@ figcaption {
   white-space: nowrap !important;
 }
 
-/* Theme toggle */
+/* Theme switch */
 
-.toggle {
-  position: absolute;
-  display: flex;
-  top: 1em;
-  right: 1em;
-  margin: 0;
-  padding: 0;
-  font: inherit;
-  padding: 0.1em 0.5em;
-  background-color: var(--btnBgColor);
-  color: var(--btnTextColor);
-  border: none;
-  border-radius: 20px;
+[data-theme-switch] {
   -webkit-appearance: none;
-  -moz-appearance: none;
+  align-items: center;
   appearance: none;
+  background-color: var(--btnBgColor);
+  border: 1px solid var(--btnBgColor);
+  border-radius: 20px;
+  color: var(--btnTextColor);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  justify-content: center;
+  outline-offset: 0.1em;
+  padding: 0.1em 0.5em;
+  position: absolute;
+  right: 1em;
+  top: 1em;
 }
-.nav .toggle {
-  top: 50%;
-  transform: translateY(-50%);
+
+[data-theme-switch][aria-checked="true"] [data-theme-switch-icon="dark"],
+[data-theme-switch][aria-checked="false"] [data-theme-switch-icon="light"] {
+  display: block;
 }
-.toggle__day,
-.toggle__night {
-  display: inline-block;
-  vertical-align: middle;
-}
-.toggle__night {
-  margin-left: 0.75em;
-}
-.toggle.toggle--on .toggle__day,
-.toggle.toggle--off .toggle__night {
-  opacity: 0.4;
+
+[data-theme-switch][aria-checked="true"] [data-theme-switch-icon="light"],
+[data-theme-switch][aria-checked="false"] [data-theme-switch-icon="dark"] {
+  display: none;
 }
 
 /* Responsive */
+
 @media (max-width: 667px) {
   body {
     font-family: Helvetica, Arial, sans-serif;
@@ -179,12 +177,4 @@ figcaption {
     margin-left: 1.3125rem;
     margin-right: 1.3125rem;
   }
-}
-
-.preload * {
-  -webkit-transition: none !important;
-  -moz-transition: none !important;
-  -ms-transition: none !important;
-  -o-transition: none !important;
-  transition: none !important;
 }
