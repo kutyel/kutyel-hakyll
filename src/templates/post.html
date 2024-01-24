@@ -35,6 +35,8 @@ $partial("templates/nav.html")$
   </div>
 </footer>
 
+<script async src="./js/time.js"></script>
+
 <script src="https://giscus.app/client.js"
   data-repo="kutyel/kutyel-hakyll"
   data-repo-id="R_kgDOJAKzeQ"
@@ -49,27 +51,4 @@ $partial("templates/nav.html")$
   data-lang="en"
   crossorigin="anonymous"
   async>
-</script>
-<script>
-;(() => {
-  const init = () => {
-    document.querySelector("button.toggle").addEventListener('click', (e) => {
-      const isActive = window.localStorage.getItem('isActive') === 'true'
-      const theme = isActive ? "dark_dimmed" : "light"
-      sendMessage({ setConfig: { theme } })
-    })
-
-    function sendMessage(message) {
-      const iframe = document.querySelector('iframe.giscus-frame');
-      if (!iframe) return;
-      iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
-    }
-
-    const isActive = window.localStorage.getItem('isActive') === 'true'
-    const theme = isActive ? "dark_dimmed" : "light"
-    sendMessage({ setConfig: { theme } })
-  }
-
-  setTimeout(init, 1000)
-})()
 </script>
