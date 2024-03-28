@@ -263,6 +263,7 @@ data ImportType
 ```
 
 And now we can proceed with the parsing stuff, you will notice a few interesting things
+
 1. There is a strange `reserved` combinator, which is a user defined combinator that is pretty clever and has the notion of comments/whitespace.
 2. Similarly, `strlit` is also user defined and it helps us to parse string literals.
 3. What the hell is `<?>` ?? Another crazy operator?? Well, do not worry, it is just to give proper error messages when the parser get's stuck, the Elm equivalent would be the  `problem : String -> Parser a` function. 😉
