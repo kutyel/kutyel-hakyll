@@ -34,6 +34,7 @@ type Parser a = String -> Maybe (a, String)
 ```
 
 Although no *production ready* parser combinators library would be as naive, it serves well our purpose to understand the simple essence of it:
+
 1. Await a `String` value.
 2. Produce a result that may or not succeed (that's why it returns a `Maybe`, although with this minimalistic design there is no possible way to know why the parser failed).
 3. Return a tuple of the value you want to parse and whatever's left of the string that you did not consume to produce a value of type `a`.
