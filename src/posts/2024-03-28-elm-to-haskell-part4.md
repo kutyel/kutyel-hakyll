@@ -80,7 +80,7 @@ type PStep value
 
 This looks a bit closer to the initial Haskell definition we looked at, and you can therefore now notice that `PStep` is just a sophisticated version of `Maybe` that will give you more information in case of failure.
 
-## The hidden type class
+## The hidden typeclass
 
 The hidden secret of parser combinators, in my humble opinion, lies in the simple `oneOf` function:
 
@@ -273,42 +273,65 @@ And now we can proceed with the parsing stuff, you will notice a few interesting
 Here is a similar parser, written with `elm/parser` as a reference! 
 
 ```elm
-import Parser exposing (Parser, (|.), (|=), chompIf, chompWhile, getChompedString, oneOf, spaces, succeed, symbol)
+import Parser
+    exposing
+        ( (|.)
+        , (|=)
+        , Parser
+        , chompIf
+        , chompWhile
+        , getChompedString
+        , oneOf
+        , spaces
+        , succeed
+        , symbol
+        )
 
-type Import = Idl String | Protocol String | Schema String
+
+type Import
+    = Idl String
+    | Protocol String
+    | Schema String
+
 
 parser : Parser Import
 parser =
-  let
-    importHelper : (String -> Import) -> String -> Parser Import
-    importHelper ct t = 
-      succeed ct 
-        |. symbol t 
-        |. spaces 
-        |= strlit 
-        |. symbol ";"
-  in
-  succeed identity
-    |. symbol "import"
-    |. spaces
-    |=  oneOf
-      [ importHelper Idl "idl"
-      , importHelper Protocol "protocol"
-      , importHelper Schema "schema"
-      ]
+    let
+        importHelper :
+            (String -> Import)
+            -> String
+            -> Parser Import
+        importHelper ct t =
+            succeed ct
+                |. symbol t
+                |. spaces
+                |= strlit
+                |. symbol ";"
+    in
+    succeed identity
+        |. symbol "import"
+        |. spaces
+        |= oneOf
+            [ importHelper Idl "idl"
+            , importHelper Protocol "protocol"
+            , importHelper Schema "schema"
+            ]
+
 
 strlit : Parser String
 strlit =
-  getChompedString <|
-    succeed ()
-      |. chompIf (\c -> c == '"')
-      |. chompWhile (Char.isLower)
-      |. chompIf (\c -> c == '.')
-      |. chompWhile (Char.isLower)
-      |. chompIf (\c -> c == '"')
+    getChompedString <|
+        succeed ()
+            |. chompIf (\c -> c == '"')
+            |. chompWhile Char.isLower
+            |. chompIf (\c -> c == '.')
+            |. chompWhile Char.isLower
+            |. chompIf (\c -> c == '"')
 
-output = Debug.toString <| Parser.run parser "import protocol \"foo.avpr\";"
--- > Ok (Protocol "\"foo.avpr\"")
+
+output =
+    Parser.run parser "import protocol \"foo.avpr\";"
+    -- > Ok (Protocol "\"foo.avpr\"")
 ```
 
 As you can see, the code is fairly similar, we only used the `oneOf`  instead of the `<|>` operator, and the only complicated thing in Elm was figuring out how our `strlit` combinator had to look like. (Obviously this implementation is not perfect, but it is good enough for educational purposes).
