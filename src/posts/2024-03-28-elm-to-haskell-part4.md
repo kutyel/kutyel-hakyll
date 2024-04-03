@@ -7,6 +7,7 @@ keywords: 'haskell,elm,functional,programming'
 lang: 'en'
 title: 'Haskell for Elm developers: giving names to stuff (Part 4 - Parser combinators)'
 date: '2024-03-28T17:00:00Z'
+updated: '03/04/2024 11:15'
 ---
 
 <img src="./images/haskell-elm.svg" alt="logo" width="300px">
@@ -243,6 +244,8 @@ parseImport =
     impHelper :: MonadParsec Char T.Text m => (T.Text -> a) -> T.Text -> m a
     impHelper ct t = ct <$> (reserved t *> strlit <* symbol ";")
 ```
+
+> If you are curious regarding how such a parser would look with other libraries (like `trifecta`), you can have a look at [this code](https://github.com/kutyel/haskell-kata/commit/bde30daf28718eda7f35b22325a07ce29f8e9882), which is surprisingly similar to Elm!
 
 Before you freak out, let me explain to you what this piece of code is trying to parse: in the [Avro IDL language](https://avro.apache.org/docs/1.11.1/idl-language/#imports) (which is used for example, in [Kafka](https://kafka.apache.org/)), you can define imports of 3 different types:
 
