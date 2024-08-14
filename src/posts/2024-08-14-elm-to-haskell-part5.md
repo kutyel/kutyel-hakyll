@@ -6,7 +6,8 @@ image: ./images/haskell-elm.png
 keywords: 'haskell,elm,functional,programming'
 lang: 'en'
 title: 'Haskell for Elm developers: giving names to stuff (Part 5 - Semigroups and Monoids)'
-date: '2024-08-14T17:00:00Z'
+date: '2024-08-14T15:00:00Z'
+updated: '14/08/2024 15:15'
 ---
 
 <img src="./images/haskell-elm.svg" alt="logo" width="300px">
@@ -15,14 +16,18 @@ Hello everyone! In my [last post](https://flaviocorpa.com/haskell-for-elm-develo
 
 ## What is a Semigroup?
 
-As you may already know, all these fancy terms come from **category theory**, but we are not going to dive into that garden, we are just going to focus on learning Haskell through simple Elm code examples. So, how are Semigroups defined in Haskell?
+As you may already know, these fancy terms come from [**algebra**](https://en.wikipedia.org/wiki/Semigroup), but we are not going to write a mathematical post, we are just going to focus on learning Haskell through simple Elm code examples. So, how are Semigroups defined in Haskell?
 
 ```haskell
 class Semigroup a where
   (<>) :: a -> a -> a
 ```
 
-Actually it is not something really exciting, a `Semigroup` is every single type that has a `<>` operator (or an `append` function, which behaves the same way) and just allows us to put things together... what simple examples come to mind? Of course, lists and strings!
+Actually it is not something really exciting, a `Semigroup` is every single type that has a `<>` operator (or an `append` function, which behaves the same way) and just allows us to put things together... 
+
+The only interesting prerequisite that we need to have in mind to be considered a Semigroup, is that the `<>` operation should be **associative**: `a <> (b <> c) = (a <> b) <> c`.
+
+For Elm, what simple examples come to mind? Of course, lists and strings!
 
 ```elm
 > [1, 2] ++ [3, 4]
@@ -163,7 +168,7 @@ foldr : (a -> b -> b) -> b -> List a -> b
 
 This means that, every time you are folding **anything**, you need a "reducing" function and and accumulator. The accumulator, if you are following my train of thought, is the `mempty` value every Monoid has to have. And the "reducing" function (in the case of `foldr` is `(a -> b -> b)`), is just a function from `a -> b` that is also able to concat two `b`s! (This means that in reality this "reducing" function is effectively like calling `fmap` and then `mconcat`).
 
-So, whether you like it or now, every single time in your life that you had to `reduce` or `fold` anything in programming, you were using an underlying Monoid all along! ✨🎩🪄
+So, whether you like it or not, every single time in your life that you had to `reduce` or `fold` anything in programming, you were using an underlying Monoid all along! ✨🎩🪄
 
 ## A brief word about `foldMap`
 
@@ -189,6 +194,8 @@ Product {getProduct = 15}
 This is really convenient and can spare you from using `foldr` or `foldl` if you know which is the explicit Monoid from which you want to fold on! 🙌🏻
 
 ## Acknowledgements
+
+Special thanks to [@serras](https://twitter.com/trupill) for technical proofreading this post again. 🙏🏻
 
 Thanks to all the people who liked and answered to my [previous tweet](https://x.com/FlavioCorpa/status/1823417934578090127), it feels nice to think that you are gonna spend some time pouring your thoughts out and some people might even read it! 😅
 
