@@ -156,11 +156,15 @@ figcaption {
   top: 1em;
 }
 
+body[data-theme="dark"] [data-theme-ai-icon="dark"],
+body[data-theme="light"] [data-theme-ai-icon="light"],
 [data-theme-switch][aria-checked="true"] [data-theme-switch-icon="dark"],
 [data-theme-switch][aria-checked="false"] [data-theme-switch-icon="light"] {
   display: block;
 }
 
+body[data-theme="light"] [data-theme-ai-icon="dark"],
+body[data-theme="dark"] [data-theme-ai-icon="light"],
 [data-theme-switch][aria-checked="true"] [data-theme-switch-icon="light"],
 [data-theme-switch][aria-checked="false"] [data-theme-switch-icon="dark"] {
   display: none;
