@@ -7,6 +7,7 @@ keywords: 'haskell,elm,functional,programming'
 lang: 'en'
 title: 'Haskell for Elm developers: giving names to stuff (Part 1 - Functors)'
 date: '2023-01-27T15:01:00Z'
+postId: 'at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3lacoolte652w'
 ---
 
 <img src="./images/haskell-elm.svg" alt="logo" width="300px">
