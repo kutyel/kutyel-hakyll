@@ -50,11 +50,6 @@
             localStorage.setItem('theme', name);
             window.site.theme = name;
             window.site.refreshThemeSwitch();
-
-            document.querySelector('iframe.giscus-frame')?.contentWindow.postMessage(
-              { giscus: { setConfig: { theme: name === 'dark' ? 'dark_dimmed' : 'light' } } },
-              'https://giscus.app'
-            );
           },
           refreshThemeSwitch: () => {
             const isLight = window.site.theme === 'light';
