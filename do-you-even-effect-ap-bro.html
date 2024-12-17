@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Do you even Effect.ap, bro?</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="How I contributed to the Effect.ts ecosystem by adding the applicative operator.">
+    <meta name="author" content="Flavio Corpa">
+    <meta name="keywords" content="web,typescript,functional,programming,effect-ts">
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU">
+    <meta http-equiv="origin-trial" content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ==">
+
+    <meta property="og:site_name" content="flaviocorpa.com">
+    <meta property="og:title" content="Do you even Effect.ap, bro?">
+    <meta property="og:url" content="https://flaviocorpa.com/do-you-even-effect-ap-bro.html">
+    <meta property="og:description" content="How I contributed to the Effect.ts ecosystem by adding the applicative operator.">
+    <meta property="og:image" content="https://flaviocorpa.com./images/Effect.png">
+    
+      <meta property="og:type" content="article">
+    
+
+    
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:image:src" content="https://flaviocorpa.com./images/Effect.png">
+    
+    <meta property="twitter:url" content="https://flaviocorpa.com/do-you-even-effect-ap-bro.html" />
+    <meta property="twitter:site" content="flaviocorpa.com">
+    <meta property="twitter:title" content="Do you even Effect.ap, bro?">
+    <meta property="twitter:description" content="How I contributed to the Effect.ts ecosystem by adding the applicative operator.">
+    <meta property="twitter:creator" content="@FlavioCorpa">
+
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>'>
+    <link rel="canonical" href="https://flaviocorpa.com/do-you-even-effect-ap-bro.html">
+    <link rel="stylesheet" href="./css/default.css" />
+    
+      <link rel="stylesheet" href="./css/article.css" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" />
+  </head>
+  <body data-theme="dark">
+    <script>
+      ;(() => {
+        window.site = {
+          theme: localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          setTheme: (name) => {
+            document.body.setAttribute('data-theme', name)
+            localStorage.setItem('theme', name);
+            window.site.theme = name;
+            window.site.refreshThemeSwitch();
+          },
+          refreshThemeSwitch: () => {
+            const isLight = window.site.theme === 'light';
+            const themeSwitch = document.querySelector('[data-theme-switch]');
+
+            themeSwitch?.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true');
+          },
+        };
+
+        window.site.setTheme(window.site.theme);
+      })();
+    </script>
+
+    <button
+      aria-label="Switch to light mode"
+      aria-checked="true"
+      data-theme-switch
+      role="switch"
+      type="button"
+    >
+      <span aria-hidden="true" data-theme-switch-icon="dark">🌙</span>
+      <span aria-hidden="true" data-theme-switch-icon="light">🌞</span>
+    </button>
+
+    <nav class="nav">
+  <div class="layout--constrained" data-nav-wrap>
+    <a class="nav__link nav__skip" href="#content">Skip to content</a>
+    <a class="nav__link" href="./">Home</a>
+    <a class="nav__link" href="https://github.com/sponsors/kutyel">Sponsor me</a>
+    <a class="nav__link" href="./atom.xml">RSS</a>
+  </div>
+</nav>
+
+
+<style>
+  bsky-comments {
+    --background-color: var(--bgColor);
+    --text-color: var(--textColor);
+    --link-color: var(--textLinkColor);
+    --link-hover-color: var(--textLinkHoverColor);
+    --comment-meta-color: #888;
+    --error-color: #ff4d4d;
+    --reply-border-color: var(--separatorColor);
+    --button-background-color: var(--btnBgColor);
+    --button-hover-background-color: rgba(var(--btnBgColor), 0.2);
+    --author-avatar-border-radius: 50%;
+}
+</style>
+
+<main id="content" tabindex="-1">
+  <article>
+    <header>
+      <h1>Do you even Effect.ap, bro?</h1>
+      <div class="info">
+        <small class="italic">17/11/2023</small>
+        <small class="italic"> | <span id="time">X</span> min read</small>
+        
+      </div>
+    </header>
+    <section class="layout--constrained"><p><img src="./images/Effect.png" alt="effect-ts" width="400px"></p>
+<p>After my last functional programming workshop in React Alicante 2023, I got a fair complain: <em>“Why aren’t we doing this in TypeScript”?</em>. And the reason was simple: a few years ago, there was <strong>no clear improvement over <a href="https://ramdajs.com/">Ramda</a> and <a href="https://crocks.dev">Crocks</a> for JavaScript</strong>. These libraries worked great and provided everything I needed for a pleasant functional programming experience: function composition, currying and data-last, unary functions that I could compose easily, to give you a sample snippet:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// getStreetName :: User -&gt; Maybe String</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> getStreetName <span class="op">=</span> <span class="fu">compose</span>(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">chain</span>(<span class="fu">getProp</span>(<span class="st">&#39;name&#39;</span>))<span class="op">,</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">chain</span>(<span class="fu">getProp</span>(<span class="st">&#39;street&#39;</span>))<span class="op">,</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">getProp</span>(<span class="st">&#39;address&#39;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>However, it is hard enough to explain functional concepts, so the added complexity for the students of having to compile this operations in their heads (not being used to them) and receiving no help from their editor whatsoever made it a fair complain. So, I made up my mind, I was going to rewrite my <a href="https://github.com/kutyel/fpjs-workshop">workshop repo exercises</a> into TypeScript! 🚀</p>
+<h2 id="historical-issues-with-fp-in-typescript">Historical issues with FP in TypeScript</h2>
+<p>However, there was a tiny little issue: all typings for Ramda and Crocks for TypeScript are <strong>utterly broken</strong>. Those libraries were designed to work in JavaScript, and never had TypeScript in mind. For example, curried functions in general <a href="https://discord.com/channels/795981131316985866/1159080096339087390/1159094255822843904">mess up with TypeScript’s type inference</a>, which is tree based, and a function like <a href="https://ramdajs.com/docs/#curry"><code>curry</code></a> itself would be virtually impossible to represent in TypeScript.</p>
+<p>Furthermore, I needed a library like Crocks, that provided me the data structures and ADTs (Algebraic Data Types) that I am used to and that was thought from the ground up to work with TypeScript and made it shine. And that is when I decided to finally try out <a href="https://effect.website/">Effect.ts</a>!</p>
+<h2 id="enter-effectts">Enter <code>Effect.ts</code></h2>
+<p>After watching a couple of <a href="https://youtu.be/fTN8BX5qj6s?si=wEXoaqvUgtBPhmJi">videos on YouTube</a>, reading a few Twitter threads and <a href="https://discord.com/channels/795981131316985866/1159105251685711963">asking some questions on their Discord</a> (which is really friendly btw), I managed to convert my exercises successfully to TypeScript and to solve them in really elegant ways:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> register <span class="op">=</span> (name<span class="op">:</span> <span class="dt">string</span>)<span class="op">:</span> Effect<span class="op">.</span><span class="at">Effect</span><span class="op">&lt;</span><span class="dt">never</span><span class="op">,</span> <span class="dt">never</span><span class="op">,</span> <span class="dt">string</span><span class="op">&gt;</span> <span class="kw">=&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pipe</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">validateName</span>(name)<span class="op">,</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    Effect<span class="op">.</span><span class="fu">flatMap</span>(save)<span class="op">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    Effect<span class="op">.</span><span class="fu">match</span>({</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      onFailure<span class="op">:</span> (error) <span class="kw">=&gt;</span> <span class="vs">`Failure: </span><span class="sc">${</span>error<span class="sc">}</span><span class="vs">`</span><span class="op">,</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      onSuccess<span class="op">:</span> (user) <span class="kw">=&gt;</span> <span class="vs">`Success: </span><span class="sc">${</span>user<span class="op">.</span><span class="at">name</span><span class="sc">}</span><span class="vs"> saved!`</span><span class="op">,</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<p>The overall concept of Effect is quite easy to grasp, it is really well explained with amazing documentation and it is very powerful at its core. The only thing I needed to get used to is that <strong>the <code>pipe</code> function needs to receive as the first argument the data itself, instead of only a succession of curried functions</strong>. This single detail pleases the TypeScript compiler (type inference can now work nicely) and allows me to keep focusing on writing my declarative functions the way I want to! 💯</p>
+<h2 id="do-you-even-lift-bro">Do you even <code>lift</code>, bro?</h2>
+<p>Everything was fine and dandy until I reached the exercises with Applicative Functors and I found <a href="https://github.com/Effect-TS/effect/issues/1502">one issue</a> with the library: there was no <code>ap</code> method in the <code>Effect</code> type, nor in the <code>Either</code> type. I <a href="https://discord.com/channels/795981131316985866/1125094089281511474/threads/1160871851631849532">asked this on their discord</a> and it was agreed that those functions were missing, so I decided to <a href="https://github.com/Effect-TS/effect/pull/1504">contribute them</a>, as you can see by the headline image of this blogpost. 😉</p>
+<p>The funny thing about this is that there were other ways to solve this exercise, for example, the <code>Effect.all</code> function:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> renderAllDOM<span class="op">:</span> Effect<span class="op">.</span><span class="at">Effect</span><span class="op">&lt;</span><span class="dt">never</span><span class="op">,</span> <span class="dt">never</span><span class="op">,</span> <span class="dt">string</span><span class="op">&gt;</span> <span class="op">=</span> Effect<span class="op">.</span><span class="fu">all</span>([</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">getPost</span>(<span class="dv">1</span>)<span class="op">,</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">getComments</span>(<span class="dv">1</span>)<span class="op">,</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>])<span class="op">.</span><span class="fu">pipe</span>(Effect<span class="op">.</span><span class="fu">map</span>(renderAll))</span></code></pre></div>
+<p>And even another syntactical choice is offered to the Effect user: using <strong>async generators</strong> to emulate Haskell’s <code>do-notation</code>! 🤯</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> renderGenDOM <span class="op">=</span> Effect<span class="op">.</span><span class="fu">gen</span>(<span class="kw">function</span><span class="op">*</span> (_) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> posts <span class="op">=</span> <span class="kw">yield</span><span class="op">*</span> <span class="fu">_</span>(<span class="fu">getPost</span>(<span class="dv">1</span>))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> comments <span class="op">=</span> <span class="kw">yield</span><span class="op">*</span> <span class="fu">_</span>(<span class="fu">getComments</span>(<span class="dv">1</span>))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">renderAll</span>([posts<span class="op">,</span> comments])</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
+<p>What this means is that, obviously, the <code>Effect</code> and <code>Either</code> types <strong>were already valid Applicative Functors</strong>, they were just missing a specific operator to made the code a <em>bit more familiar</em> to functional programmers coming from Haskell like myself. The same code, using the classic <code>ap</code> operator, would be like the following:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> renderDOM<span class="op">:</span> Effect<span class="op">.</span><span class="at">Effect</span><span class="op">&lt;</span><span class="dt">never</span><span class="op">,</span> <span class="dt">never</span><span class="op">,</span> <span class="dt">string</span><span class="op">&gt;</span> <span class="op">=</span> <span class="fu">pipe</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  Effect<span class="op">.</span><span class="fu">succeed</span>(render)<span class="op">,</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  Effect<span class="op">.</span><span class="fu">ap</span>(<span class="fu">getPost</span>(<span class="dv">1</span>))<span class="op">,</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  Effect<span class="op">.</span><span class="fu">ap</span>(<span class="fu">getComments</span>(<span class="dv">1</span>))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Which style to go for is a matter of personal preference, but I’m glad my contribution to the library made this choice also available. 😊</p>
+<h2 id="effectts-vs-fp-ts"><code>Effect.ts</code> vs <code>fp-ts</code></h2>
+<p>Every time I tried applying what I knew about FP from Ramda/JS to TypeScript, I always felt I was out of my comfort zone. I never quite understood fully <code>fp-ts</code>, since it was <strong>heavily inspired by Scala</strong> and I learnt functional programming in Haskell. This might sound silly and appear to be a trivial difference, but it is not, at least for the way my brain was wired. 🧠</p>
+<p>On the contrary, Effect seemed to be very simple to understand in principle and everything felt like pieces of a puzzle 🧩 fitting together and playing along very nicely with the subtleties of TypeScript, like, type inference sort of keeps working (<em>with some exceptional footguns</em>) and currying and function composition work reasonably well, and that is amazing!</p>
+<p>Also, having the incredible <a href="https://twitter.com/GiulioCanti">@gcanti</a> on board the <code>Effect.ts</code> train, is not only a good sign (<em>he was absolutely kind and helpful both on Github and Discord</em>), but it is a clear correct step in the right direction for functional programming in TypeScript!</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>With my existing knowledge of functional programming concepts, it took me <em>less than a week</em> (‼️) to learn the basics of <code>Effect.ts</code>, and now I can <strong>thoroughly recommend it</strong> to the people that want to use these timeless concepts in their TypeScript codebases.</p>
+<p>If you have enjoyed this blogpost, definitely give <code>Effect.ts</code> a try and follow me on Twitter (<a href="https://twitter.com/FlavioCorpa">@FlavioCorpa</a>) to support my impostor syndrome and motivate me to keep writing technical posts! 🙏🏻</p>
+<p>I hope to give a future workshop in <a href="https://reactalicante.es/">React Alicante 2024</a> and teach the amazing super powers of functional programming in TypeScript with <code>Effect.ts</code>, if you want to learn more and meet me in person, hope to see you there! 🤞🏻</p></section>
+  </article>
+</main>
+
+
+
+<footer class="section--padded">
+  <div class="layout--constrained">
+    <ul role="list">
+      <li role="listitem">
+        <a href="https://notbyai.fyi/">
+          <img data-theme-ai-icon="dark" src="./images/notbyai-dark.png" alt="notbyai" width="100">
+          <img data-theme-ai-icon="light" src="./images/notbyai-light.png" alt="notbyai" width="100">
+        </a>
+      </li>
+      <li role="listitem">
+        <a href="./">Home</a>
+      </li>
+      <li role="listitem">
+        <a href="https://github.com/sponsors/kutyel/">Sponsor me</a>
+      </li>
+      <li role="listitem">
+        <a href="./atom.xml">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+
+<script async src="./js/time.js"></script>
+<script src="https://gistcdn.githack.com/kutyel/41d12e099484fd390fb67168271fcdd9/raw/9be26e500525a2e4edacc53d3a8006aaddec0e15/bsky-comments.js"></script>
+
+
+    <script async>
+      ;(() => {
+        window.site.refreshThemeSwitch();
+        document.querySelector('[data-theme-switch]').addEventListener('click', e => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light');
+        });
+      })();
+     </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+  </body>
+</html>
