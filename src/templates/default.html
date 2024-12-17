@@ -22,9 +22,10 @@
     $endif$
 
     $if(image)$
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:image" content="$root$$image$">
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:image:src" content="$root$$image$">
     $endif$
+    <meta property="twitter:url" content="$root$$url$" />
     <meta property="twitter:site" content="$siteName$">
     <meta property="twitter:title" content="$title$">
     <meta property="twitter:description" content="$desc$">
