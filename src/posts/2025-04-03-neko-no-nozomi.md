@@ -5,9 +5,11 @@ desc: '猫の望み、オリジナル物語'
 image: ./images/nozomi.png
 keywords: '日本語、白い犬、クリエイティブライティング'
 lang: 'jp'
-title: '猫の望み'
+title: 'The wish of the cat'
 date: '2025-04-03T13:00:00Z'
 ---
+
+# 猫の望み
 
 <img src="./images/nozomi.png" alt="An illustration of a buddhist monk playing the shamisen and a djinn orange cat coming out of it" width="700px">
 
