@@ -7,6 +7,7 @@ keywords: '日本語、白い犬、クリエイティブライティング'
 lang: 'jp'
 title: 'The wish of the cat'
 date: '2025-04-03T13:00:00Z'
+postId: 'at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3llvwklpum225'
 ---
 
 # 猫の望み
