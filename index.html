@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Flavio Corpa | Senior Software Engineer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Functional programming, Haskell & Elm, Chess & stuff">
+    
+    
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU">
+    <meta http-equiv="origin-trial" content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ==">
+
+    <meta property="og:site_name" content="flaviocorpa.com">
+    <meta property="og:title" content="Flavio Corpa | Senior Software Engineer">
+    <meta property="og:url" content="https://flaviocorpa.com/index.html">
+    <meta property="og:description" content="Functional programming, Haskell & Elm, Chess & stuff">
+    
+    
+      <meta property="og:type" content="website">
+    
+
+    
+    <meta property="twitter:url" content="https://flaviocorpa.com/index.html" />
+    <meta property="twitter:site" content="flaviocorpa.com">
+    <meta property="twitter:title" content="Flavio Corpa | Senior Software Engineer">
+    <meta property="twitter:description" content="Functional programming, Haskell & Elm, Chess & stuff">
+    
+
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>'>
+    <link rel="canonical" href="https://flaviocorpa.com/index.html">
+    <link rel="stylesheet" href="./css/default.css" />
+    
+      <link rel="stylesheet" href="./css/home.css" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" />
+  </head>
+  <body data-theme="dark">
+    <script>
+      ;(() => {
+        window.site = {
+          theme: localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          setTheme: (name) => {
+            document.body.setAttribute('data-theme', name)
+            localStorage.setItem('theme', name);
+            window.site.theme = name;
+            window.site.refreshThemeSwitch();
+          },
+          refreshThemeSwitch: () => {
+            const isLight = window.site.theme === 'light';
+            const themeSwitch = document.querySelector('[data-theme-switch]');
+
+            themeSwitch?.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true');
+          },
+        };
+
+        window.site.setTheme(window.site.theme);
+      })();
+    </script>
+
+    <button
+      aria-label="Switch to light mode"
+      aria-checked="true"
+      data-theme-switch
+      role="switch"
+      type="button"
+    >
+      <span aria-hidden="true" data-theme-switch-icon="dark">🌙</span>
+      <span aria-hidden="true" data-theme-switch-icon="light">🌞</span>
+    </button>
+
+    <main>
+  <header class="author">
+    <div class="layout--constrained">
+      <img
+        alt="me playing chess!"
+        class="author__image"
+        decoding="async"
+        width="150"
+        loading="lazy"
+        src="./images/avatar.jpg"
+      />
+      <h1 class="author__name">Flavio Corpa</h1>
+      <h2 class="author__title">Senior Software Engineer</h2>
+      <div class="author__links">
+        <a href="https://bsky.app/profile/flaviocorpa.com">
+          <i class="fa-brands fa-bluesky"></i>
+        </a>
+        <a href="https://twitter.com/FlavioCorpa">
+          <i class="fa-brands fa-twitter"></i>
+        </a>
+        <a href="https://github.com/kutyel">
+          <i class="fa-brands fa-github"></i>
+        </a>
+        <a href="https://www.youtube.com/c/FlavioCorpaR%C3%ADos">
+          <i class="fa-brands fa-youtube"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/flaviocorpa">
+          <i class="fa-brands fa-linkedin"></i>
+        </a>
+        <a href="https://dl.acm.org/profile/99659565902">
+          <strong>ACM</strong>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <section class="posts">
+    <div class="layout--constrained">
+      <h2 class="posts__header">Blog Posts</h2>
+      <ul class="posts__list">
+        
+          <li>
+            <div><a href="/the-wish-of-the-cat.html">The wish of the cat</a></div>
+            <small>03/04/2025</small>
+          </li>
+        
+          <li>
+            <div><a href="/my-journey-to-japanese-n3-level.html">My Journey to Japanese N3 Level</a></div>
+            <small>18/09/2024</small>
+          </li>
+        
+          <li>
+            <div><a href="/haskell-for-elm-developers-giving-names-to-stuff-part-5-semigroups-and-monoids.html">Haskell for Elm developers: giving names to stuff (Part 5 - Semigroups and Monoids)</a></div>
+            <small>14/08/2024</small>
+          </li>
+        
+          <li>
+            <div><a href="/haskell-for-elm-developers-giving-names-to-stuff-part-4-parser-combinators.html">Haskell for Elm developers: giving names to stuff (Part 4 - Parser combinators)</a></div>
+            <small>28/03/2024</small>
+          </li>
+        
+          <li>
+            <div><a href="/do-you-even-effect-ap-bro.html">Do you even Effect.ap, bro?</a></div>
+            <small>17/11/2023</small>
+          </li>
+        
+          <li>
+            <div><a href="/taking-screenshots-with-elm-0-19.html">Taking Screenshots with Elm 0.19</a></div>
+            <small>04/08/2023</small>
+          </li>
+        
+          <li>
+            <div><a href="/haskell-for-elm-developers-giving-names-to-stuff-part-3-monads.html">Haskell for Elm developers: giving names to stuff (Part 3 - Monads!)</a></div>
+            <small>01/03/2023</small>
+          </li>
+        
+          <li>
+            <div><a href="/declarative-uis-without-css-with-elm-ui.html">Declarative UIs without CSS with elm-ui</a></div>
+            <small>24/02/2023</small>
+          </li>
+        
+          <li>
+            <div><a href="/haskell-for-elm-developers-giving-names-to-stuff-part-2-applicative-functors.html">Haskell for Elm developers: giving names to stuff (Part 2 - Applicative Functors)</a></div>
+            <small>23/02/2023</small>
+          </li>
+        
+          <li>
+            <div><a href="/haskell-for-elm-developers-giving-names-to-stuff-part-1-functors.html">Haskell for Elm developers: giving names to stuff (Part 1 - Functors)</a></div>
+            <small>27/01/2023</small>
+          </li>
+        
+      </ul>
+    </div>
+  </section>
+
+  <section class="posts">
+    <div class="layout--constrained">
+      <h2 class="posts__header">Talks</h2>
+      <ul class="posts__list">
+          <li>
+            <div><a href="https://youtu.be/GDITBmIzCDs?si=icOImK_jm9EOeVVc">Describing microservices using modern Haskell (Haskell Symposium 2020)</a></div>
+            <small>12/09/2020</small>
+          </li>
+          <li>
+            <div><a href="https://youtu.be/5IcG_BCGxEY?si=7nvOFZs10ESE50Zs">What happens if you let the creator of React design a programming language (LambdAle 2019)</a></div>
+            <small>11/10/2019</small>
+          </li>
+          <li>
+            <div><a href="https://youtu.be/IoVaArsh6tM?si=RfDmTovdbR9M9Krh">Functional lenses in JavaScript (Lambda World 2018)</a></div>
+            <small>03/12/2018</small>
+          </li>
+          <li>
+            <div><a href="https://youtu.be/VMH5fEg1NXQ?si=waAeaiVzzpTijAjb">Lambdas, lambdas everywhere (React Alicante 2018)</a></div>
+            <small>19/09/2018</small>
+          </li>
+          <li>
+            <div><a href="https://youtu.be/47E4iXOxCbg?si=LU0UfDEphDZmJiK_">Case study: Lucentum, creating your own React component library (React Alicante 2017)</a></div>
+            <small>09/11/2017</small>
+          </li>
+          <li>
+            <div><a href="https://youtu.be/zTvPzu0RWzQ?si=38W9UlEQMfI5ffsi&t=2">Programación funcional en JavaScript (Codemotion 2016)</a></div>
+            <small>18/11/2016</small>
+          </li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+
+    <script async>
+      ;(() => {
+        window.site.refreshThemeSwitch();
+        document.querySelector('[data-theme-switch]').addEventListener('click', e => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light');
+        });
+      })();
+     </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+  </body>
+</html>
