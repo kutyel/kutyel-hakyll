@@ -30,7 +30,7 @@ For comparison, the Elm app currently has ~900 LOC, whereas the Svelte app has *
 
 ## Firebase
 
-My original app was just a simple calendar view in which I could mark how many chapters of a book I read a single day, so that I could build a habit to read every single day. I wanted my app to live on the Cloud and to be purely frontend based. I also did not want to handle authentication, etc, so I decided to use Firebase and also try out its realtime databases.
+My original app was just a simple calendar view in which I could mark how many chapters of a book I read a single day, so that I could build a habit to read every day. I wanted my app to live on the Cloud and to be purely frontend based. I also did not want to handle authentication, etc, so I decided to use Firebase and also try out its realtime databases.
 
 For Elm, I used the [elm-firestore](https://package.elm-lang.org/packages/IzumiSy/elm-firestore/latest/Firestore) library, which is just amazing and let's me write completely TYPE SAFE Elm queries to interact with Firestore, here is an example of such a query:
 
@@ -61,7 +61,7 @@ Working with this library is amazing and using all the power of Elm and its famo
 
 However, the sad part is that since this library uses Firestore RESTful API, which is officially said to be out of support for realtime update, I could not leverage this functionality in my Elm application. 😢
 
-For Svelte, I used the [svelte-firebase-state](https://svelte-firebase-state.vercel.app/firestore/collection-state), and I was really impressed with it. Have a look at exactly the same query I showed you above, but in Svelte:
+For Svelte, I used the [svelte-firebase-state](https://svelte-firebase-state.vercel.app/firestore/collection-state) package, and I was really impressed with it. Have a look at exactly the same query I showed you above, but in Svelte:
 
 ```typescript
 const readings = new CollectionState<DocumentData, Reading>({
@@ -119,7 +119,7 @@ The crown jewel of this small application is, without a doubt, it's calendar com
 
 <img src="./images/google-chart.png" alt="google-chart" width="650px">
 
-Even though Svelte has excellent support for Web Components, I stumbled upon a very weird ant not very well documented issue, you need this code to make pretty much any Web Component to work within Svelte:
+Even though Svelte has excellent support for Web Components, I stumbled upon a very weird and not very well documented issue, you need this code to make pretty much any Web Component to work within Svelte:
 
 ```typescript
 onMount(async () => {
@@ -153,7 +153,7 @@ The simplicity of the Svelte code here is very nice:
 
 Although I'm not a big fan of templating (I still have nightmares with Angular 🤮), I have to recognise that Svelte seems to have picked up the best parts of Vue, React and other frontend frameworks and it feels really simple and elegant to build your views like this (as opposed to JSX, which also took its time to be loved 💔).
 
-## JS standard library
+## JavaScript's "standard" library
 
 It has been a while ago since the last time I had to write new JavaScript or TypeScript code, so I was really hoping some problems with the language itself would be a thing of the past, for example, here is how I conditionally render the chapter selector each time you pick a book in the UI in Elm:
 
@@ -168,7 +168,7 @@ select [ onInput <| SelectChapter << Maybe.withDefault 0 << String.toInt ] <|
         (List.range 1 <| getNumChapters selectedBook)
 ```
 
-You might not be very familiar with this syntax, but once you get used to it, it is quite straightforward. Did you nothing the use of `List.range`? 👀
+You might not be very familiar with this syntax, but once you get used to it, it is quite straightforward. Did you notice the use of `List.range`? 👀
 
 When translating this code to TypeScript, I COULD NOT BELIEVE it is 2025 already and JavaScript still **does not have** a built in `range` function... I mean... come on! Yes, we have some sort of proposal to bring [`Iterator.range` in Stage 2](https://github.com/tc39/proposal-iterator.range), but very far away from being able to use it natively! 🥹 I had to use `core-js` and *manually patch TypeScript* 💀 to be able to use it in the Svelte app, and the result was not pretty...
 
@@ -180,7 +180,7 @@ When translating this code to TypeScript, I COULD NOT BELIEVE it is 2025 already
 </Select>
 ```
 
-The API is far from perfect, but it was not as annoying as having to deal with **Dates** in JavaScript again... In Elm, all dates are `UTC`, and since it is a language that compiles down to JS, its API for working with `Date` and time is much more nicer than JavaScript's, have a look at the Svelte code:
+The API is far from perfect, but it was not as annoying as having to deal with **Dates** in JavaScript again... In Elm, all dates are `UTC`, and since it is a language that compiles down to JS, its API for working with `Date` and time is much nicer than JavaScript's, have a look at the Svelte code:
 
 ```typescript
 const readingsData = $derived(
