@@ -141,7 +141,7 @@ As you can see, it looks pretty similar, but you have *fine grained* control abo
 
 The simplicity of the Svelte code here is very nice:
 
-```svelte
+```jsx
   {#if readings.loading}
     <Loading />
   {:else}
@@ -172,7 +172,7 @@ You might not be very familiar with this syntax, but once you get used to it, it
 
 When translating this code to TypeScript, I COULD NOT BELIEVE it is 2025 already and JavaScript still **does not have** a built in `range` function... I mean... come on! Yes, we have some sort of proposal to bring [`Iterator.range` in Stage 2](https://github.com/tc39/proposal-iterator.range), but very far away from being able to use it natively! 🥹 I had to use `core-js` and *manually patch TypeScript* 💀 to be able to use it in the Svelte app, and the result was not pretty...
 
-```svelte
+```jsx
 <Select labelText="Year" bind:selected={selectedYear} onchange={onChangeYear}>
   {#each Iterator.range(2020, new UTCDate().getFullYear(), { inclusive: true }) as value}
     <SelectItem {value} />
