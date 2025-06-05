@@ -203,7 +203,7 @@ I know there is a brighter future ahead with the [Temporal API](https://develope
 
 ## Type safety
 
-Ok so, Svelte is pretty great... but, what is my main complain? **TypeScript** 😁 (please bear with me haha). The following code in the application is valid and it actually works:
+Ok so, Svelte is pretty great... but, what is my main complaint? **TypeScript** 😁 (please bear with me haha). The following code in the application is valid and it actually works:
 
 ```typescript
 async function handleRead() {
@@ -217,7 +217,7 @@ async function handleRead() {
 
 Besides having to mutate `$state` data etc, which I can bear, where is the error handling? **Nothing** prevented me from writing (and shipping to production!) such code, because it is on YOU, the developer, the responsibility for error handling and making sure things don't break. For example, wrapping async code in `try { ... } catch { ... } finally { ... }` blocks, etc...
 
-Besides, even when TypeScript is able to infer correctly sometimes the types in the application, it can be completely overriden by the developer with `as` manual castings, etc. Such escape hatches simply DO NOT EXIST in Elm. Elm is a language with [Hindley-Milner type inference](https://www.epicweb.dev/talks/hindley-and-milner-walk-into-a-bar) and as such, is far superior to TypeScript. Bear in mind that the ["no runtime errors" filosophy](https://softwareengineering.stackexchange.com/questions/337295/what-is-the-benefit-of-having-no-runtime-errors-like-elm-claims) of Elm is for me still one of its strongest selling points. 💪🏻
+Besides, even when TypeScript is able to infer correctly sometimes the types in the application, it can be completely overriden by the developer with `as` manual castings, etc. Such escape hatches simply DO NOT EXIST in Elm. Elm is a language with [Hindley-Milner type inference](https://www.epicweb.dev/talks/hindley-and-milner-walk-into-a-bar) and as such, is far superior to TypeScript. Bear in mind that the ["no runtime errors" philosophy](https://softwareengineering.stackexchange.com/questions/337295/what-is-the-benefit-of-having-no-runtime-errors-like-elm-claims) of Elm is for me still one of its strongest selling points. 💪🏻
 
 Have a look at the following Elm code from the app:
 
@@ -246,13 +246,13 @@ ReadChapter (Ok chapter) ->
     ( { model | readings = RemoteData.map ((::) chapter) model.readings }, Cmd.none )
 
 ReadChapter (Err _) ->
-    -- in this particular case, I know a failure is due to trying to record the same twice
+    -- in this particular case, I know a failure is due to trying to record the same reading twice
     ( { model | readings = Failure <| BadBody "You tried recording the same reading twice, refresh the page!" }, Cmd.none )
 ```
 
 And therefore I always need to handle explicity what happens, not only in the happy path (as shown in the TypeScript/Svelte snippet above), but also **ALL possible states/scenarios when things go wrong.**
 
-> Elm's philosophy trully helps you make impossible states actually impossible!
+> Elm's philosophy truly helps you make impossible states actually impossible!
 
 ## Conclusion
 
