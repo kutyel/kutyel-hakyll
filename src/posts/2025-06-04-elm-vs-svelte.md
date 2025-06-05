@@ -242,7 +242,7 @@ The Model-View-Update followed by TEA needs some time to wrap our head around it
 
 ```elm
 ReadChapter (Ok chapter) ->
-    -- if we succeed reading a chapter we just append it to the begging of the list
+    -- if we succeed reading a chapter we just append it to the beginning of the list
     ( { model | readings = RemoteData.map ((::) chapter) model.readings }, Cmd.none )
 
 ReadChapter (Err _) ->
