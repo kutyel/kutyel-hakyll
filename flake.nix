@@ -4,59 +4,21 @@
   nixConfig = {
     allow-import-from-derivation = "true";
     bash-prompt = "[hakyll-nix]λ ";
-    extra-substituters = [
-      "https://cache.iog.io"
-      "https://cache.zw3rk.com" # https://github.com/input-output-hk/haskell.nix/issues/1408
-    ];
-    extra-trusted-public-keys = [
-      "hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ="
-      "loony-tools:pr9m4BkM/5/eSTZlkQyRt57Jz7OMBxNSUiMC4FkcNfk="
-    ];
   };
 
-  inputs.haskellNix.url = "github:input-output-hk/haskell.nix";
-  inputs.nixpkgs.follows = "haskellNix/nixpkgs-unstable";
   inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
 
-  outputs = { self, nixpkgs, flake-utils, haskellNix }:
+  outputs = { self, nixpkgs, flake-utils, }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        overlays = [
-          haskellNix.overlay
-          (final: prev: {
-            hakyllProject = final.haskell-nix.project' {
-              src = ./ssg;
-              index-state = "2023-03-07T00:00:00Z";
-              compiler-nix-name = "ghc944";
-              shell.buildInputs = [
-                hakyll-site
-              ];
-              shell.tools = {
-                cabal = "latest";
-                hlint = "latest";
-                haskell-language-server = "latest";
-              };
-            };
-          })
-        ];
+        pkgs = import nixpkgs {          inherit system;        };
 
-        pkgs = import nixpkgs {
-          inherit overlays system;
-          inherit (haskellNix) config;
-        };
-
-        flake = pkgs.hakyllProject.flake { };
-
-        hakyll-site = flake.packages."ssg:exe:hakyll-site";
+        hakyll-site = pkgs.haskell.lib.justStaticExecutables (pkgs.haskellPackages.callPackage ./ssg {});
 
         website = pkgs.stdenv.mkDerivation {
           name = "website";
-          buildInputs = [ ];
-          src = pkgs.nix-gitignore.gitignoreSourcePure [
-            ./.gitignore
-            ".git"
-            ".github"
-          ] ./.;
+          src = ./.;
 
           # LANG and LOCALE_ARCHIVE are fixes pulled from the community:
           #   https://github.com/jaspervdj/hakyll/issues/614#issuecomment-411520691
@@ -78,7 +40,8 @@
         };
 
       in
-      flake // rec {
+      # flake
+      {
         apps = {
           default = flake-utils.lib.mkApp {
             drv = hakyll-site;
