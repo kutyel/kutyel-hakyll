@@ -1,6 +1,7 @@
 # hakyll-nix-template
 
 [![Github Actions](https://github.com/kutyel/kutyel-hakyll/actions/workflows/main.yml/badge.svg)](https://github.com/kutyel/kutyel-hakyll/actions/workflows/main.yml)
+![NixCI Badge](https://nix-ci.com/badge/gh:kutyel:kutyel-hakyll)
 
 [Hakyll](https://jaspervdj.be/hakyll/) + [Nix](https://nixos.org) template
 
