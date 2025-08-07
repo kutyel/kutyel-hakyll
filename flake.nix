@@ -17,6 +17,9 @@
         website = pkgs.stdenv.mkDerivation {
           name = "website";
           src = ./.;
+          # This hack is needed apparently https://github.com/jaspervdj/hakyll/pull/1017
+          LANG = "en_US.UTF-8";
+          LOCALE_ARCHIVE = "${pkgs.glibcLocales}/lib/locale/locale-archive";
           buildPhase = ''
             ${hakyll-site}/bin/hakyll-site build --verbose
           '';
