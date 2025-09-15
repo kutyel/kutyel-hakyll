@@ -12,7 +12,7 @@ $partial("templates/nav.html")$
     --button-background-color: var(--btnBgColor);
     --button-hover-background-color: rgba(var(--btnBgColor), 0.2);
     --author-avatar-border-radius: 50%;
-}
+  }
 </style>
 
 <main id="content" tabindex="-1">
@@ -21,7 +21,7 @@ $partial("templates/nav.html")$
       <h1>$title$</h1>
       <div class="info">
         <small class="italic">$date$</small>
-        <small class="italic"> | <span id="time">X</span> min read</small>
+        <small class="italic"> | $readingtime$ min read</small>
         $if(updated)$
         <small class="italic"> (updated: $updated$)</small>
         $endif$
@@ -51,5 +51,4 @@ $endif$
   </div>
 </footer>
 
-<script async src="./js/time.js"></script>
 <script src="https://gistcdn.githack.com/kutyel/41d12e099484fd390fb67168271fcdd9/raw/9be26e500525a2e4edacc53d3a8006aaddec0e15/bsky-comments.js"></script>
