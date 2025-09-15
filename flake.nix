@@ -19,6 +19,7 @@
           src = ./.;
           # This hack is needed apparently https://github.com/jaspervdj/hakyll/pull/1017
           LANG = "en_US.UTF-8";
+          LC_ALL = "C.UTF-8";
           buildPhase = ''
             ${hakyll-site}/bin/hakyll-site build --verbose
           '';
