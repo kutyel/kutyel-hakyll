@@ -28,7 +28,11 @@ jobs:
           name: kutyel-hakyll
           signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}
 
-      - run: nix build --accept-flake-config
+      - name: Build with Nix
+        run: nix build --accept-flake-config
+
+      - name: Run hlint
+        run: nix develop --command bash -c "cd ssg && cabal test hlint"
 
       - name: Artifact pages
         uses: actions/upload-artifact@v4.6.2

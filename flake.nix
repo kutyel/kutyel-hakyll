@@ -44,6 +44,14 @@
           inherit hakyll-site website;
           default = website;
         };
+
+        devShells.default = pkgs.mkShell {
+          buildInputs = with pkgs; [
+            haskellPackages.hlint
+            haskellPackages.ghc
+            haskellPackages.cabal-install
+          ];
+        };
       }
     );
 }

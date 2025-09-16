@@ -1,4 +1,4 @@
-{ mkDerivation, base, filepath, hakyll, lib, pandoc, slugger
+{ mkDerivation, base, filepath, hakyll, hlint, lib, pandoc, slugger
 , tagsoup, text
 }:
 mkDerivation {
@@ -10,6 +10,7 @@ mkDerivation {
   executableHaskellDepends = [
     base filepath hakyll pandoc slugger tagsoup text
   ];
+  testHaskellDepends = [ base hlint ];
   license = lib.licenses.bsd3;
   mainProgram = "hakyll-site";
 }

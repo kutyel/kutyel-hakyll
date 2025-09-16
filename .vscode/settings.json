@@ -1,4 +1,5 @@
 {
   "nixEnvSelector.nixFile": "${workspaceRoot}/default.nix",
-  "nixEnvPicker.envFile": "${workspaceFolder}${/}flake.nix"
+  "nixEnvPicker.envFile": "${workspaceFolder}${/}flake.nix",
+  "editor.formatOnSave": true
 }

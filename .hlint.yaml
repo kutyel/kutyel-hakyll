@@ -1,0 +1,83 @@
+# HLint configuration file
+# https://github.com/ndmitchell/hlint
+##########################
+
+- arguments:
+  - -XTypeApplications
+  - -XOverloadedRecordDot
+
+# Warnings we don't care about
+- ignore: {name: "Reduce duplication"}
+- ignore: {name: "Redundant do"}
+- ignore: {name: "Use list comprehension"}
+- ignore: {name: "Redundant id"}
+- ignore: {name: "Use TH quotation brackets"}
+# This should be removed once we can use `Functor.NonEmpty.Unzip`, at base >= 4.19 (GHC 9.8)
+- ignore: {name: Avoid NonEmpty.unzip}
+- ignore: {name: "Redundant $", within: ["Scrive.ESign.API.V3.Server.User.Settings", "Scrive.ESign.API.V3.Server.User"]}
+# We don't want this as there are many places in the code where we have
+#   someFunction <$> theDocument >>= hugeLambdaExpression
+# With this substitution, the above becomes
+#   theDocument >>= (hugeLambdaExpression) . someFunction
+# which is even harder to read than the original.
+- ignore: {name: "Redundant <$>"}
+
+# Not great for readability.
+- ignore: {name: "Use map with tuple-section"}
+
+# We don't want this as it doesn't really help anything and sometimes
+# makes the code harder to read:
+# Found:
+#   \ did actual
+#     -> DocumentObjectVersionDoesNotMatch did object_version actual
+# Perhaps:
+#   (`DocumentObjectVersionDoesNotMatch` object_version)
+- ignore: {name: "Avoid lambda using `infix`"}
+
+# Condemn nub and friends
+- warn: {lhs: nub (sort x), rhs: Data.List.Extra.nubSort x}
+- warn: {lhs: nubOrd (sort x), rhs: Data.List.Extra.nubSort x}
+- warn: {lhs: sort (nubOrd x), rhs: Data.List.Extra.nubSort x}
+- warn: {lhs: nub, rhs: Data.List.Extra.nubOrd}
+- warn: {lhs: nubBy, rhs: Data.List.Extra.nubOrdBy}
+- warn: {lhs: nubOn, rhs: Data.List.Extra.nubOrdOn}
+- warn: {lhs: return, rhs: pure}
+
+# Prefer shorter form without fmap
+- warn: {lhs: fmap f $ g, rhs: f <$> g}
+
+# Handle temporary files properly
+- warn: {lhs: getTemporaryDirectory, rhs: withSystemTempDirectory}
+- warn: {lhs: withTempDirectory, rhs: withSystemTempDirectory}
+- warn: {lhs: withTempFile, rhs: withSystemTempFile}
+
+# Replace a $ b $ c with a . b $ c
+- group: {name: dollar, enabled: true}
+
+- functions:
+  # DB migrations
+  - {name: sqlAddValidFK, within: []}
+
+# Prefer specific functions
+- warn: {lhs: maybe x identity, rhs: fromMaybe x}
+- warn: {lhs: maybe x pure a, rhs: whenNothing a x}
+- warn: {lhs: maybe (pure ()) f x, rhs: whenJust x f}
+- warn: {lhs: Control.Monad.Extra.fromMaybeM (throwE x), rhs: Control.Error.Util.failWith x}
+- warn: {lhs: maybe (Left e) Right, rhs: Data.Either.Extra.maybeToEither e }
+- warn: {lhs: sortBy (on compare x), rhs: sortOn x }
+- warn: {lhs: "either a b =<< c", rhs: "Control.Monad.Extra.eitherM a b c"}
+- warn: {lhs: "either (const Nothing) Just", rhs: "Data.Either.Extra.eitherToMaybe"}
+# Control.Monad.Extra.concatForM
+- warn: {lhs: fmap concat (forM a b), rhs: Control.Monad.Extra.concatForM a b}
+- warn: {lhs: map concat (forM a b), rhs: Control.Monad.Extra.concatForM a b}
+- warn: {lhs: concat <$> forM a b, rhs: Control.Monad.Extra.concatForM a b}
+- warn: {lhs: forM a b <&> concat, rhs: Control.Monad.Extra.concatForM a b}
+
+- modules:
+  - {name: [Data.Set], as: Set}
+  - {name: [Data.ByteString.Lazy], as: BSL}
+  - {name: [Data.Text, Data.Text.Encoding], as: T}
+  - {name: [Data.ByteString], as: BS}
+  - {name: [Data.List.NonEmpty], as: NE}
+  - {name: [Data.Map], as: Map}
+  #- {name: [Data.Aeson], as: A}
