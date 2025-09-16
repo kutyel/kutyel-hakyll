@@ -32,7 +32,7 @@ jobs:
         run: nix build --accept-flake-config
 
       - name: Run hlint
-        run: nix develop --command bash -c "cd ssg && cabal test hlint"
+        run: nix develop --accept-flake-config --command bash -c "cd ssg && cabal test hlint"
 
       - name: Artifact pages
         uses: actions/upload-artifact@v4.6.2
