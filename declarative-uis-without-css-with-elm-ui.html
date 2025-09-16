@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Declarative UIs without CSS with elm-ui</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="elm-ui is a package for layout and interface design. This is a novel iteration on declarative styling where you can use Elm types and functions to define your UI in a declarative way.">
+    <meta name="author" content="Flavio Corpa">
+    <meta name="keywords" content="egghead,elm,UI,css,elm-ui">
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU">
+    <meta http-equiv="origin-trial" content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ==">
+
+    <meta property="og:site_name" content="flaviocorpa.com">
+    <meta property="og:title" content="Declarative UIs without CSS with elm-ui">
+    <meta property="og:url" content="https://flaviocorpa.com/declarative-uis-without-css-with-elm-ui.html">
+    <meta property="og:description" content="elm-ui is a package for layout and interface design. This is a novel iteration on declarative styling where you can use Elm types and functions to define your UI in a declarative way.">
+    <meta property="og:image" content="https://flaviocorpa.com./images/elm-ui-course.webp">
+    
+      <meta property="og:type" content="article">
+    
+
+    
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:image:src" content="https://flaviocorpa.com./images/elm-ui-course.webp">
+    
+    <meta property="twitter:url" content="https://flaviocorpa.com/declarative-uis-without-css-with-elm-ui.html" />
+    <meta property="twitter:site" content="flaviocorpa.com">
+    <meta property="twitter:title" content="Declarative UIs without CSS with elm-ui">
+    <meta property="twitter:description" content="elm-ui is a package for layout and interface design. This is a novel iteration on declarative styling where you can use Elm types and functions to define your UI in a declarative way.">
+    <meta property="twitter:creator" content="@FlavioCorpa">
+
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>'>
+    <link rel="canonical" href="https://flaviocorpa.com/declarative-uis-without-css-with-elm-ui.html">
+    <link rel="stylesheet" href="./css/default.css" />
+    
+      <link rel="stylesheet" href="./css/article.css" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" />
+  </head>
+  <body data-theme="dark">
+    <script>
+      ;(() => {
+        window.site = {
+          theme: localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          setTheme: (name) => {
+            document.body.setAttribute('data-theme', name)
+            localStorage.setItem('theme', name);
+            window.site.theme = name;
+            window.site.refreshThemeSwitch();
+          },
+          refreshThemeSwitch: () => {
+            const isLight = window.site.theme === 'light';
+            const themeSwitch = document.querySelector('[data-theme-switch]');
+
+            themeSwitch?.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true');
+          },
+        };
+
+        window.site.setTheme(window.site.theme);
+      })();
+    </script>
+
+    <button
+      aria-label="Switch to light mode"
+      aria-checked="true"
+      data-theme-switch
+      role="switch"
+      type="button"
+    >
+      <span aria-hidden="true" data-theme-switch-icon="dark">🌙</span>
+      <span aria-hidden="true" data-theme-switch-icon="light">🌞</span>
+    </button>
+
+    <nav class="nav">
+  <div class="layout--constrained" data-nav-wrap>
+    <a class="nav__link nav__skip" href="#content">Skip to content</a>
+    <a class="nav__link" href="./">Home</a>
+    <a class="nav__link" href="https://github.com/sponsors/kutyel">Sponsor me</a>
+    <a class="nav__link" href="./atom.xml">RSS</a>
+  </div>
+</nav>
+
+
+<style>
+  bsky-comments {
+    --background-color: var(--bgColor);
+    --text-color: var(--textColor);
+    --link-color: var(--textLinkColor);
+    --link-hover-color: var(--textLinkHoverColor);
+    --comment-meta-color: #888;
+    --error-color: #ff4d4d;
+    --reply-border-color: var(--separatorColor);
+    --button-background-color: var(--btnBgColor);
+    --button-hover-background-color: rgba(var(--btnBgColor), 0.2);
+    --author-avatar-border-radius: 50%;
+  }
+</style>
+
+<main id="content" tabindex="-1">
+  <article>
+    <header>
+      <h1>Declarative UIs without CSS with elm-ui</h1>
+      <div class="info">
+        <small class="italic">24/02/2023</small>
+        <small class="italic"> | 0 min read</small>
+        
+      </div>
+    </header>
+    <section class="layout--constrained"><p><a href="https://egghead.io/courses/declarative-uis-without-css-with-elm-ui-93bd?af=e68v38">Check out my <code>elm-ui</code> course on egghead.io!</a></p>
+<p><a href="(https://egghead.io/courses/declarative-uis-without-css-with-elm-ui-93bd?af=e68v38)"><img src="./images/elm-ui-course.webp" alt="course-img" /></a></p>
+<p><code>elm-ui</code> is a package for layout and interface design. This is a novel iteration on declarative styling where you can use Elm types and functions to define your UI in a declarative way.</p>
+<p>The novel part is that it <strong>does not require you to know CSS</strong> to be used. The API is very simple and can be learned quickly! 💅🏻</p>
+<p>The approach taken by <code>elm-ui</code> is based on two big ideas: Getting the compiler to verify as much of the layout and styling as possible by defining them in Elm code Enabling refactoring capabilities of Elm for UI code.</p>
+<h2 id="future-new-eggheadio-elm-course">Future new egghead.io Elm course!?</h2>
+<p>If you would like me to work on a <a href="https://egghead.io/q?access_state=free">free community egghead.io resource</a> to learn Elm from scratch, you can please <a href="https://github.com/sponsors/kutyel/">sponsor my work on Github Sponsors</a> or just reach out to me on <a href="https://twitter.com/FlavioCorpa">Twitter</a> and let me know!</p>
+<p>The more requests I get the more motivation I will have to put in the time and effort to create the next ultimate Elm learning resource! 🙌🏻</p></section>
+  </article>
+</main>
+
+
+
+<footer class="section--padded">
+  <div class="layout--constrained">
+    <ul role="list">
+      <li role="listitem">
+        <a href="./">Home</a>
+      </li>
+      <li role="listitem">
+        <a href="https://github.com/sponsors/kutyel/">Sponsor me</a>
+      </li>
+      <li role="listitem">
+        <a href="./atom.xml">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+
+<script src="https://gistcdn.githack.com/kutyel/41d12e099484fd390fb67168271fcdd9/raw/9be26e500525a2e4edacc53d3a8006aaddec0e15/bsky-comments.js"></script>
+
+
+    <script async>
+      ;(() => {
+        window.site.refreshThemeSwitch();
+        document.querySelector('[data-theme-switch]').addEventListener('click', e => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light');
+        });
+      })();
+     </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+  </body>
+</html>
