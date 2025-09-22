@@ -1,12 +1,13 @@
 ---
-author: "Flavio Corpa"
-authorTwitter: "@FlavioCorpa"
-desc: "elm-ui is a package for layout and interface design. This is a novel iteration on declarative styling where you can use Elm types and functions to define your UI in a declarative way."
+author: 'Flavio Corpa'
+authorTwitter: '@FlavioCorpa'
+desc: 'elm-ui is a package for layout and interface design. This is a novel iteration on declarative styling where you can use Elm types and functions to define your UI in a declarative way.'
 image: ./images/elm-ui-course.webp
-keywords: "egghead,elm,UI,css,elm-ui"
-lang: "en"
-title: "Declarative UIs without CSS with elm-ui"
-date: "2023-02-24T12:07:00Z"
+keywords: 'egghead,elm,UI,css,elm-ui'
+tags: egghead, elm, elm-ui
+lang: 'en'
+title: 'Declarative UIs without CSS with elm-ui'
+date: '2023-02-24T12:07:00Z'
 ---
 
 [Check out my `elm-ui` course on egghead.io!](https://egghead.io/courses/declarative-uis-without-css-with-elm-ui-93bd?af=e68v38)

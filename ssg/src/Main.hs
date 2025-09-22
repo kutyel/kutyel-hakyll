@@ -96,15 +96,30 @@ main = hakyllWith config $ do
     route idRoute
     compile compressCssCompiler
 
-  match "posts/*" $ do
-    let ctx = constField "type" "article" <> postCtx
+  tags <- buildTags "posts/*" (fromCapture "tags/*.html")
 
+  match "posts/*" $ do
     route $ metadataRoute titleRoute
     compile $
       pandocCompilerCustom
-        >>= loadAndApplyTemplate "templates/post.html" ctx
+        >>= loadAndApplyTemplate "templates/post.html" (postCtxWithTags tags)
         >>= saveSnapshot blogSnapshot
+        >>= loadAndApplyTemplate "templates/default.html" (postCtxWithTags tags)
+
+  tagsRules tags $ \tag tagPattern -> do
+    let title = "Posts tagged \"" ++ tag ++ "\""
+    route idRoute
+    compile $ do
+      posts <- recentFirst =<< loadAll tagPattern
+      let ctx =
+            constField "title" title
+              <> listField "posts" (postCtxWithTags tags) (pure posts)
+              <> defaultContext
+
+      makeItem ""
+        >>= loadAndApplyTemplate "templates/tag.html" ctx
         >>= loadAndApplyTemplate "templates/default.html" ctx
+        >>= relativizeUrls
 
   match "index.html" $ do
     route idRoute
@@ -173,6 +188,9 @@ postCtx =
     <> dateField "date" "%d/%m/%Y"
     <> readingTimeField "readingtime"
     <> defaultContext
+
+postCtxWithTags :: Tags -> Context String
+postCtxWithTags tags = tagsField "tags" tags `mappend` postCtx
 
 titleCtx :: Context String
 titleCtx =

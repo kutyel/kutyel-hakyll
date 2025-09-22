@@ -4,6 +4,7 @@ authorTwitter: '@FlavioCorpa'
 desc: '猫の望み、オリジナル物語'
 image: ./images/nozomi.png
 keywords: '日本語、白い犬、クリエイティブライティング'
+tags: language, japanese
 lang: 'jp'
 title: 'The wish of the cat'
 date: '2025-04-03T13:00:00Z'
@@ -28,7 +29,7 @@ postId: 'at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3llvwklpum225'
 
 『あなたの<ruby>皮<rt>かわ</rt></ruby>？』
 
-『そう、その<ruby>三味線<rt>しゃみせん</rt></ruby>は私の<ruby>皮<rt>かわ</rt></ruby>の<ruby>残骸<rt>ざんがい</rt></ruby>から<ruby>作<rt>つく</rt></ruby>られたもので、あなたが私を<ruby>呼<rt>よ</rt></ruby>び<ruby>出<rt>だ</rt></ruby>した<ruby>以上<rt>いじょう</rt></ruby>、3つの<ruby>願<rt>ねが</rt></ruby>いを<ruby>叶<rt>かな</rt></ruby>えるのが私の<ruby>務<rt>つと</rt></ruby>めだにゃん』
+『そう、その<ruby>三味線<rt>しゃみせん</rt></ruby>は私の<ruby>皮<rt>かわ</rt></ruby>の<ruby>残骸<rt>ざんがい</rt></ruby>から<ruby>作<rt>つく</rt></ruby>られたもので、あなたが私を<ruby>呼<rt>よ</rt></ruby>び<ruby>出<rt>だ</rt></ruby>した<ruby>以上<rt>いじょう</rt></ruby>、3 つの<ruby>願<rt>ねが</rt></ruby>いを<ruby>叶<rt>かな</rt></ruby>えるのが私の<ruby>務<rt>つと</rt></ruby>めだにゃん』
 
 『へーー。。。そうですか？』
 
@@ -44,11 +45,11 @@ postId: 'at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3llvwklpum225'
 
 『<ruby>願<rt>ねが</rt></ruby>いが<ruby>叶<rt>かな</rt></ruby>ったにゃん！』
 
-『私の2つ<ruby>目<rt>め</rt></ruby>の<ruby>願<rt>ねが</rt></ruby>いは、私が<ruby>死<rt>し</rt></ruby>んだ<ruby>後<rt>あと</rt></ruby>、<ruby>家族<rt>かぞく</rt></ruby>に<ruby>大切<rt>たいせつ</rt></ruby>なものが<ruby>何<rt>なに</rt></ruby>も<ruby>足<rt>た</rt></ruby>りないものがないようにすることだ。』
+『私の 2 つ<ruby>目<rt>め</rt></ruby>の<ruby>願<rt>ねが</rt></ruby>いは、私が<ruby>死<rt>し</rt></ruby>んだ<ruby>後<rt>あと</rt></ruby>、<ruby>家族<rt>かぞく</rt></ruby>に<ruby>大切<rt>たいせつ</rt></ruby>なものが<ruby>何<rt>なに</rt></ruby>も<ruby>足<rt>た</rt></ruby>りないものがないようにすることだ。』
 
 『<ruby>面白<rt>おもしろ</rt></ruby>いにゃん！<ruby>完成<rt>かんせい</rt></ruby>です。』
 
-『<ruby>最後<rt>さいご</rt></ruby>に、3つ<ruby>目<rt>め</rt></ruby>の<ruby>願<rt>ねが</rt></ruby>いは、あなたの<ruby>魂<rt>たましい</rt></ruby>が<ruby>安<rt>やす</rt></ruby>らかに<ruby>眠<rt>ねむ</rt></ruby>れるようにということです。』
+『<ruby>最後<rt>さいご</rt></ruby>に、3 つ<ruby>目<rt>め</rt></ruby>の<ruby>願<rt>ねが</rt></ruby>いは、あなたの<ruby>魂<rt>たましい</rt></ruby>が<ruby>安<rt>やす</rt></ruby>らかに<ruby>眠<rt>ねむ</rt></ruby>れるようにということです。』
 
 『あー！ワクワクします、どうもーにゃん！』
 
