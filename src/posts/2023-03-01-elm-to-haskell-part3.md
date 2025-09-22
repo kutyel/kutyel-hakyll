@@ -4,7 +4,6 @@ authorTwitter: '@FlavioCorpa'
 desc: 'A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!'
 image: ./images/haskell-elm.png
 keywords: 'haskell,elm,functional,programming'
-tags: haskell, elm, fp
 lang: 'en'
 title: 'Haskell for Elm developers: giving names to stuff (Part 3 - Monads!)'
 date: '2023-03-01T17:22:00Z'

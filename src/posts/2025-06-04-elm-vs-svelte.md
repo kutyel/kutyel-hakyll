@@ -4,11 +4,10 @@ authorTwitter: '@FlavioCorpa'
 desc: 'A blogpost comparing the latest cutting edge frontend framework (Svelte), with the older but functionally pure Elm programming language'
 image: ./images/elm-vs-svelte.png
 keywords: 'frontend,svelte,elm,functional,programming'
-tags: frontend, svelte, elm, fp
 lang: 'en'
 title: 'Building a non-trivial app with Elm and with Svelte'
 date: '2025-06-04T15:00:00Z'
-postId: 'at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3lpuiptgukc2m'
+postId: "at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3lpuiptgukc2m"
 ---
 
 <img src="./images/elm-vs-svelte.png" alt="elm-vs-svelte" width="500px">
@@ -21,14 +20,13 @@ I recently started to volunteer by contributing to a Svelte + TypeScript codebas
 
 I think Svelte lives up to its hype, I started to learn it by just using their tutorial in the [Svelte website](https://svelte.dev/tutorial/svelte/welcome-to-svelte), and in a matter of only **10 hours of work**, I was able to reproduce a fully fledged Svelte app, with Firebase and authentication just like the one I built in Elm for my personal use 3 years ago!
 
-This means two things:
-
+This means two things: 
 1. Svelte is incredibly easy to learn! 💃🏻
 2. Svelte feels like just building HTML apps, but with magical bits ✨
 
 > I can't state how happy I am of not having to type `className` ever again! 😅
 
-For comparison, the Elm app currently has ~900 LOC, whereas the Svelte app has _exactly_ 187 LOC 🤯, divided into 120 LOC of TypeScript and 67 LOC of template (Svelte HTML). This feels amazing, but is it really a fair comparison? No, and that is why in the following sections of the blogpost I am going to describe the pros and cons of both implementations!
+For comparison, the Elm app currently has ~900 LOC, whereas the Svelte app has *exactly* 187 LOC 🤯, divided into 120 LOC of TypeScript and 67 LOC of template (Svelte HTML). This feels amazing, but is it really a fair comparison? No, and that is why in the following sections of the blogpost I am going to describe the pros and cons of both implementations!
 
 ## Firebase
 
@@ -72,9 +70,9 @@ const readings = new CollectionState<DocumentData, Reading>({
   listen: true,
   query: () => [
     where('date', '<=', subHours(new UTCDate(selectedYear + 1, 0, 1), 1)),
-    where('date', '>=', new UTCDate(selectedYear, 0, 1)),
+    where('date', '>=', new UTCDate(selectedYear, 0, 1))
   ],
-  path: (currentUser) => `users/${currentUser?.uid}/readings`,
+  path: (currentUser) => `users/${currentUser?.uid}/readings`
 })
 ```
 
@@ -95,7 +93,7 @@ This is not bad per se but I know that state and derived state can go out of han
 
 ## elm-ui vs. Tailwindcss
 
-This section is a bit offtopic, because I love Tailwind CSS, but I also love [**elm-ui**](https://package.elm-lang.org/packages/mdgriffith/elm-ui/latest/). In both applications, _I did not write a single line of CSS_, and both look great!
+This section is a bit offtopic, because I love Tailwind CSS, but I also love [**elm-ui**](https://package.elm-lang.org/packages/mdgriffith/elm-ui/latest/). In both applications, *I did not write a single line of CSS*, and both look great!
 
 If you don't know about `elm-ui`, I created an [Egghead tutorial](https://egghead.io/courses/declarative-uis-without-css-with-elm-ui-93bd?af=e68v38) about it, it is an incredible way to create styles in a declarative and idiomatic way within Elm, but that it does not force you to know/understand all the ins and outs of CSS. I thoroughly recommend it! 💅🏻
 
@@ -131,7 +129,7 @@ onMount(async () => {
 
 That took a shameful amount of time to figure out and I felt really stupid. 😢
 
-Elm _also_ has excellent support for Web Components, but after Google breaking its library a few times while updating dependencies (I know, right 😅), I decided for the Elm app to get rid of it and try out [elm-charts](https://www.elm-charts.org/) instead.
+Elm *also* has excellent support for Web Components, but after Google breaking its library a few times while updating dependencies (I know, right 😅), I decided for the Elm app to get rid of it and try out [elm-charts](https://www.elm-charts.org/) instead.
 
 This is also not a fair comparison, and a few extra hundred of lines of Elm code come by building the calendar chart by hand, similar to a heatmap. [elm-charts](https://www.elm-charts.org/) is like the analog of D3.js but for Elm, it is a beautiful library and very potent! 🚀
 
@@ -139,7 +137,7 @@ Here is what the end result looked like:
 
 <img src="./images/elm-chart.png" alt="elm-chart" width="650px">
 
-As you can see, it looks pretty similar, but you have _fine grained_ control about everything, for example, I was able to display the days of the week **from Monday to Sunday**, something currently the Google Calendar chart does not allow you to do. 📆
+As you can see, it looks pretty similar, but you have *fine grained* control about everything, for example, I was able to display the days of the week **from Monday to Sunday**, something currently the Google Calendar chart does not allow you to do. 📆
 
 The simplicity of the Svelte code here is very nice:
 
@@ -163,7 +161,7 @@ It has been a while ago since the last time I had to write new JavaScript or Typ
 select [ onInput <| SelectChapter << Maybe.withDefault 0 << String.toInt ] <|
     List.map
         (\chapter ->
-            option
+            option 
               [ Html.Attrs.selected <| chapter == selectedChapter ]
               [ Html.text <| fromInt chapter ]
         )
@@ -172,7 +170,7 @@ select [ onInput <| SelectChapter << Maybe.withDefault 0 << String.toInt ] <|
 
 You might not be very familiar with this syntax, but once you get used to it, it is quite straightforward. Did you notice the use of `List.range`? 👀
 
-When translating this code to TypeScript, I COULD NOT BELIEVE it is 2025 already and JavaScript still **does not have** a built in `range` function... I mean... come on! Yes, we have some sort of proposal to bring [`Iterator.range` in Stage 2](https://github.com/tc39/proposal-iterator.range), but very far away from being able to use it natively! 🥹 I had to use `core-js` and _manually patch TypeScript_ 💀 to be able to use it in the Svelte app, and the result was not pretty...
+When translating this code to TypeScript, I COULD NOT BELIEVE it is 2025 already and JavaScript still **does not have** a built in `range` function... I mean... come on! Yes, we have some sort of proposal to bring [`Iterator.range` in Stage 2](https://github.com/tc39/proposal-iterator.range), but very far away from being able to use it natively! 🥹 I had to use `core-js` and *manually patch TypeScript* 💀 to be able to use it in the Svelte app, and the result was not pretty...
 
 ```jsx
 <Select labelText="Year" bind:selected={selectedYear} onchange={onChangeYear}>
@@ -193,7 +191,7 @@ const readingsData = $derived(
       1, // the below snippet builds the tooltip for the calendar chart
       `<div style="font-size: 1rem;padding: 0.75rem;">
         ${format(d, 'MMMM d, yyyy')}: <strong>${book} ${chapter}</strong>
-      </div>`,
+      </div>`
     ]
   })
 )
@@ -212,7 +210,7 @@ async function handleRead() {
   readingId = await readings.add({
     book: selectedBook,
     chapter: selectedChapter,
-    date: Timestamp.fromDate(selectedDate),
+    date: Timestamp.fromDate(selectedDate)
   })
 }
 ```
@@ -262,6 +260,6 @@ I have to say, Svelte has sparkled back in me the excitement for web development
 
 If I had to choose a JavaScript/TypeScript frontend framework for my next app, I would **probably never use React again** (and this is huge!) and pick Svelte instead. However, as mentioned in the previous section, TypeScript is still MILES behind from the type safety of Elm. Therefore, even despite the verbosity of the code, if I REALLY cared about the correctness and maintainability of the application I am going to write, and I want to sleep well at night rest assured that nothing is going to blow up, **I would still pick Elm for my frontend development**.
 
-Obviously, both Elm and Svelte have their tradeoffs (for example, Elm's foreign function interface with JavaScript is _very_ limited) but I hope I have presented them objectively enough in this post and that you enjoyed it!
+Obviously, both Elm and Svelte have their tradeoffs (for example, Elm's foreign function interface with JavaScript is *very* limited) but I hope I have presented them objectively enough in this post and that you enjoyed it!
 
 If you found joy in this blogpost, share it in your social networks and **follow me on [Twitter](https://twitter.com/FlavioCorpa)** and [BlueSky](https://bsky.app/profile/flaviocorpa.com)! 🦋

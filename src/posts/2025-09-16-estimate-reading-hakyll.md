@@ -3,7 +3,6 @@ author: 'Flavio Corpa'
 authorTwitter: '@FlavioCorpa'
 desc: 'A small technical Haskell blogpost about the Hakyll platform!'
 keywords: 'haskell,functional,programming'
-tags: haskell, fp, hakyll
 lang: 'en'
 title: 'How to add estimated reading time to your Hakyll blog'
 date: '2025-09-16T15:01:00Z'
