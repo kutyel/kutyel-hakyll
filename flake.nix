@@ -51,6 +51,7 @@
             haskellPackages.ghc
             haskellPackages.cabal-install
             haskellPackages.ormolu
+            haskellPackages.haskell-language-server
           ];
         };
       }
