@@ -50,6 +50,7 @@
             haskellPackages.hlint
             haskellPackages.ghc
             haskellPackages.cabal-install
+            haskellPackages.ormolu
           ];
         };
       }

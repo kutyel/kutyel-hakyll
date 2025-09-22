@@ -16,15 +16,15 @@ If you also use Hakyll, you might have wondered how can we calculate the estimat
 readingTimeField :: String -> Context String
 readingTimeField key =
   field key calculate
- where
-  calculate :: Item String -> Compiler String
-  calculate = pure . withTagList acc . itemBody
-  acc ts = [TagText . show $ time ts]
-  -- M. Brysbaert, Journal of Memory and Language (2009) vol 109.
-  -- DOI: 10.1016/j.jml.2019.104047
-  time ts = foldr count 0 ts `div` 238
-  count (TagText s) n = n + length (words s)
-  count _ n = n
+  where
+    calculate :: Item String -> Compiler String
+    calculate = pure . withTagList acc . itemBody
+    acc ts = [TagText . show $ time ts]
+    -- M. Brysbaert, Journal of Memory and Language (2009) vol 109.
+    -- DOI: 10.1016/j.jml.2019.104047
+    time ts = foldr count 0 ts `div` 238
+    count (TagText s) n = n + length (words s)
+    count _ n = n
 ```
 
 What's funny about the above implementation is that I found an actual research [paper](https://www.sciencedirect.com/science/article/abs/pii/S0749596X19300786) that tells us the average reading speed for adults and non-fiction, so I did not have to guess it!

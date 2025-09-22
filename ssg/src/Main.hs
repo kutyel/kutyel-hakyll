@@ -8,16 +8,16 @@ import Data.Text.Slugger qualified as Slugger
 import Hakyll
 import System.FilePath (takeFileName)
 import Text.HTML.TagSoup (Tag (..))
-import Text.Pandoc (
-  Extension (..),
-  Extensions,
-  ReaderOptions,
-  WriterOptions (writerHighlightStyle),
-  extensionsFromList,
-  githubMarkdownExtensions,
-  readerExtensions,
-  writerExtensions,
- )
+import Text.Pandoc
+  ( Extension (..),
+    Extensions,
+    ReaderOptions,
+    WriterOptions (writerHighlightStyle),
+    extensionsFromList,
+    githubMarkdownExtensions,
+    readerExtensions,
+    writerExtensions,
+  )
 import Text.Pandoc.Highlighting (Style, breezeDark, styleToCss)
 
 --------------------------------------------------------------------------------
@@ -54,24 +54,24 @@ blogSnapshot = "content"
 config :: Configuration
 config =
   defaultConfiguration
-    { destinationDirectory = "dist"
-    , ignoreFile = ignoreFile'
-    , previewHost = "127.0.0.1"
-    , previewPort = 8000
-    , providerDirectory = "src"
-    , storeDirectory = "ssg/_cache"
-    , tmpDirectory = "ssg/_tmp"
+    { destinationDirectory = "dist",
+      ignoreFile = ignoreFile',
+      previewHost = "127.0.0.1",
+      previewPort = 8000,
+      providerDirectory = "src",
+      storeDirectory = "ssg/_cache",
+      tmpDirectory = "ssg/_tmp"
     }
- where
-  ignoreFile' path
-    | ".DS_Store" == fileName = True
-    | "." `isPrefixOf` fileName = False
-    | "#" `isPrefixOf` fileName = True
-    | "~" `isSuffixOf` fileName = True
-    | ".swp" `isSuffixOf` fileName = True
-    | otherwise = False
-   where
-    fileName = takeFileName path
+  where
+    ignoreFile' path
+      | ".DS_Store" == fileName = True
+      | "." `isPrefixOf` fileName = False
+      | "#" `isPrefixOf` fileName = True
+      | "~" `isSuffixOf` fileName = True
+      | ".swp" `isSuffixOf` fileName = True
+      | otherwise = False
+      where
+        fileName = takeFileName path
 
 --------------------------------------------------------------------------------
 -- BUILD
@@ -83,13 +83,13 @@ main = hakyllWith config $ do
         route idRoute
         compile copyFileCompiler
     )
-    [ "CNAME"
-    , "favicon.ico"
-    , "robots.txt"
-    , "_config.yml"
-    , "images/*"
-    , "js/*"
-    , "fonts/*"
+    [ "CNAME",
+      "favicon.ico",
+      "robots.txt",
+      "_config.yml",
+      "images/*",
+      "js/*",
+      "fonts/*"
     ]
 
   match "css/*" $ do
@@ -181,14 +181,14 @@ titleCtx =
 readingTimeField :: String -> Context String
 readingTimeField key =
   field key calculate
- where
-  calculate :: Item String -> Compiler String
-  calculate = pure . withTagList acc . itemBody
-  acc ts = [TagText . show $ time ts]
-  -- M. Brysbaert, Journal of Memory and Language (2009) vol 109. DOI: 10.1016/j.jml.2019.104047
-  time ts = foldr count 0 ts `div` 238
-  count (TagText s) n = n + length (words s)
-  count _ n = n
+  where
+    calculate :: Item String -> Compiler String
+    calculate = pure . withTagList acc . itemBody
+    acc ts = [TagText . show $ time ts]
+    -- M. Brysbaert, Journal of Memory and Language (2009) vol 109. DOI: 10.1016/j.jml.2019.104047
+    time ts = foldr count 0 ts `div` 238
+    count (TagText s) n = n + length (words s)
+    count _ n = n
 
 --------------------------------------------------------------------------------
 -- TITLE HELPERS
@@ -220,11 +220,11 @@ pandocExtensionsCustom :: Extensions
 pandocExtensionsCustom =
   githubMarkdownExtensions
     <> extensionsFromList
-      [ Ext_fenced_code_attributes
-      , Ext_gfm_auto_identifiers
-      , Ext_implicit_header_references
-      , Ext_smart
-      , Ext_footnotes
+      [ Ext_fenced_code_attributes,
+        Ext_gfm_auto_identifiers,
+        Ext_implicit_header_references,
+        Ext_smart,
+        Ext_footnotes
       ]
 
 pandocReaderOpts :: ReaderOptions
@@ -236,8 +236,8 @@ pandocReaderOpts =
 pandocWriterOpts :: WriterOptions
 pandocWriterOpts =
   defaultHakyllWriterOptions
-    { writerExtensions = pandocExtensionsCustom
-    , writerHighlightStyle = Just pandocHighlightStyle
+    { writerExtensions = pandocExtensionsCustom,
+      writerHighlightStyle = Just pandocHighlightStyle
     }
 
 pandocHighlightStyle :: Style
@@ -262,11 +262,11 @@ feedCompiler renderer =
 feedConfiguration :: FeedConfiguration
 feedConfiguration =
   FeedConfiguration
-    { feedTitle = myFeedTitle
-    , feedDescription = myFeedDescription
-    , feedAuthorName = myFeedAuthorName
-    , feedAuthorEmail = myFeedAuthorEmail
-    , feedRoot = myFeedRoot
+    { feedTitle = myFeedTitle,
+      feedDescription = myFeedDescription,
+      feedAuthorName = myFeedAuthorName,
+      feedAuthorEmail = myFeedAuthorEmail,
+      feedRoot = myFeedRoot
     }
 
 --------------------------------------------------------------------------------
