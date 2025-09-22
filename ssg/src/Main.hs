@@ -99,23 +99,27 @@ main = hakyllWith config $ do
   tags <- buildTags "posts/*" (fromCapture "tags/*.html")
 
   match "posts/*" $ do
+    let ctx = constField "type" "article" <> postCtxWithTags tags
     route $ metadataRoute titleRoute
     compile $
       pandocCompilerCustom
-        >>= loadAndApplyTemplate "templates/post.html" (postCtxWithTags tags)
+        >>= loadAndApplyTemplate "templates/post.html" ctx
         >>= saveSnapshot blogSnapshot
-        >>= loadAndApplyTemplate "templates/default.html" (postCtxWithTags tags)
+        >>= loadAndApplyTemplate "templates/default.html" ctx
 
   tagsRules tags $ \tag tagPattern -> do
-    let title = "Posts tagged \"" ++ tag ++ "\""
+    let title = "Posts tagged '" ++ tag ++ "'"
     route idRoute
     compile $ do
       posts <- recentFirst =<< loadAll tagPattern
       let ctx =
             constField "title" title
+              <> constField "desc" title
+              <> constField "siteName" mySiteName
+              <> constField "root" mySiteRoot
+              <> constField "type" "article"
               <> listField "posts" (postCtxWithTags tags) (pure posts)
               <> defaultContext
-
       makeItem ""
         >>= loadAndApplyTemplate "templates/tag.html" ctx
         >>= loadAndApplyTemplate "templates/default.html" ctx

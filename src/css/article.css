@@ -1,18 +1,33 @@
 @import url('https://fonts.googleapis.com/css?family=JetBrains+Mono&display=swap');
 
-body[data-theme="light"] {
+body[data-theme='light'] {
   --deepBgColor: #011627;
   --footerBgColor: #f5f5f5;
   --footerLinkColor: #2676ac;
   --h1Color: currentColor;
   --headerBgColor: #c4dfff;
 }
-body[data-theme="dark"] {
+body[data-theme='dark'] {
   --deepBgColor: #011627;
   --footerBgColor: #373c49;
   --footerLinkColor: #c693ea;
   --h1Color: var(--textColor);
   --headerBgColor: var(--deepBgColor);
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  display: flex;
+  flex-direction: column;
+}
+main {
+  flex: 1 0 auto;
+}
+footer {
+  flex-shrink: 0; /* attempt at fixing the footer */
 }
 
 /* NAV */
