@@ -4,6 +4,7 @@ authorTwitter: '@FlavioCorpa'
 desc: 'A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!'
 image: ./images/haskell-elm.png
 keywords: 'haskell,elm,functional,programming'
+tags: haskell, elm, fp
 lang: 'en'
 title: 'Haskell for Elm developers: giving names to stuff (Part 4 - Parser combinators)'
 date: '2024-03-28T17:00:00Z'
@@ -11,7 +12,6 @@ updated: '03/04/2024 11:15'
 ---
 
 <img src="./images/haskell-elm.svg" alt="logo" width="300px">
-
 
 > ⚠️ DISCLAIMER ⚠️
 > This is by no means a full in-depth explanation of parser combinators, as there are many papers on the subject. This post assumes you are somewhat familiar with `elm/parser`, and thus you are equipped with the tools you need to get familiar with parser combinators in Haskell!
@@ -34,7 +34,7 @@ As this definition is better explained with examples, let's have a look at the s
 type Parser a = String -> Maybe (a, String)
 ```
 
-Although no *production ready* parser combinators library would be as naive, it serves well our purpose to understand the simple essence of it:
+Although no _production ready_ parser combinators library would be as naive, it serves well our purpose to understand the simple essence of it:
 
 1. Await a `String` value.
 2. Produce a result that may or not succeed (that's why it returns a `Maybe`, although with this minimalistic design there is no possible way to know why the parser failed).
@@ -107,7 +107,7 @@ optional :: Alternative f => f a -> f (Maybe a)
 optional d = Just <$> d <|> pure Nothing
 ```
 
-As you can see, the `maybe` decoder function is called `optional` in Haskell, but the interesting stuff is the typeclass constraint: `Alternative f =>`. This is the magical final piece of the puzzle we need to understand to *get* parser combinators!
+As you can see, the `maybe` decoder function is called `optional` in Haskell, but the interesting stuff is the typeclass constraint: `Alternative f =>`. This is the magical final piece of the puzzle we need to understand to _get_ parser combinators!
 
 Let's have a look at simplified version of how the `Alternative` typeclass is defined in Haskell:
 
@@ -165,7 +165,7 @@ ignorer keepParser ignoreParser =
   map2 always keepParser ignoreParser
 ```
 
-Which is funny, because we CANNOT define infix operators in Elm, but Evan can 😜. Besides that, what is actually interesting is that, for conveniency, it is better to have infix operators for the `keeper`  and `ignorer` (or the `eater` operator, as Tereza Sokol called it in [her nice talk](https://youtu.be/M9ulswr1z0E?si=9LyCZ9lX298x2GYQ) 🤣) functions that allows us to consume or discard input, because it leads to somewhat more readable code™️.
+Which is funny, because we CANNOT define infix operators in Elm, but Evan can 😜. Besides that, what is actually interesting is that, for conveniency, it is better to have infix operators for the `keeper` and `ignorer` (or the `eater` operator, as Tereza Sokol called it in [her nice talk](https://youtu.be/M9ulswr1z0E?si=9LyCZ9lX298x2GYQ) 🤣) functions that allows us to consume or discard input, because it leads to somewhat more readable code™️.
 
 If we want to find those functions in Haskell, let me confess something right now: I did not show you in the previous `Applicative` post **all** there is to it regarding applicative functors, you have been lied to! 😈
 
@@ -223,7 +223,7 @@ and...
 (|.) : Parser c x keep -> Parser c x ignore -> Parser c x keep
 ```
 
-So this means that the `<*`  and the `<*>` operators are, respectively, the `ignorer` and `keeper` functions from `elm/parser`!! 🤯🤯🤯
+So this means that the `<*` and the `<*>` operators are, respectively, the `ignorer` and `keeper` functions from `elm/parser`!! 🤯🤯🤯
 
 What about the `*>` operator? Well, as you know, in Haskell we have this massive operator overflow, so it is exactly the same as `<*` but it let's us ignore the argument to the _left_ of the operator, as we will now see in a REAL WORLD™️ parser code sample. 😉
 
@@ -270,10 +270,10 @@ And now we can proceed with the parsing stuff, you will notice a few interesting
 
 1. There is a strange `reserved` combinator, which is a user defined combinator that is pretty clever and has the notion of comments/whitespace.
 2. Similarly, `strlit` is also user defined and it helps us to parse string literals.
-3. What the hell is `<?>` ?? Another crazy operator?? Well, do not worry, it is just to give proper error messages when the parser get's stuck, the Elm equivalent would be the  `problem : String -> Parser a` function. 😉
+3. What the hell is `<?>` ?? Another crazy operator?? Well, do not worry, it is just to give proper error messages when the parser get's stuck, the Elm equivalent would be the `problem : String -> Parser a` function. 😉
 4. What is that scary `MonadParsec Char T.Text m => m` typeclass constrain? Well, I would gladly read that as just `Parser` in the example we were giving before, but since in my package I used the [`megaparsec`](https://hackage.haskell.org/package/megaparsec) library, I did not want to lie to you again and show you the real type of the parser (more on `megaparsec` later).
 
-Here is a similar parser, written with `elm/parser` as a reference! 
+Here is a similar parser, written with `elm/parser` as a reference!
 
 ```elm
 import Parser
@@ -337,13 +337,13 @@ output =
     -- > Ok (Protocol "\"foo.avpr\"")
 ```
 
-As you can see, the code is fairly similar, we only used the `oneOf`  instead of the `<|>` operator, and the only complicated thing in Elm was figuring out how our `strlit` combinator had to look like. (Obviously this implementation is not perfect, but it is good enough for educational purposes).
+As you can see, the code is fairly similar, we only used the `oneOf` instead of the `<|>` operator, and the only complicated thing in Elm was figuring out how our `strlit` combinator had to look like. (Obviously this implementation is not perfect, but it is good enough for educational purposes).
 
 If you were able to understand the above Haskell code, congratulations, you know parser combinators already! 🎉🎉🎉
 
 ## The state of parsers in the Haskell ecosystem
 
-As opposed to Elm, where there is only one choice (`elm/parser`), the Haskell ecosystem is much more rich and diverse, each one with their different tradeoffs. Here is an *incomplete list* of parser combinator libraries I'm aware of:
+As opposed to Elm, where there is only one choice (`elm/parser`), the Haskell ecosystem is much more rich and diverse, each one with their different tradeoffs. Here is an _incomplete list_ of parser combinator libraries I'm aware of:
 
 - Parsec
 - Trifecta

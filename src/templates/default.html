@@ -2,67 +2,86 @@
 <html lang="en">
   <head>
     <title>$title$</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="$desc$">
-    $if(author)$<meta name="author" content="$author$">$endif$
-    $if(keywords)$<meta name="keywords" content="$keywords$">$endif$
-    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU">
-    <meta http-equiv="origin-trial" content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ==">
-
-    <meta property="og:site_name" content="$siteName$">
-    <meta property="og:title" content="$title$">
-    <meta property="og:url" content="$root$$url$">
-    <meta property="og:description" content="$desc$">
-    $if(image)$<meta property="og:image" content="$root$$image$">$endif$
-    $if(type)$
-      <meta property="og:type" content="$type$">
-    $else$
-      <meta property="og:type" content="website">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="$desc$" />
+    $if(author)$
+    <meta name="author" content="$author$" />
+    $endif$ $if(keywords)$
+    <meta name="keywords" content="$keywords$" />
     $endif$
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU" />
+    <meta
+      http-equiv="origin-trial"
+      content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ=="
+    />
 
+    <meta property="og:site_name" content="$siteName$" />
+    <meta property="og:title" content="$title$" />
+    <meta property="og:url" content="$root$$url$" />
+    <meta property="og:description" content="$desc$" />
     $if(image)$
-    <meta property="twitter:card" content="summary">
-    <meta property="twitter:image:src" content="$root$$image$">
+    <meta property="og:image" content="$root$$image$" />
+    $endif$ $if(type)$
+    <meta property="og:type" content="$type$" />
+    $else$
+    <meta property="og:type" content="website" />
+    $endif$ $if(image)$
+    <meta property="twitter:card" content="summary" />
+    <meta property="twitter:image:src" content="$root$$image$" />
     $endif$
     <meta property="twitter:url" content="$root$$url$" />
-    <meta property="twitter:site" content="$siteName$">
-    <meta property="twitter:title" content="$title$">
-    <meta property="twitter:description" content="$desc$">
-    $if(authorTwitter)$<meta property="twitter:creator" content="$authorTwitter$">$endif$
+    <meta property="twitter:site" content="$siteName$" />
+    <meta property="twitter:title" content="$title$" />
+    $if(desc)$
+    <meta property="twitter:description" content="$desc$" />
+    $endif$ $if(authorTwitter)$
+    <meta property="twitter:creator" content="$authorTwitter$" />
+    $endif$
 
-    <link rel="icon" href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>'>
-    <link rel="canonical" href="$root$$url$">
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>"
+    />
+    <link rel="canonical" href="$root$$url$" />
     <link rel="stylesheet" href="./css/default.css" />
     $if(type)$
-      <link rel="stylesheet" href="./css/$type$.css" />
+    <link rel="stylesheet" href="./css/$type$.css" />
     $else$
-      <link rel="stylesheet" href="./css/home.css" />
+    <link rel="stylesheet" href="./css/home.css" />
     $endif$
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+    />
   </head>
   <body data-theme="dark">
     <script>
       ;(() => {
         window.site = {
-          theme: localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          theme:
+            localStorage.getItem('theme') ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
           setTheme: (name) => {
             document.body.setAttribute('data-theme', name)
-            localStorage.setItem('theme', name);
-            window.site.theme = name;
-            window.site.refreshThemeSwitch();
+            localStorage.setItem('theme', name)
+            window.site.theme = name
+            window.site.refreshThemeSwitch()
           },
           refreshThemeSwitch: () => {
-            const isLight = window.site.theme === 'light';
-            const themeSwitch = document.querySelector('[data-theme-switch]');
+            const isLight = window.site.theme === 'light'
+            const themeSwitch = document.querySelector('[data-theme-switch]')
 
-            themeSwitch?.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
-            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true');
+            themeSwitch?.setAttribute(
+              'aria-label',
+              isLight ? 'Switch to dark mode' : 'Switch to light mode'
+            )
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true')
           },
-        };
+        }
 
-        window.site.setTheme(window.site.theme);
-      })();
+        window.site.setTheme(window.site.theme)
+      })()
     </script>
 
     <button
@@ -80,15 +99,19 @@
 
     <script async>
       ;(() => {
-        window.site.refreshThemeSwitch();
-        document.querySelector('[data-theme-switch]').addEventListener('click', e => {
-          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light');
-        });
-      })();
-     </script>
+        window.site.refreshThemeSwitch()
+        document.querySelector('[data-theme-switch]').addEventListener('click', (e) => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light')
+        })
+      })()
+    </script>
 
     <!-- Cloudflare Web Analytics -->
-    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'></script>
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'
+    ></script>
     <!-- End Cloudflare Web Analytics -->
   </body>
 </html>

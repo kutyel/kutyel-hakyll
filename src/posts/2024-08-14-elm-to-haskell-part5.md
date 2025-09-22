@@ -4,6 +4,7 @@ authorTwitter: '@FlavioCorpa'
 desc: 'A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!'
 image: ./images/haskell-elm.png
 keywords: 'haskell,elm,functional,programming'
+tags: haskell, elm, fp
 lang: 'en'
 title: 'Haskell for Elm developers: giving names to stuff (Part 5 - Semigroups and Monoids)'
 date: '2024-08-14T15:00:00Z'
@@ -23,7 +24,7 @@ class Semigroup a where
   (<>) :: a -> a -> a
 ```
 
-Actually it is not something really exciting, a `Semigroup` is every single type that has a `<>` operator (or an `append` function, which behaves the same way) and just allows us to put things together... 
+Actually it is not something really exciting, a `Semigroup` is every single type that has a `<>` operator (or an `append` function, which behaves the same way) and just allows us to put things together...
 
 The only interesting prerequisite that we need to have in mind to be considered a Semigroup, is that the `<>` operation should be **associative**: `a <> (b <> c) = (a <> b) <> c`.
 
