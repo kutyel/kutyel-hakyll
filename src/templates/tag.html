@@ -1,18 +1,19 @@
 $partial("templates/nav.html")$
 
 <main id="content" tabindex="-1">
-  <article>
-    <div class="info">
-      <h1>$title$</h1>
-    </div>
-    <section class="layout--constrained">
-      <ul>
+  <section class="posts">
+    <div class="layout--constrained">
+      <h2 class="posts__header">$title$</h2>
+      <ul class="posts__list">
         $for(posts)$
-        <li>$date$ － <a href="$url$">$title$</a></li>
+        <li>
+          <div><a href="$url$">$title$</a></div>
+          <small>$date$</small>
+        </li>
         $endfor$
       </ul>
-    </section>
-  </article>
+    </div>
+  </section>
 </main>
 
 $partial("templates/footer.html")$
