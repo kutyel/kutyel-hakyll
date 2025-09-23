@@ -1,12 +1,12 @@
 $partial("templates/nav.html")$
 
-<main id="content" tabindex="-1">
-  <section class="posts">
-    <div class="layout--constrained">
-      <h2 class="posts__header">$title$</h2>
-      <ul class="posts__list">
+<main class="flex flex-col h-screen justify-between" id="content" tabindex="-1">
+  <section class="mt-5">
+    <div class="relative ml-auto mr-auto w-[600px]">
+      <h2 class="mt-8 text-2xl font-normal before:block before:h-0 before:pb-5">$title$</h2>
+      <ul class="m-0 p-0">
         $for(posts)$
-        <li>
+        <li class="mb-5 border-s-3 px-5 py-1 dark:border-separator-dark border-separator">
           <div><a href="$url$">$title$</a></div>
           <small>$date$</small>
         </li>

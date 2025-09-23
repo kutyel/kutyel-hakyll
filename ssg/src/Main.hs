@@ -117,7 +117,6 @@ main = hakyllWith config $ do
               <> constField "desc" title
               <> constField "siteName" mySiteName
               <> constField "root" mySiteRoot
-              <> constField "type" "article"
               <> listField "posts" (postCtxWithTags tags) (pure posts)
               <> defaultContext
       makeItem ""
