@@ -4,7 +4,7 @@ authorTwitter: '@FlavioCorpa'
 desc: '猫の望み、オリジナル物語'
 image: ./images/nozomi.png
 keywords: '日本語、白い犬、クリエイティブライティング'
-tags: language, japanese
+tags: languages, japanese
 lang: 'jp'
 title: 'The wish of the cat'
 date: '2025-04-03T13:00:00Z'

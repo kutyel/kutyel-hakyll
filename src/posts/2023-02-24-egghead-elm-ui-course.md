@@ -4,7 +4,7 @@ authorTwitter: '@FlavioCorpa'
 desc: 'elm-ui is a package for layout and interface design. This is a novel iteration on declarative styling where you can use Elm types and functions to define your UI in a declarative way.'
 image: ./images/elm-ui-course.webp
 keywords: 'egghead,elm,UI,css,elm-ui'
-tags: egghead, elm, elm-ui
+tags: egghead, elm, elm-ui, web, frontend
 lang: 'en'
 title: 'Declarative UIs without CSS with elm-ui'
 date: '2023-02-24T12:07:00Z'

@@ -4,7 +4,7 @@ authorTwitter: '@FlavioCorpa'
 desc: 'A blogpost comparing the latest cutting edge frontend framework (Svelte), with the older but functionally pure Elm programming language'
 image: ./images/elm-vs-svelte.png
 keywords: 'frontend,svelte,elm,functional,programming'
-tags: frontend, svelte, elm, fp
+tags: frontend, svelte, elm, fp, web
 lang: 'en'
 title: 'Building a non-trivial app with Elm and with Svelte'
 date: '2025-06-04T15:00:00Z'
