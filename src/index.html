@@ -2,23 +2,23 @@
 title: Flavio Corpa | Senior Software Engineer
 desc: Functional programming, Haskell & Elm, Chess & stuff
 lang: en
-stylesheet: default
 ---
 
-<main>
-  <header class="author">
-    <div class="layout--constrained">
+<main class="flex-1">
+  <header class="relative m-10">
+    <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0">
       <img
         alt="me playing chess!"
-        class="author__image"
+        class="absolute right-0 top-0 rounded-[10%] m-0 w-[150px]"
         decoding="async"
-        width="150"
         loading="lazy"
         src="./images/avatar.jpg"
       />
-      <h1 class="author__name">Flavio Corpa</h1>
-      <h2 class="author__title">Senior Software Engineer</h2>
-      <div class="author__links">
+      <h1 class="m-0 font-normal leading-[1.2] text-[2.643rem]">Flavio Corpa</h1>
+      <h3 class="m-0 font-normal leading-[1.2] text-base text-[var(--authorTitleColor)]">
+        Senior Software Engineer
+      </h3>
+      <div class="flex mt-5 max-w-[450px] gap-[10px] items-center">
         <a href="https://bsky.app/profile/flaviocorpa.com">
           <i class="fa-brands fa-bluesky"></i>
         </a>
@@ -41,48 +41,82 @@ stylesheet: default
     </div>
   </header>
 
-  <section class="posts">
-    <div class="layout--constrained">
-      <h2 class="posts__header">Blog Posts</h2>
-      <ul class="posts__list">
+  <section class="mt-5">
+    <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0">
+      <h2
+        class="mt-8 text-[1.643rem] font-normal leading-[1.2] before:block before:h-0 before:pb-5 before:border-t-[5px] before:border-[var(--separatorColor)]"
+      >
+        Blog Posts
+      </h2>
+      <ul class="m-0 p-0 list-none">
         $for(posts)$
-          <li>
-            <div><a href="$url$">$title$</a></div>
-            <small>$date$</small>
-          </li>
+        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
+          <div><a href="$url$">$title$</a></div>
+          <small>$date$</small>
+        </li>
         $endfor$
       </ul>
     </div>
   </section>
 
-  <section class="posts">
-    <div class="layout--constrained">
-      <h2 class="posts__header">Talks</h2>
-      <ul class="posts__list">
-          <li>
-            <div><a href="https://youtu.be/GDITBmIzCDs?si=icOImK_jm9EOeVVc">Describing microservices using modern Haskell (Haskell Symposium 2020)</a></div>
-            <small>12/09/2020</small>
-          </li>
-          <li>
-            <div><a href="https://youtu.be/5IcG_BCGxEY?si=7nvOFZs10ESE50Zs">What happens if you let the creator of React design a programming language (LambdAle 2019)</a></div>
-            <small>11/10/2019</small>
-          </li>
-          <li>
-            <div><a href="https://youtu.be/IoVaArsh6tM?si=RfDmTovdbR9M9Krh">Functional lenses in JavaScript (Lambda World 2018)</a></div>
-            <small>03/12/2018</small>
-          </li>
-          <li>
-            <div><a href="https://youtu.be/VMH5fEg1NXQ?si=waAeaiVzzpTijAjb">Lambdas, lambdas everywhere (React Alicante 2018)</a></div>
-            <small>19/09/2018</small>
-          </li>
-          <li>
-            <div><a href="https://youtu.be/47E4iXOxCbg?si=LU0UfDEphDZmJiK_">Case study: Lucentum, creating your own React component library (React Alicante 2017)</a></div>
-            <small>09/11/2017</small>
-          </li>
-          <li>
-            <div><a href="https://youtu.be/zTvPzu0RWzQ?si=38W9UlEQMfI5ffsi&t=2">Programación funcional en JavaScript (Codemotion 2016)</a></div>
-            <small>18/11/2016</small>
-          </li>
+  <section class="mt-5">
+    <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0">
+      <h2
+        class="mt-8 text-[1.643rem] font-normal leading-[1.2] before:block before:h-0 before:pb-5 before:border-t-[5px] before:border-[var(--separatorColor)]"
+      >
+        Talks
+      </h2>
+      <ul class="m-0 p-0 list-none">
+        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
+          <div>
+            <a href="https://youtu.be/GDITBmIzCDs?si=icOImK_jm9EOeVVc"
+              >Describing microservices using modern Haskell (Haskell Symposium 2020)</a
+            >
+          </div>
+          <small>12/09/2020</small>
+        </li>
+        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
+          <div>
+            <a href="https://youtu.be/5IcG_BCGxEY?si=7nvOFZs10ESE50Zs"
+              >What happens if you let the creator of React design a programming language (LambdAle
+              2019)</a
+            >
+          </div>
+          <small>11/10/2019</small>
+        </li>
+        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
+          <div>
+            <a href="https://youtu.be/IoVaArsh6tM?si=RfDmTovdbR9M9Krh"
+              >Functional lenses in JavaScript (Lambda World 2018)</a
+            >
+          </div>
+          <small>03/12/2018</small>
+        </li>
+        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
+          <div>
+            <a href="https://youtu.be/VMH5fEg1NXQ?si=waAeaiVzzpTijAjb"
+              >Lambdas, lambdas everywhere (React Alicante 2018)</a
+            >
+          </div>
+          <small>19/09/2018</small>
+        </li>
+        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
+          <div>
+            <a href="https://youtu.be/47E4iXOxCbg?si=LU0UfDEphDZmJiK_"
+              >Case study: Lucentum, creating your own React component library (React Alicante
+              2017)</a
+            >
+          </div>
+          <small>09/11/2017</small>
+        </li>
+        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
+          <div>
+            <a href="https://youtu.be/zTvPzu0RWzQ?si=38W9UlEQMfI5ffsi&t=2"
+              >Programación funcional en JavaScript (Codemotion 2016)</a
+            >
+          </div>
+          <small>18/11/2016</small>
+        </li>
       </ul>
     </div>
   </section>

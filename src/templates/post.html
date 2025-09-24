@@ -15,20 +15,24 @@ $partial("templates/nav.html")$
   }
 </style>
 
-<main id="content" tabindex="-1">
-  <article>
-    <header>
-      <h1>$title$</h1>
-      <div class="info">
-        <small class="italic">$date$</small>
-        <small class="italic"> | $readingtime$</small>
-        $if(updated)$
-        <small class="italic"> (updated: $updated$)</small>
-        $endif$
-        <div class="tags">[ $tags$ ]</div>
+<main class="flex-1" id="content" tabindex="-1">
+  <article class="pb-10">
+    <header class="bg-[var(--headerBgColor)] mb-8 px-[1.3125rem] md:px-0 py-4 md:py-8">
+      <div class="mx-auto md:w-[600px]">
+        <h1 class="text-[1.7rem] md:text-[3rem] m-0 mb-4 font-normal leading-[1.2] text-[var(--h1Color)]">
+          $title$
+        </h1>
+        <div class="mx-auto md:w-[600px]">
+          <small class="italic">$date$</small>
+          <small class="italic"> | $readingtime$</small>
+          $if(updated)$
+          <small class="italic"> (updated: $updated$)</small>
+          $endif$
+          <div class="mt-2">[ $tags$ ]</div>
+        </div>
       </div>
     </header>
-    <section class="layout--constrained">$body$</section>
+    <section class="mx-auto md:w-[600px] px-[1.3125rem] md:px-0">$body$</section>
   </article>
 </main>
 
