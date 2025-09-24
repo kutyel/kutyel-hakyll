@@ -4,7 +4,7 @@ authorTwitter: '@FlavioCorpa'
 desc: 'How I implemented recently screenshots for a webpage using the latest version of Elm!'
 image: ./images/elm.jpg
 keywords: 'web,elm,functional,programming,screenshots'
-tags: web, elm, fp, screenshots
+tags: web, elm, fp, screenshots, frontend
 lang: 'en'
 title: 'Taking Screenshots with Elm 0.19'
 date: '2023-08-04T17:22:00Z'
