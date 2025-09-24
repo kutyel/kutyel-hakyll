@@ -1,37 +1,33 @@
 $partial("templates/nav.html")$
 
-<main id="content" tabindex="-1">
-  <article class="article">
-    <header class="article__bg" style="background-image: url('$image$')">
-      <div class="article__bgHeader">
-        <div class="layout--constrained">
-          <div class="article__bgTitleWrap">
-            <h1 class="article__bgTitle">
-              <a href="$url$">$title$</a>
-            </h1>
-            <div class="article__bgSubHeader">
-              <small class="italic">$date$</small>
-              $if(updated)$
-              <small class="italic">(updated: $updated$)</small>
-              $endif$
-              $if(photoCredit)$
-                <small class="article__bgPhotoCred italic">
-                  [ photo credit <a href="$photoWebsite$">$photoCredit$</a> ]
-                </small>
-              $endif$
-            </div>
+<main id="content" tabindex="-1" class="flex-1">
+  <article>
+    <header class="bg-cover bg-center mb-8" style="background-image: url('$image$')">
+      <div class="px-[1.3125rem] md:px-0 py-4 md:py-8" style="background: linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.35))">
+        <div class="mx-auto md:w-[600px] text-white">
+          <h1 class="m-0 mb-2 font-normal leading-[1.2] text-[1.7rem] md:text-[3rem]">
+            <a class="text-inherit" href="$url$">$title$</a>
+          </h1>
+          <div class="text-sm">
+            <small class="italic">$date$</small>
+            $if(updated)$
+            <small class="italic"> (updated: $updated$)</small>
+            $endif$
+            $if(photoCredit)$
+              <small class="italic"> [ photo credit <a class="text-inherit" href="$photoWebsite$">$photoCredit$</a> ]</small>
+            $endif$
           </div>
         </div>
-        </div>
+      </div>
     </header>
-    <section class="layout--constrained">
-      <header class="article__header">
-        <h1 class="article__title">
-          <a href="$url$">$title$</a>
+    <section class="mx-auto md:w-[600px] px-[1.3125rem] md:px-0">
+      <header class="mb-4">
+        <h1 class="m-0 font-normal leading-[1.2] text-[2.643rem]">
+          <a class="text-inherit" href="$url$">$title$</a>
         </h1>
         <small class="italic">$date$</small>
         $if(updated)$
-        <small class="italic">(updated: $updated$)</small>
+        <small class="italic"> (updated: $updated$)</small>
         $endif$
       </header>
       $body$

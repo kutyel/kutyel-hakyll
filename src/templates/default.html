@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <title>$title$</title>
     <meta charset="utf-8" />
@@ -42,14 +42,35 @@
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>"
     />
     <link rel="canonical" href="$root$$url$" />
-    <link rel="stylesheet" href="/css/default.css" />
-    $if(type)$
-    <link rel="stylesheet" href="/css/$type$.css" />
-    $else$
-    <link rel="stylesheet" href="/css/home.css" />
-    $endif$
+
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style type="text/tailwindcss">
+      /* Base resets */
+      :root {
+        color-scheme: light dark;
+      }
+      html {
+        box-sizing: border-box;
+      }
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
+      body {
+        font-family: Verdana, Helvetica, Arial, sans-serif;
+        margin: 0;
+      }
+      body,
+      input,
+      button {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      input,
+      button {
+        font: inherit;
+      }
+      /* Theme tokens (Tailwind v4) */
       @theme {
         --color-clifford: #da373d;
         --color-separator: #f2f2f2;
@@ -58,13 +79,307 @@
         --color-footer-bg-dark: #373c49;
       }
       @custom-variant dark (&:where(.dark, .dark *));
+
+      /* Light/Dark CSS variables ported from CSS folder */
+      body.light {
+        --authorTitleColor: #767676;
+        --bgColor: #fff;
+        --blockquoteBorderColor: #eee;
+        --btnBgColor: #287cb4;
+        --btnTextColor: #fff;
+        --iframeBorderColor: #e8e8e8;
+        --inlineCodeBgColor: rgba(255, 229, 100, 0.2);
+        --inlineCodeColor: #1a1a1a;
+        --inputBgColor: #fff;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #334249;
+        --secretGraphicColor: #1a1a1a;
+        --secretGraphicHoverColor: #206592;
+        --separatorColor: #f2f2f2;
+        --textColor: #334249;
+        --textLinkBorderColor: #287cb4;
+        --textLinkColor: #287cb4;
+        --textLinkHoverColor: #206592;
+        --deepBgColor: #011627;
+        --footerBgColor: #f5f5f5;
+        --footerLinkColor: #2676ac;
+        --h1Color: currentColor;
+        --headerBgColor: #c4dfff;
+      }
+      body.dark {
+        --separatorColor: #424857;
+        --authorTitleColor: hsla(0, 0%, 100%, 0.65);
+        --bgColor: #282c35;
+        --blockquoteBorderColor: var(--separatorColor);
+        --btnBgColor: #001627;
+        --btnTextColor: #fff;
+        --iframeBorderColor: var(--separatorColor);
+        --inlineCodeBgColor: rgba(115, 124, 153, 0.2);
+        --inlineCodeColor: #e2e4e9;
+        --inputBgColor: #282c35;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #fff;
+        --secretGraphicBorderLeftColor: #c693ea;
+        --secretGraphicColor: hsla(0, 0%, 100%, 0.88);
+        --secretGraphicHoverColor: rgba(255, 167, 196, 0.75);
+        --textColor: hsla(0, 0%, 100%, 0.88);
+        --textLinkBorderColor: #c693ea;
+        --textLinkColor: #c693ea;
+        --textLinkHoverColor: rgba(198, 147, 234, 0.8);
+        --deepBgColor: #011627;
+        --footerBgColor: #373c49;
+        --footerLinkColor: #c693ea;
+        --h1Color: var(--textColor);
+        --headerBgColor: var(--deepBgColor);
+      }
+
+      /* Minimal base styles moved from CSS folder */
+      a[href] {
+        text-decoration: none;
+        color: var(--textLinkColor);
+        box-shadow: 0 1px 0 0 currentColor;
+        word-wrap: break-word;
+      }
+      a[href]:hover,
+      a[href]:focus,
+      a[href]:visited {
+        color: var(--textLinkHoverColor);
+      }
+      h1 > a[href],
+      h1 > a[href]:hover,
+      h1 > a[href]:focus,
+      h1 > a[href]:visited {
+        color: inherit;
+      }
+      h1,
+      h2 {
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        font-size: 1.643rem;
+      }
+      h2::before {
+        content: '';
+        display: block;
+        height: 0;
+        border-top: 5px solid var(--separatorColor);
+        padding-bottom: 20px;
+      }
+      a[href].footnote-ref {
+        box-shadow: none;
+      }
+      img {
+        display: block;
+        height: auto;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 100%;
+        border: 0;
+      }
+
+      /* Theme switch icon visibility rules */
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='dark'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='light'] {
+        display: block;
+      }
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='light'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='dark'] {
+        display: none;
+      }
+
+      /* Code font stack */
+      code,
+      kbd,
+      pre,
+      samp {
+        font-family: JetBrains Mono, Consolas, Menlo, Monaco, source-code-pro, 'Courier New',
+          monospace;
+        font-size: 0.9em;
+        -webkit-font-feature-settings: normal;
+        font-feature-settings: normal;
+      }
+      pre code {
+        font-size: inherit;
+        line-height: 1.4rem;
+      }
+      .sourceCode:not(pre):not(code) {
+        background-color: var(--deepBgColor);
+        overflow: hidden;
+        margin: 1.25rem 0;
+        border-radius: 10px;
+      }
+      pre.sourceCode {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 1.3125rem;
+        margin: 0;
+        color: #fff;
+        background: none;
+        font-size: 0.8rem;
+        line-height: 1.4rem;
+      }
+      /* Optional line numbers support */
+      pre.numberSource.sourceCode > code {
+        counter-reset: source-line 0;
+      }
+      pre.numberSource.sourceCode > code > span {
+        counter-increment: source-line;
+      }
+      pre.numberSource.sourceCode > code > span > a {
+        box-shadow: none;
+      }
+      code.sourceCode > a.sourceLine:before {
+        display: inline-block;
+        content: attr(title);
+        text-align: right;
+        border-right: 1px solid rgba(128, 147, 147, 0.4);
+        color: rgb(128, 147, 147);
+        width: 30px;
+        padding-right: 10px;
+        margin-right: 10px;
+      }
+      @media (max-width: 667px) {
+        .sourceCode:not(pre):not(code) {
+          border-radius: 0;
+        }
+        code.sourceCode > a.sourceLine:before {
+          display: none;
+        }
+      }
+      :not(pre) > code {
+        border-radius: 0.3em;
+        background-color: var(--inlineCodeBgColor);
+        color: var(--inlineCodeColor);
+        padding: 0.15em 0.2em 0.05em;
+        white-space: normal;
+      }
+      /* Syntax token colors (Pandoc/Highlight) */
+      .co {
+        color: rgb(128, 147, 147);
+      }
+      .ch,
+      .st,
+      .vs {
+        color: rgb(236, 196, 141);
+      }
+      .va {
+        color: rgb(214, 222, 235);
+      }
+      .dv,
+      .bn,
+      .fl {
+        color: rgb(247, 140, 108);
+      }
+      .bu,
+      .cn,
+      .at,
+      .fu,
+      .dt {
+        color: rgb(130, 170, 255);
+      }
+      .im,
+      .op,
+      .kw,
+      .ot,
+      .cf {
+        color: #c693ea;
+      }
+
+      /* Typography & content spacing */
+      article p {
+        margin: 0;
+        line-height: 1.75;
+      }
+      article p + p {
+        margin-top: 1.75em;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+        font-size: 1.643rem;
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      hr {
+        height: 0;
+        border: none;
+        border-top: 5px solid var(--separatorColor);
+        margin: 1.75em 0;
+      }
+      blockquote {
+        margin-left: 1.5em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        padding-left: 1em;
+        border-left: 4px solid var(--blockquoteBorderColor);
+      }
+      blockquote em {
+        font-size: 1.286rem;
+      }
+      /* Lists */
+      article ul {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: disc outside;
+      }
+      article ol {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: decimal outside;
+      }
+      article li {
+        margin: 0.25em 0;
+      }
+      article li > ul,
+      article li > ol {
+        margin: 0.5em 0;
+      }
+      /* Media helpers */
+      iframe {
+        width: 100%;
+      }
+      .iframe--example {
+        border: 2px solid var(--iframeBorderColor);
+      }
+      .pdf {
+        margin: 1rem -6rem;
+        height: 30rem;
+        width: calc(100% + 12rem);
+      }
+      .pdf-link {
+        display: none;
+      }
+      @media (max-width: 800px) {
+        .pdf {
+          margin: 1rem 0;
+          width: 100%;
+        }
+      }
+      @media (max-width: 667px) {
+        .pdf {
+          display: none;
+        }
+        .pdf-link {
+          display: inline;
+        }
+      }
     </style>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
     />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body class="dark">
+  <body
+    class="dark min-h-dvh flex flex-col bg-[var(--bgColor)] text-[var(--textColor)] leading-[1.643] antialiased"
+  >
     <script>
       ;(() => {
         window.site = {
@@ -100,6 +415,7 @@
       data-theme-switch
       role="switch"
       type="button"
+      class="appearance-none flex items-center justify-center bg-[var(--btnBgColor)] border border-[var(--btnBgColor)] text-[var(--btnTextColor)] rounded-[20px] px-2 py-[0.1em] outline-offset-[0.1em] absolute right-4 top-4"
     >
       <span aria-hidden="true" data-theme-switch-icon="dark">🌙</span>
       <span aria-hidden="true" data-theme-switch-icon="light">🌞</span>

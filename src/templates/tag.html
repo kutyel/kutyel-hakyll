@@ -1,12 +1,12 @@
 $partial("templates/nav.html")$
 
-<main class="flex flex-col h-screen justify-between" id="content" tabindex="-1">
+<main class="flex-1" id="content" tabindex="-1">
   <section class="mt-5">
-    <div class="relative ml-auto mr-auto w-[600px]">
-      <h2 class="mt-8 text-2xl font-normal before:block before:h-0 before:pb-5">$title$</h2>
-      <ul class="m-0 p-0">
+    <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0">
+      <h2 class="mt-8 text-[1.643rem] font-normal leading-[1.2] before:block before:h-0 before:pb-5 before:border-t-[5px] before:border-[var(--separatorColor)]">$title$</h2>
+      <ul class="m-0 p-0 list-none">
         $for(posts)$
-        <li class="mb-5 border-s-3 px-5 py-1 dark:border-separator-dark border-separator">
+        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
           <div><a href="$url$">$title$</a></div>
           <small>$date$</small>
         </li>
