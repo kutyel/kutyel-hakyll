@@ -208,7 +208,7 @@ readingTimeField key =
 
     acc ts = [TagText . formatTime $ time ts]
 
-    -- M. Brysbaert, Journal of Memory and Language (2009) vol 109. 
+    -- M. Brysbaert, Journal of Memory and Language (2009) vol 109.
     -- DOI: 10.1016/j.jml.2019.104047
     time ts = foldr count 0 ts `div` 238
 
