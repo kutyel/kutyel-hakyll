@@ -99,7 +99,7 @@ main = hakyllWith config $ do
   tags <- buildTags "posts/*" (fromCapture "tags/*.html")
 
   match "posts/*" $ do
-    let ctx = constField "type" "article" <> postCtxWithTags tags
+    let ctx = postCtxWithTags tags
     route $ metadataRoute titleRoute
     compile $
       pandocCompilerCustom
