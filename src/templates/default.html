@@ -27,8 +27,10 @@
     $else$
     <meta property="og:type" content="website" />
     $endif$ $if(image)$
-    <meta name="twitter:card" content="summary" />
     <meta name="twitter:image" content="$root$$image$" />
+    <meta name="twitter:card" content="summary_large_image" />
+    $else$
+    <meta name="twitter:card" content="summary" />
     $endif$
     <meta name="twitter:url" content="$root$$url$" />
     <meta name="twitter:site" content="$siteName$" />
