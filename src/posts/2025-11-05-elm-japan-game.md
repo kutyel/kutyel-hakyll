@@ -13,7 +13,7 @@ postId: 'at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3m4j72dng6k2u'
 
 <img src="./images/japan.png" alt="logo" width="500px">
 
-After going on a holiday with my wife's cousing and her sons, I decided to build a few games to memorize things I've always wanted to know by heart, namely: the [flags of the world](https://elm-countries-quiz.netlify.app/), the prefectures of [Japan](https://elm-japan.netlify.app/), and the provinces of [Spain](https://elm-spain.vercel.app/). So I decided to build a game with Elm and what I learnt along the way is what I'll be describing in this blogpost, although all games follow a very similar structure.
+After going on a holiday with my wife's cousin and her sons, I decided to build a few games to memorize things I've always wanted to know by heart, namely: the [flags of the world](https://elm-countries-quiz.netlify.app/), the prefectures of [Japan](https://elm-japan.netlify.app/), and the provinces of [Spain](https://elm-spain.vercel.app/). So I decided to build a game with Elm and what I learnt along the way is what I'll be describing in this blogpost, although all games follow a very similar structure.
 
 ## The Types
 
@@ -146,7 +146,7 @@ I added a few unit tests to my game, and I ended up with the following code:
 all : Test
 all =
     describe "getPrefectureStatus tests"
-        [ test "current country is focused -> color Focused" <|
+        [ test "current prefecture is focused -> color Focused" <|
             \_ ->
                 let
                     zipper : Zipper Prefecture
@@ -161,7 +161,7 @@ all =
                         ]
                 in
                 Expect.equal expectedStyles (getPrefectureStatus 2 zipper)
-        , test "country not yet asked -> color NotAsked" <|
+        , test "prefecture not yet asked -> color NotAsked" <|
         -- ... more tests
         ]
 ```
@@ -185,7 +185,7 @@ And the nicer resulting code looks now like this:
 all : Test
 all =
     describe "getPrefectureStatus tests"
-        [ test "current country is focused -> Focused state" <|
+        [ test "current prefecture is focused -> Focused state" <|
             \_ ->
                 let
                     zipper : Zipper Prefecture
@@ -193,7 +193,7 @@ all =
                         Zipper.singleton aomori
                 in
                 Expect.equal Focused (getPrefectureStatus 2 zipper)
-        , test "country not yet asked -> NotAsked state" <|
+        , test "prefecture not yet asked -> NotAsked state" <|
         -- ... more tests
         ]
 ```
