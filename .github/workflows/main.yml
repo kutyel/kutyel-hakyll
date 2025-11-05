@@ -35,7 +35,7 @@ jobs:
       #   run: nix develop --accept-flake-config --command bash -c "cd ssg && cabal test hlint"
 
       - name: Artifact pages
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v5.0.0
         with:
           name: pages
           path: result/dist
@@ -47,7 +47,7 @@ jobs:
 
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v5.0.0
+        uses: actions/download-artifact@v6.0.0
         with:
           name: pages
           path: result
