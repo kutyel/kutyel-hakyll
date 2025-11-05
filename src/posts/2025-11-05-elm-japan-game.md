@@ -8,6 +8,7 @@ tags: games, elm, fp, web, frontend
 lang: 'en'
 title: 'Japan Prefectures Quiz: building a browser memory game with Elm'
 date: '2025-11-05T15:00:00Z'
+postId: 'at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3m4j72dng6k2u'
 ---
 
 <img src="./images/japan.png" alt="logo" width="500px">
@@ -25,7 +26,7 @@ type Model
     | Finished Score (Toast.Tray Toast)
 ```
 
-One benefit of working with **Algebraic Data Types** (ADT for short), is that you can define really nicely the minimal representation of data you want to have for your whole domain. In the above type, the whole game only has 3 phases: idle (the initial screen, where you select the game mode you want to play), the game state while you are actually playing and the finished state, where you just want to show the score to the user and maybe, the last toast message telling them wether their last guess was right or wrong.
+One benefit of working with **Algebraic Data Types** (ADT for short), is that you can define really nicely the minimal representation of data you want to have for your whole domain. In the above type, the game only has 3 phases: idle (the initial screen, where you select the game mode you want to play), the game state while you are actually playing and the finished state, where you just want to show the score to the user and maybe, the last toast message telling them wether their last guess was right or wrong.
 
 Let me introduce you now to the `Msg` type of the game:
 
@@ -61,13 +62,13 @@ This was only the initial design, later we will discuss how it was greatly impro
 As you already know, dealing with random values is a side effect, and Elm, being a purely functional programming language, does not like those, but we have our way of purely handling that, this was my first implementation:
 
 ```elm
-  Start ->
-      let
-          prefectureGenerator : Random.Generator ( Maybe Prefecture, List Prefecture )
-          prefectureGenerator =
-              Random.List.choose allPrefectures
-      in
-      ( model, Random.generate (RandomPrefecture (Score 0 0)) prefectureGenerator )
+Start ->
+    let
+        prefectureGenerator : Random.Generator ( Maybe Prefecture, List Prefecture )
+        prefectureGenerator =
+            Random.List.choose allPrefectures
+    in
+    ( model, Random.generate (RandomPrefecture (Score 0 0)) prefectureGenerator )
 ```
 
 I used the [`choose`](https://package.elm-lang.org/packages/elm-community/random-extra/latest/Random-List#choose) function from the `random-extra` package, which has the following signature:
@@ -79,14 +80,14 @@ choose : List a -> Generator ( Maybe a, List a )
 And the logic was quite simple: every time I ask a user for a prefecture, I would just _choose_ it from the list, and this function already extracts it from the remaining of the list. The Maybe in the first half of the tuple `( Maybe Prefecture , List Prefecture )` means that if the chosen option is a `Nothing`, you run out of options and you can finish the game. What was the downside of this approach? I needed to perform **N number of side effects**, where N is the length of the list of things I want to memorize in the game. Is there a cleaner way?
 
 ```elm
-  Start ->
-      let
-          prefectureGenerator : Random.Generator (List Prefecture)
-          prefectureGenerator =
-              -- the whole game revolves around this!
-              Random.List.shuffle allPrefectures
-      in
-      ( model, Random.generate (RandomPrefecture (Score 0 0)) prefectureGenerator )
+Start ->
+    let
+        prefectureGenerator : Random.Generator (List Prefecture)
+        prefectureGenerator =
+            -- the whole game revolves around this!
+            Random.List.shuffle allPrefectures
+    in
+    ( model, Random.generate (RandomPrefecture (Score 0 0)) prefectureGenerator )
 ```
 
 Yes, following the game logic, I just need to scrumble the list **once**! And therefore, I can just use the [`shuffle`](https://package.elm-lang.org/packages/elm-community/random-extra/latest/Random-List#shuffle) function from the same package and, since a List in Elm is simply a Linked List, I can `List.head` every item from the remaining list of prefectures in the game until I run out of options, a nice improvement!
@@ -100,7 +101,7 @@ type Zipper a
     = Zipper (List a) a (List a)
 ```
 
-Indeed, the structure I really want is a [Zipper](https://package.elm-lang.org/packages/wernerdegroot/listzipper/4.0.0/)! A zipper always has a focused object, a List before and after the focused item, so this represents really nicely what I wanted to acomplish:
+Indeed, the structure I really want is a [Zipper](https://package.elm-lang.org/packages/wernerdegroot/listzipper/4.0.0/)! A zipper always has a focused item, a List before and after that, so this represents really nicely what I wanted to acomplish:
 
 ```elm
 type alias GameState =
@@ -113,11 +114,11 @@ type alias GameState =
 A few changes I had to do to the logic of the game were, first in the way I initialize the game state:
 
 ```elm
-    RandomPrefecture score (p :: ps) ->
-        ( Playing (GameState (Zipper.fromCons p ps) score "") emptyTray, Cmd.none )
+RandomPrefecture score (p :: ps) ->
+    ( Playing (GameState (Zipper.fromCons p ps) score "") emptyTray, Cmd.none )
 
-    RandomPrefecture score [] ->
-        ( Finished score emptyTray, Cmd.none )
+RandomPrefecture score [] ->
+    ( Finished score emptyTray, Cmd.none )
 ```
 
 As you can see, since **pattern matching** is the way we do everything in Elm, I can construct nicely my first zipper when I come back from the random shuffle function by just using `Zipper.fromCons`.
@@ -125,14 +126,14 @@ As you can see, since **pattern matching** is the way we do everything in Elm, I
 And then the update function after we guess every prefecture in the game:
 
 ```elm
-  ( case Zipper.next updatedCurrentPrefecture of
-      Just remainingPrefectures ->
-          Playing (GameState remainingPrefectures updatedGameScore "") tray
+( case Zipper.next updatedCurrentPrefecture of
+    Just remainingPrefectures ->
+        Playing (GameState remainingPrefectures updatedGameScore "") tray
 
-      Nothing ->
-          -- if there is no Zipper.next, the game is over!
-          Finished updatedGameScore tray
-  , Cmd.none )
+    Nothing ->
+        -- if there is no Zipper.next, the game is over!
+        Finished updatedGameScore tray
+, Cmd.none )
 ```
 
 Every time we guess a prefecture, we move to the `next`, and if that operation fails, it means we have finished the game!
@@ -155,7 +156,9 @@ all =
                     expectedStyles : List (Svg.Attribute msg)
                     expectedStyles =
                         -- this is bad!! 🤢
-                        [ SvgAttr.fill "#422ad5", SvgAttr.class "animate-pulse" ]
+                        [ SvgAttr.fill "#422ad5"
+                        , SvgAttr.class "animate-pulse"
+                        ]
                 in
                 Expect.equal expectedStyles (getPrefectureStatus 2 zipper)
         , test "country not yet asked -> color NotAsked" <|
@@ -173,6 +176,7 @@ fillColor id =
 
 getPrefectureStatus : Int -> Zipper Prefecture -> Status
 getPrefectureStatus id zipper =
+    -- implementation of this function is not relevant now...
 ```
 
 And the nicer resulting code looks now like this:
@@ -194,7 +198,7 @@ all =
         ]
 ```
 
-Once nice implication of using functional languages, is that all the functions are pure, which means for every input I can **always** guarantee the same output, and that makes unit testing a breeze! ✨
+One nice implication of using functional languages, is that all the functions are pure, which means for every input I can **always** guarantee the same output, and that makes unit testing a breeze! ✨
 
 ## The CI Setup
 
