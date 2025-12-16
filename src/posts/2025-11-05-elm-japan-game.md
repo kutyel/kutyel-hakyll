@@ -8,7 +8,7 @@ tags: games, elm, fp, web, frontend
 lang: 'en'
 title: 'Japan Prefectures Quiz: building a browser memory game with Elm'
 date: '2025-11-05T15:00:00Z'
-updated: '11/11/2025 15:10'
+updated: '16/12/2025 15:10'
 postId: 'at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3m4j72dng6k2u'
 ---
 
@@ -36,13 +36,12 @@ type Msg
     = Start
     | Restart
     | ToastMsg Toast.Msg
-    | AddToast Toast
     | OnInput GameState
     | CheckAnswer GameState (Toast.Tray Toast)
     | RandomPrefecture Score (List Prefecture)
 ```
 
-This represents all the possible actions that can happen in your app, as you see, there are two messages that are purely mundane because we need to display toast messages (`ToastMsg` and `AddToast`), two others that need the `GameState` and the most important one of them: the one I use to generate the random list of prefectures to ask in the game: `RandomPrefecture`.
+This represents all the possible actions that can happen in your app, as you can see, there is one message that we need to display toast messages (`ToastMsg`), two others that need the `GameState` (`OnInput` and `CheckAnswer`) and the most important one of them: the one I use to generate the random list of prefectures to ask in the game: `RandomPrefecture`.
 
 For reference, the important `GameState` type is defined as follows:
 
@@ -203,7 +202,7 @@ One nice implication of using functional languages, is that all the functions ar
 
 ## The CI Setup
 
-I have been learning Nix ❄️ recently for my Haskell development, so I wanted to use Nix too for my Elm needs. I updated my [elm-parcel-template](https://github.com/kutyel/elm-parcel-template) to now use Nix and, as a nice side effect, I have **FREE, NO CONFIG CI** now thanks to [nix-ci.com](https://nix-ci.com/) (it figures out automagically what it needs to do based on your `flake.nix` file, no extra config needed! ✨), check it out if you are interested, it is a really nice project!
+I have been learning Nix ❄️ recently for my Haskell development, so I wanted to use Nix too for my Elm needs. I updated my [elm-parcel-template](https://github.com/kutyel/elm-parcel-template) to now use Nix and, as a nice side effect, I have a **FREE, ZERO CONFIG CI** thanks to [nix-ci.com](https://nix-ci.com/) (it figures out automagically what it needs to do based on your `flake.nix` file, no extra config needed! ✨), check it out if you are interested, it is a really nice project!
 
 ## Acknowledgements
 
