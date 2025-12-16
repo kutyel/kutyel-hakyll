@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <title>Haskell for Elm developers: giving names to stuff (Part 3 - Monads!)</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!" />
+    
+    <meta name="author" content="Flavio Corpa" />
+     
+    <meta name="keywords" content="haskell,elm,functional,programming" />
+    
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU" />
+    <meta
+      http-equiv="origin-trial"
+      content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ=="
+    />
+
+    <meta property="og:site_name" content="flaviocorpa.com" />
+    <meta property="og:title" content="Haskell for Elm developers: giving names to stuff (Part 3 - Monads!)" />
+    <meta property="og:url" content="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-3-monads.html" />
+    <meta property="og:description" content="A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!" />
+    
+    <meta property="og:image" content="https://flaviocorpa.com./images/haskell-elm.png" />
+     
+    <meta property="og:type" content="article" />
+     
+    <meta name="twitter:image" content="https://flaviocorpa.com./images/haskell-elm.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <meta name="twitter:url" content="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-3-monads.html" />
+    <meta name="twitter:site" content="flaviocorpa.com" />
+    <meta name="twitter:title" content="Haskell for Elm developers: giving names to stuff (Part 3 - Monads!)" />
+    <meta name="twitter:description" content="A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!" />
+    
+    <meta name="twitter:creator" content="@FlavioCorpa" />
+    
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>"
+    />
+    <link rel="canonical" href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-3-monads.html" />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      /* Base resets */
+      :root {
+        color-scheme: light dark;
+      }
+      html {
+        box-sizing: border-box;
+      }
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
+      body {
+        font-family: Verdana, Helvetica, Arial, sans-serif;
+        margin: 0;
+      }
+      body,
+      input,
+      button {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      input,
+      button {
+        font: inherit;
+      }
+      /* Tailwind v4 */
+      @custom-variant dark (&:where(.dark, .dark *));
+
+      /* Light/Dark CSS variables ported from CSS folder */
+      body.light {
+        --authorTitleColor: #767676;
+        --bgColor: #fff;
+        --blockquoteBorderColor: #eee;
+        --btnBgColor: #287cb4;
+        --btnTextColor: #fff;
+        --iframeBorderColor: #e8e8e8;
+        --inlineCodeBgColor: rgba(255, 229, 100, 0.2);
+        --inlineCodeColor: #1a1a1a;
+        --inputBgColor: #fff;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #334249;
+        --secretGraphicColor: #1a1a1a;
+        --secretGraphicHoverColor: #206592;
+        --separatorColor: #f2f2f2;
+        --textColor: #334249;
+        --textLinkBorderColor: #287cb4;
+        --textLinkColor: #287cb4;
+        --textLinkHoverColor: #206592;
+        --deepBgColor: #011627;
+        --footerBgColor: #f5f5f5;
+        --footerLinkColor: #2676ac;
+        --h1Color: currentColor;
+        --headerBgColor: #c4dfff;
+      }
+      body.dark {
+        --separatorColor: #424857;
+        --authorTitleColor: hsla(0, 0%, 100%, 0.65);
+        --bgColor: #282c35;
+        --blockquoteBorderColor: var(--separatorColor);
+        --btnBgColor: #001627;
+        --btnTextColor: #fff;
+        --iframeBorderColor: var(--separatorColor);
+        --inlineCodeBgColor: rgba(115, 124, 153, 0.2);
+        --inlineCodeColor: #e2e4e9;
+        --inputBgColor: #282c35;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #fff;
+        --secretGraphicBorderLeftColor: #c693ea;
+        --secretGraphicColor: hsla(0, 0%, 100%, 0.88);
+        --secretGraphicHoverColor: rgba(255, 167, 196, 0.75);
+        --textColor: hsla(0, 0%, 100%, 0.88);
+        --textLinkBorderColor: #c693ea;
+        --textLinkColor: #c693ea;
+        --textLinkHoverColor: rgba(198, 147, 234, 0.8);
+        --deepBgColor: #011627;
+        --footerBgColor: #373c49;
+        --footerLinkColor: #c693ea;
+        --h1Color: var(--textColor);
+        --headerBgColor: var(--deepBgColor);
+      }
+
+      /* Minimal base styles moved from CSS folder */
+      a[href] {
+        text-decoration: none;
+        color: var(--textLinkColor);
+        box-shadow: 0 1px 0 0 currentColor;
+        word-wrap: break-word;
+      }
+      a[href]:hover,
+      a[href]:focus,
+      a[href]:visited {
+        color: var(--textLinkHoverColor);
+      }
+      h1 > a[href],
+      h1 > a[href]:hover,
+      h1 > a[href]:focus,
+      h1 > a[href]:visited {
+        color: inherit;
+      }
+      h1,
+      h2 {
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        font-size: 1.643rem;
+      }
+      h2::before {
+        content: '';
+        display: block;
+        height: 0;
+        border-top: 5px solid var(--separatorColor);
+        padding-bottom: 20px;
+      }
+      a[href].footnote-ref {
+        box-shadow: none;
+      }
+      img {
+        display: block;
+        height: auto;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 100%;
+        border: 0;
+      }
+
+      /* Theme switch icon visibility rules */
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='dark'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='light'] {
+        display: block;
+      }
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='light'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='dark'] {
+        display: none;
+      }
+
+      /* Code font stack */
+      code,
+      kbd,
+      pre,
+      samp {
+        font-family: JetBrains Mono, Consolas, Menlo, Monaco, source-code-pro, 'Courier New',
+          monospace;
+        font-size: 0.9em;
+        -webkit-font-feature-settings: normal;
+        font-feature-settings: normal;
+      }
+      pre code {
+        font-size: inherit;
+        line-height: 1.4rem;
+      }
+      .sourceCode:not(pre):not(code) {
+        background-color: var(--deepBgColor);
+        overflow: hidden;
+        margin: 1.25rem 0;
+        border-radius: 10px;
+      }
+      pre.sourceCode {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 1.3125rem;
+        margin: 0;
+        color: #fff;
+        background: none;
+        font-size: 0.8rem;
+        line-height: 1.4rem;
+      }
+      /* Optional line numbers support */
+      pre.numberSource.sourceCode > code {
+        counter-reset: source-line 0;
+      }
+      pre.numberSource.sourceCode > code > span {
+        counter-increment: source-line;
+      }
+      pre.numberSource.sourceCode > code > span > a {
+        box-shadow: none;
+      }
+      code.sourceCode > a.sourceLine:before {
+        display: inline-block;
+        content: attr(title);
+        text-align: right;
+        border-right: 1px solid rgba(128, 147, 147, 0.4);
+        color: rgb(128, 147, 147);
+        width: 30px;
+        padding-right: 10px;
+        margin-right: 10px;
+      }
+      @media (max-width: 667px) {
+        .sourceCode:not(pre):not(code) {
+          border-radius: 0;
+        }
+        code.sourceCode > a.sourceLine:before {
+          display: none;
+        }
+      }
+      :not(pre) > code {
+        border-radius: 0.3em;
+        background-color: var(--inlineCodeBgColor);
+        color: var(--inlineCodeColor);
+        padding: 0.15em 0.2em 0.05em;
+        white-space: normal;
+      }
+      /* Syntax token colors (Pandoc/Highlight) */
+      .co {
+        color: rgb(128, 147, 147);
+      }
+      .ch,
+      .st,
+      .vs {
+        color: rgb(236, 196, 141);
+      }
+      .va {
+        color: rgb(214, 222, 235);
+      }
+      .dv,
+      .bn,
+      .fl {
+        color: rgb(247, 140, 108);
+      }
+      .bu,
+      .cn,
+      .at,
+      .fu,
+      .dt {
+        color: rgb(130, 170, 255);
+      }
+      .im,
+      .op,
+      .kw,
+      .ot,
+      .cf {
+        color: #c693ea;
+      }
+
+      /* Typography & content spacing */
+      article p {
+        margin: 0;
+        line-height: 1.75;
+      }
+      article p + p {
+        margin-top: 1.75em;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+        font-size: 1.643rem;
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      hr {
+        height: 0;
+        border: none;
+        border-top: 5px solid var(--separatorColor);
+        margin: 1.75em 0;
+      }
+      blockquote {
+        margin-left: 1.5em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        padding-left: 1em;
+        border-left: 4px solid var(--blockquoteBorderColor);
+      }
+      blockquote em {
+        font-size: 1.286rem;
+      }
+      /* Lists */
+      article ul {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: disc outside;
+      }
+      article ol {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: decimal outside;
+      }
+      article li {
+        margin: 0.25em 0;
+      }
+      article li > ul,
+      article li > ol {
+        margin: 0.5em 0;
+      }
+      /* Media helpers */
+      iframe {
+        width: 100%;
+      }
+      .iframe--example {
+        border: 2px solid var(--iframeBorderColor);
+      }
+      .pdf {
+        margin: 1rem -6rem;
+        height: 30rem;
+        width: calc(100% + 12rem);
+      }
+      .pdf-link {
+        display: none;
+      }
+      @media (max-width: 800px) {
+        .pdf {
+          margin: 1rem 0;
+          width: 100%;
+        }
+      }
+      @media (max-width: 667px) {
+        .pdf {
+          display: none;
+        }
+        .pdf-link {
+          display: inline;
+        }
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="dark min-h-dvh flex flex-col bg-[var(--bgColor)] text-[var(--textColor)] leading-[1.643] antialiased"
+  >
+    <script>
+      ;(() => {
+        window.site = {
+          theme:
+            localStorage.getItem('theme') ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          setTheme: (name) => {
+            document.body.classList.add(name === 'light' ? 'light' : 'dark')
+            document.body.classList.remove(name === 'light' ? 'dark' : 'light')
+            localStorage.setItem('theme', name)
+            window.site.theme = name
+            window.site.refreshThemeSwitch()
+          },
+          refreshThemeSwitch: () => {
+            const isLight = window.site.theme === 'light'
+            const themeSwitch = document.querySelector('[data-theme-switch]')
+
+            themeSwitch?.setAttribute(
+              'aria-label',
+              isLight ? 'Switch to dark mode' : 'Switch to light mode'
+            )
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true')
+          },
+        }
+
+        window.site.setTheme(window.site.theme)
+      })()
+    </script>
+
+    <button
+      aria-label="Switch to light mode"
+      aria-checked="true"
+      data-theme-switch
+      role="switch"
+      type="button"
+      class="appearance-none flex items-center justify-center bg-[var(--btnBgColor)] border border-[var(--btnBgColor)] text-[var(--btnTextColor)] rounded-[20px] px-2 py-[0.1em] outline-offset-[0.1em] absolute right-4 top-4"
+    >
+      <span aria-hidden="true" data-theme-switch-icon="dark">🌙</span>
+      <span aria-hidden="true" data-theme-switch-icon="light">🌞</span>
+    </button>
+
+    <nav class="my-6 py-2">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0" data-nav-wrap>
+    <a class="mr-5 absolute left-[-10000px] focus:static focus:left-auto" href="#content"
+      >Skip to content</a
+    >
+    <a class="mr-5" href="/">Home</a>
+    <a class="mr-5" href="https://github.com/sponsors/kutyel">Sponsor me</a>
+    <a class="mr-5" href="/atom.xml">RSS</a>
+  </div>
+</nav>
+
+
+<style>
+  bsky-comments {
+    --background-color: var(--bgColor);
+    --text-color: var(--textColor);
+    --link-color: var(--textLinkColor);
+    --link-hover-color: var(--textLinkHoverColor);
+    --comment-meta-color: #888;
+    --error-color: #ff4d4d;
+    --reply-border-color: var(--separatorColor);
+    --button-background-color: var(--btnBgColor);
+    --button-hover-background-color: rgba(var(--btnBgColor), 0.2);
+    --author-avatar-border-radius: 50%;
+  }
+</style>
+
+<main class="flex-1" id="content" tabindex="-1">
+  <article class="pb-10">
+    <header class="bg-[var(--headerBgColor)] mb-8 px-[1.3125rem] md:px-0 py-4 md:py-8">
+      <div class="mx-auto md:w-[600px]">
+        <h1 class="text-[1.7rem] md:text-[3rem] m-0 mb-4 font-normal leading-[1.2] text-[var(--h1Color)]">
+          Haskell for Elm developers: giving names to stuff (Part 3 - Monads!)
+        </h1>
+        <div class="mx-auto md:w-[600px]">
+          <small class="italic">01/03/2023</small>
+          <small class="italic"> | 6 min read</small>
+          
+          <small class="italic"> (updated: 03/03/2023 12:57)</small>
+          
+          <div class="mt-2">[ <a title="All pages tagged &#39;haskell&#39;." href="/tags/haskell.html" rel="tag">haskell</a>, <a title="All pages tagged &#39;elm&#39;." href="/tags/elm.html" rel="tag">elm</a>, <a title="All pages tagged &#39;fp&#39;." href="/tags/fp.html" rel="tag">fp</a> ]</div>
+        </div>
+      </div>
+    </header>
+    <section class="mx-auto md:w-[600px] px-[1.3125rem] md:px-0"><p><img src="./images/haskell-elm.svg" alt="logo" width="300px"></p>
+<p>It is finally time, I did not think I would ever write a <a href="https://byorgey.wordpress.com/2009/01/12/abstraction-intuition-and-the-monad-tutorial-fallacy/"><code>Monad</code> tutorial</a>, but here it is! 😅 Let us have a look at the way <code>Monad</code>s are defined in Haskell:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Applicative</span> m) <span class="ot">=&gt;</span> <span class="dt">Monad</span> m <span class="kw">where</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  return ::</span> a <span class="ot">-&gt;</span> m a</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&gt;&gt;) ::</span> m a <span class="ot">-&gt;</span> m b <span class="ot">-&gt;</span> m b</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&gt;&gt;=) ::</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b</span></code></pre></div>
+<p>The first thing we can notice again is that the typeclass definition has itself a typeclass constraint, implied by the <code>class Applicative m =&gt;</code> bit, just like in our previous post about Applicative Functors.</p>
+<p>Needless to say, this means that every <code>Monad</code> instance must satisfy the <code>Applicative</code> instance first, and that one, in return, the <code>Functor</code> instance. 😵‍💫 By the way, if you have not already, to understand this whole post and gain more intuition about <code>Monad</code>s, you better read the previous two posts I made:</p>
+<ol>
+<li><a href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-1-functors.html">Haskell for Elm developers: giving names to stuff (Part 1 - Functors)</a></li>
+<li><a href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-2-applicative-functors.html">Haskell for Elm developers: giving names to stuff (Part 2 - Applicative Functors)</a></li>
+</ol>
+<p>SPOILER ALERT ⚠️! In Elm, some examples of <code>Monad</code>s you use every day are… 🥁🥁🥁 (<em>drum rolls…</em>) again: <code>List</code>, <code>Maybe</code>, <code>Result</code> and <code>Task</code>!!! 🤯</p>
+<h2 id="the-return-function">The <code>return</code> function</h2>
+<p>If you have good memory, you might be asking yourself right now: what is the difference between <code>pure :: a -&gt; m a</code> and <code>return</code>?</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span><span class="ot"> ::</span> a <span class="ot">-&gt;</span> m a</span></code></pre></div>
+<p>And the answer is: there is <strong>none</strong>.</p>
+<p>If you want to find out the <a href="https://stackoverflow.com/a/32788607/2834553">historical reasons</a> why we ended up with two functions called different that basically do the same thing, please check this <a href="https://www.reddit.com/r/haskell/comments/4tu9qf/is_there_any_pure_return/">Reddit thread</a> from 7 years go. 👴🏻 There is a modern <a href="https://github.com/search?o=desc&amp;q=use+pure+instead+of+return&amp;s=&amp;type=Commits">Haskell trend</a> to prefer <code>pure</code> over <code>return</code> in code (I contributed to this trend a fair bit myself), but it is totally up to you!</p>
+<h2 id="the-mr-pointy-rofl-operator-">The Mr. Pointy (🤣) operator (<code>&gt;&gt;</code>)</h2>
+<p>I did not come up with the name, I swear, I read it in the <a href="https://haskellbook.com/">Haskell Book™️</a>. Some people refer to it as the <em>sequencing operator</em>, but it does not have an “official” English-language name:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;) ::</span> m a <span class="ot">-&gt;</span> m b <span class="ot">-&gt;</span> m b</span></code></pre></div>
+<p>The only thing the Mr. Pointy operator does is sequencing two actions while discarding any result value of the first action.</p>
+<p>Let’s have another peek at the implementation of the <code>Monad</code> typeclass in <code>GHC.Base</code> and see what we can learn this time from it:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Applicative</span> m) <span class="ot">=&gt;</span> <span class="dt">Monad</span> m <span class="kw">where</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Sequentially compose two actions, passing any value produced</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- by the first as an argument to the second.</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&gt;&gt;=) ::</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Sequentially compose two actions, discarding any value produced</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- by the first, like sequencing operators (such as the semicolon)</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- in imperative languages.</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&gt;&gt;) ::</span> m a <span class="ot">-&gt;</span> m b <span class="ot">-&gt;</span> m b</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  m <span class="op">&gt;&gt;</span> k <span class="ot">=</span> m <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> k</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="ot">{-# INLINE (&gt;&gt;) #-}</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Inject a value into the monadic type.</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="ot">  return ::</span> a <span class="ot">-&gt;</span> m a</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="ot">=</span> <span class="fu">pure</span></span></code></pre></div>
+<p>First thing we can notice is hey! Another language pragma, this time called <a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/pragmas.html#inline-pragma"><code>INLINE pragma</code></a>, do not worry too much about it, all it is doing is performing a little optimization on the compiler level to tell GHC that it can go ahead and <em>inline</em> that function. A second thing we can notice is that Mr. Pointy (<code>&gt;&gt;</code>) is defined in terms of <code>&gt;&gt;=</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&gt;&gt;) ::</span> m a <span class="ot">-&gt;</span> m b <span class="ot">-&gt;</span> m b</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  m <span class="op">&gt;&gt;</span> k <span class="ot">=</span> m <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> k</span></code></pre></div>
+<p>Because of this, we are not going to waste any time trying to find the definition of Mr. Pointy in Elm (because if you define <code>&gt;&gt;=</code> for your type, you again get <em>for free</em> the definition of <code>&gt;&gt;</code>), but rather cut right to the meat!</p>
+<h2 id="the-monadic-bind-operator-">The Monadic bind operator (<code>&gt;&gt;=</code>)</h2>
+<p>I am going to try my best to give you the simplest explanation about this operator, but since I assume you know Elm, the explanation is going to be quite trivial: 😉</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;=) ::</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b</span></code></pre></div>
+<p>By looking at the type signature of the bind operator, does it not look familiar to you, dear Elm developer? Have you ever tried to <code>flatMap</code> a <code>List</code>? <code>flatMap</code> is the name chosen by JavaScript and many other languages, but Elm chose a couple of interesting ones, let us begin first with the <code>List</code> Monad. 🙊</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">List</span><span class="op">.</span><span class="fu">concatMap</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">b</span></span></code></pre></div>
+<p>As you can see, <code>List.concatMap</code> is just a flipped version of the <code>&gt;&gt;=</code> operator for Elm, but what about <code>Maybe</code>, <code>Result</code> and <code>Task</code>?</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">Maybe</span><span class="op">.</span><span class="fu">andThen</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">b</span></span></code></pre></div>
+<p>Yes! We can say with confidence that those types satisfy the <code>Monad</code> instance because we have <code>Maybe.andThen</code>, <code>Result.andThen</code> and <code>Task.andThen</code> and all of those functions allow us to <strong>chain computations</strong>! 👏🏻 Hope that was not so scary after all! 👻😘</p>
+<h2 id="the-infamous-do-notation">The infamous <code>do</code> notation</h2>
+<p><a href="https://github.com/avh4/elm-format/issues/568">Famously</a>, the issue with the <code>|&gt; andThen</code> approach, is that <a href="https://github.com/avh4/elm-format"><strong>elm-format</strong></a> (the <em>de facto standard</em> for all Elm applications) formats everything in a rather <a href="https://github.com/avh4/elm-format/issues/352">ugly manner</a>:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map5</span> :</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">c</span> <span class="op">-&gt;</span> <span class="fu">d</span> <span class="op">-&gt;</span> <span class="fu">e</span> <span class="op">-&gt;</span> <span class="fu">result</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="fu">x</span> <span class="fu">a</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="fu">x</span> <span class="fu">b</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="fu">x</span> <span class="fu">c</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="fu">x</span> <span class="fu">d</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="fu">x</span> <span class="fu">e</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="fu">x</span> <span class="fu">result</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">map5</span> <span class="fu">func</span> <span class="fu">taskA</span> <span class="fu">taskB</span> <span class="fu">taskC</span> <span class="fu">taskD</span> <span class="fu">taskE</span> <span class="op">=</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">taskA</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">|&gt;</span> <span class="fu">andThen</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>            (\<span class="fu">a</span> <span class="op">-&gt;</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                <span class="fu">taskB</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>                    <span class="op">|&gt;</span> <span class="fu">andThen</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>                        (\<span class="fu">b</span> <span class="op">-&gt;</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">taskC</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>                                <span class="op">|&gt;</span> <span class="fu">andThen</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>                                    (\<span class="fu">c</span> <span class="op">-&gt;</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>                                        <span class="fu">taskD</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                                            <span class="op">|&gt;</span> <span class="fu">andThen</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>                                                (\<span class="fu">d</span> <span class="op">-&gt;</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>                                                    <span class="fu">taskE</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>                                                        <span class="op">|&gt;</span> <span class="fu">andThen</span> (\<span class="fu">e</span> <span class="op">-&gt;</span> <span class="fu">succeed</span> (<span class="fu">func</span> <span class="fu">a</span> <span class="fu">b</span> <span class="fu">c</span> <span class="fu">d</span> <span class="fu">e</span>))</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>                                                )</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>                                    )</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>                        )</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>            )</span></code></pre></div>
+<p>This, however, is <em>not an issue</em> that <code>elm-format</code> is responsible for (as a matter of fact, I love <code>elm-format</code> and think it is a <strong>modern masterpiece</strong> of software engineering! 😍), but it is rather a <em>consequence</em> of the language design decision <em>NOT</em> to have something like <code>do</code> notation in Elm. For example, the above code would be really similar <strong>without</strong> <code>do</code> notation in Haskell (if you use a formatter like <a href="https://ormolu-live.tweag.io/"><code>ormolu</code></a>):</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">map5 ::</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c <span class="ot">-&gt;</span> d <span class="ot">-&gt;</span> e <span class="ot">-&gt;</span> result) <span class="ot">-&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x a <span class="ot">-&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x b <span class="ot">-&gt;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x c <span class="ot">-&gt;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x d <span class="ot">-&gt;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x e <span class="ot">-&gt;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x result</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>map5 func taskA taskB taskC taskD taskE <span class="ot">=</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  taskA</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">&gt;&gt;=</span> \a <span class="ot">-&gt;</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>      taskB</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \b <span class="ot">-&gt;</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>          taskC</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>            <span class="op">&gt;&gt;=</span> \c <span class="ot">-&gt;</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>              taskD</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>                <span class="op">&gt;&gt;=</span> \d <span class="ot">-&gt;</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>                  taskE</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>                    <span class="op">&gt;&gt;=</span> \e <span class="ot">-&gt;</span> <span class="fu">pure</span> (func a b c d e)</span></code></pre></div>
+<p>Yes, there are Haskellers that still to this very day <strong>format their code by hand</strong> (😅), and so they would use less indentation in the aforementioned code, but we are not gonna let humans get in the way of the machine (thank God we have formatters 😍). Nevertheless, thanks to <code>do</code> notation, we can write it in the following manner:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">map5 ::</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c <span class="ot">-&gt;</span> d <span class="ot">-&gt;</span> e <span class="ot">-&gt;</span> result) <span class="ot">-&gt;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x a <span class="ot">-&gt;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x b <span class="ot">-&gt;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x c <span class="ot">-&gt;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x d <span class="ot">-&gt;</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x e <span class="ot">-&gt;</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Task</span> x result</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>map5 func taskA taskB taskC taskD taskE <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> taskA</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  b <span class="ot">&lt;-</span> taskB</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  c <span class="ot">&lt;-</span> taskC</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> taskD</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  e <span class="ot">&lt;-</span> taskE</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> <span class="op">$</span> func a b c d e</span></code></pre></div>
+<p>Doesn’t it just look beautiful!? 💜</p>
+<blockquote>
+<p>Funnily enough, <a href="https://github.com/tweag/ormolu"><strong>ormolu</strong></a> is the closest we can get to something like <code>elm-format</code> in Haskell (which I also love 🤩 and am using to format every code sample in this blogpost) and many Haskellers hate it for no reason at all! 🤷🏼‍♂️</p>
+</blockquote>
+<blockquote>
+<p>EDIT: As pointed out by <a href="https://twitter.com/TankorSmash/status/1631347082274512897?s=20">@TankorSmash on Twitter</a>, the actual closest to <code>elm-format</code> would probably be <a href="https://github.com/cjoach/hindent-elm"><code>hindent-elm</code></a>, but it might not work 100% correctly or as complete as other Haskell formatters.</p>
+</blockquote>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>Special thanks to <a href="https://twitter.com/Forensor">@forensor</a> and other readers that have encouraged me to continue the series. Kudos to <a href="https://twitter.com/avh4">Aaron VonderHaar</a> and to <a href="https://markkarpov.com/about.html">Mark Karpov</a> for creating and maintaining <code>elm-format</code> and <code>ormolu</code> respectively! 🙌🏻</p>
+<p>Thanks again to <a href="https://twitter.com/trupill">@serras</a> for technical proofreading this post again (he single-handedly wrote an <a href="https://leanpub.com/book-of-monads">entire book</a> exclusively about <code>Monad</code>s after all 🫡) and remember! <strong>Always be nice</strong> to each other online and have in mind that we are all in different learning paths in our lives and that we can help each other out by giving <em>constructive feedback</em>, rather than trying to <a href="https://twitter.com/FlavioCorpa/status/1629225727852789762?s=20">destroy people’s hopes and dreams</a>. 😅</p>
+<p>Hope <code>Monad</code>s finally clicked for you ✨ (if they had not already) and you learned something new! If you enjoyed this post and would like me to continue the series (<em>next up would probably be maybe <strong>parser combinators</strong>?</em>, let me know what you would like to hear next!), please share it in your social networks and <strong>follow me on <a href="https://twitter.com/FlavioCorpa">Twitter</a>!</strong> 🙌🏻</p></section>
+  </article>
+</main>
+
+ <footer class="py-14 bg-[var(--footerBgColor)] shrink-0">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem]">
+    <ul class="flex justify-center list-none" role="list">
+      <li class="mx-3" role="listitem">
+        <a href="/">Home</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="https://github.com/sponsors/kutyel/">Sponsor me</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="/atom.xml">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+
+
+<script src="https://gistcdn.githack.com/kutyel/41d12e099484fd390fb67168271fcdd9/raw/9be26e500525a2e4edacc53d3a8006aaddec0e15/bsky-comments.js"></script>
+
+
+    <script async>
+      ;(() => {
+        window.site.refreshThemeSwitch()
+        document.querySelector('[data-theme-switch]').addEventListener('click', (e) => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light')
+        })
+      })()
+    </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'
+    ></script>
+    <!-- End Cloudflare Web Analytics -->
+  </body>
+</html>

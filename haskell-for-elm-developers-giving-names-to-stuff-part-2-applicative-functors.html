@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <title>Haskell for Elm developers: giving names to stuff (Part 2 - Applicative Functors)</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!" />
+    
+    <meta name="author" content="Flavio Corpa" />
+     
+    <meta name="keywords" content="haskell,elm,functional,programming" />
+    
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU" />
+    <meta
+      http-equiv="origin-trial"
+      content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ=="
+    />
+
+    <meta property="og:site_name" content="flaviocorpa.com" />
+    <meta property="og:title" content="Haskell for Elm developers: giving names to stuff (Part 2 - Applicative Functors)" />
+    <meta property="og:url" content="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-2-applicative-functors.html" />
+    <meta property="og:description" content="A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!" />
+    
+    <meta property="og:image" content="https://flaviocorpa.com./images/haskell-elm.png" />
+     
+    <meta property="og:type" content="article" />
+     
+    <meta name="twitter:image" content="https://flaviocorpa.com./images/haskell-elm.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <meta name="twitter:url" content="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-2-applicative-functors.html" />
+    <meta name="twitter:site" content="flaviocorpa.com" />
+    <meta name="twitter:title" content="Haskell for Elm developers: giving names to stuff (Part 2 - Applicative Functors)" />
+    <meta name="twitter:description" content="A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!" />
+    
+    <meta name="twitter:creator" content="@FlavioCorpa" />
+    
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>"
+    />
+    <link rel="canonical" href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-2-applicative-functors.html" />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      /* Base resets */
+      :root {
+        color-scheme: light dark;
+      }
+      html {
+        box-sizing: border-box;
+      }
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
+      body {
+        font-family: Verdana, Helvetica, Arial, sans-serif;
+        margin: 0;
+      }
+      body,
+      input,
+      button {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      input,
+      button {
+        font: inherit;
+      }
+      /* Tailwind v4 */
+      @custom-variant dark (&:where(.dark, .dark *));
+
+      /* Light/Dark CSS variables ported from CSS folder */
+      body.light {
+        --authorTitleColor: #767676;
+        --bgColor: #fff;
+        --blockquoteBorderColor: #eee;
+        --btnBgColor: #287cb4;
+        --btnTextColor: #fff;
+        --iframeBorderColor: #e8e8e8;
+        --inlineCodeBgColor: rgba(255, 229, 100, 0.2);
+        --inlineCodeColor: #1a1a1a;
+        --inputBgColor: #fff;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #334249;
+        --secretGraphicColor: #1a1a1a;
+        --secretGraphicHoverColor: #206592;
+        --separatorColor: #f2f2f2;
+        --textColor: #334249;
+        --textLinkBorderColor: #287cb4;
+        --textLinkColor: #287cb4;
+        --textLinkHoverColor: #206592;
+        --deepBgColor: #011627;
+        --footerBgColor: #f5f5f5;
+        --footerLinkColor: #2676ac;
+        --h1Color: currentColor;
+        --headerBgColor: #c4dfff;
+      }
+      body.dark {
+        --separatorColor: #424857;
+        --authorTitleColor: hsla(0, 0%, 100%, 0.65);
+        --bgColor: #282c35;
+        --blockquoteBorderColor: var(--separatorColor);
+        --btnBgColor: #001627;
+        --btnTextColor: #fff;
+        --iframeBorderColor: var(--separatorColor);
+        --inlineCodeBgColor: rgba(115, 124, 153, 0.2);
+        --inlineCodeColor: #e2e4e9;
+        --inputBgColor: #282c35;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #fff;
+        --secretGraphicBorderLeftColor: #c693ea;
+        --secretGraphicColor: hsla(0, 0%, 100%, 0.88);
+        --secretGraphicHoverColor: rgba(255, 167, 196, 0.75);
+        --textColor: hsla(0, 0%, 100%, 0.88);
+        --textLinkBorderColor: #c693ea;
+        --textLinkColor: #c693ea;
+        --textLinkHoverColor: rgba(198, 147, 234, 0.8);
+        --deepBgColor: #011627;
+        --footerBgColor: #373c49;
+        --footerLinkColor: #c693ea;
+        --h1Color: var(--textColor);
+        --headerBgColor: var(--deepBgColor);
+      }
+
+      /* Minimal base styles moved from CSS folder */
+      a[href] {
+        text-decoration: none;
+        color: var(--textLinkColor);
+        box-shadow: 0 1px 0 0 currentColor;
+        word-wrap: break-word;
+      }
+      a[href]:hover,
+      a[href]:focus,
+      a[href]:visited {
+        color: var(--textLinkHoverColor);
+      }
+      h1 > a[href],
+      h1 > a[href]:hover,
+      h1 > a[href]:focus,
+      h1 > a[href]:visited {
+        color: inherit;
+      }
+      h1,
+      h2 {
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        font-size: 1.643rem;
+      }
+      h2::before {
+        content: '';
+        display: block;
+        height: 0;
+        border-top: 5px solid var(--separatorColor);
+        padding-bottom: 20px;
+      }
+      a[href].footnote-ref {
+        box-shadow: none;
+      }
+      img {
+        display: block;
+        height: auto;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 100%;
+        border: 0;
+      }
+
+      /* Theme switch icon visibility rules */
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='dark'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='light'] {
+        display: block;
+      }
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='light'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='dark'] {
+        display: none;
+      }
+
+      /* Code font stack */
+      code,
+      kbd,
+      pre,
+      samp {
+        font-family: JetBrains Mono, Consolas, Menlo, Monaco, source-code-pro, 'Courier New',
+          monospace;
+        font-size: 0.9em;
+        -webkit-font-feature-settings: normal;
+        font-feature-settings: normal;
+      }
+      pre code {
+        font-size: inherit;
+        line-height: 1.4rem;
+      }
+      .sourceCode:not(pre):not(code) {
+        background-color: var(--deepBgColor);
+        overflow: hidden;
+        margin: 1.25rem 0;
+        border-radius: 10px;
+      }
+      pre.sourceCode {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 1.3125rem;
+        margin: 0;
+        color: #fff;
+        background: none;
+        font-size: 0.8rem;
+        line-height: 1.4rem;
+      }
+      /* Optional line numbers support */
+      pre.numberSource.sourceCode > code {
+        counter-reset: source-line 0;
+      }
+      pre.numberSource.sourceCode > code > span {
+        counter-increment: source-line;
+      }
+      pre.numberSource.sourceCode > code > span > a {
+        box-shadow: none;
+      }
+      code.sourceCode > a.sourceLine:before {
+        display: inline-block;
+        content: attr(title);
+        text-align: right;
+        border-right: 1px solid rgba(128, 147, 147, 0.4);
+        color: rgb(128, 147, 147);
+        width: 30px;
+        padding-right: 10px;
+        margin-right: 10px;
+      }
+      @media (max-width: 667px) {
+        .sourceCode:not(pre):not(code) {
+          border-radius: 0;
+        }
+        code.sourceCode > a.sourceLine:before {
+          display: none;
+        }
+      }
+      :not(pre) > code {
+        border-radius: 0.3em;
+        background-color: var(--inlineCodeBgColor);
+        color: var(--inlineCodeColor);
+        padding: 0.15em 0.2em 0.05em;
+        white-space: normal;
+      }
+      /* Syntax token colors (Pandoc/Highlight) */
+      .co {
+        color: rgb(128, 147, 147);
+      }
+      .ch,
+      .st,
+      .vs {
+        color: rgb(236, 196, 141);
+      }
+      .va {
+        color: rgb(214, 222, 235);
+      }
+      .dv,
+      .bn,
+      .fl {
+        color: rgb(247, 140, 108);
+      }
+      .bu,
+      .cn,
+      .at,
+      .fu,
+      .dt {
+        color: rgb(130, 170, 255);
+      }
+      .im,
+      .op,
+      .kw,
+      .ot,
+      .cf {
+        color: #c693ea;
+      }
+
+      /* Typography & content spacing */
+      article p {
+        margin: 0;
+        line-height: 1.75;
+      }
+      article p + p {
+        margin-top: 1.75em;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+        font-size: 1.643rem;
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      hr {
+        height: 0;
+        border: none;
+        border-top: 5px solid var(--separatorColor);
+        margin: 1.75em 0;
+      }
+      blockquote {
+        margin-left: 1.5em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        padding-left: 1em;
+        border-left: 4px solid var(--blockquoteBorderColor);
+      }
+      blockquote em {
+        font-size: 1.286rem;
+      }
+      /* Lists */
+      article ul {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: disc outside;
+      }
+      article ol {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: decimal outside;
+      }
+      article li {
+        margin: 0.25em 0;
+      }
+      article li > ul,
+      article li > ol {
+        margin: 0.5em 0;
+      }
+      /* Media helpers */
+      iframe {
+        width: 100%;
+      }
+      .iframe--example {
+        border: 2px solid var(--iframeBorderColor);
+      }
+      .pdf {
+        margin: 1rem -6rem;
+        height: 30rem;
+        width: calc(100% + 12rem);
+      }
+      .pdf-link {
+        display: none;
+      }
+      @media (max-width: 800px) {
+        .pdf {
+          margin: 1rem 0;
+          width: 100%;
+        }
+      }
+      @media (max-width: 667px) {
+        .pdf {
+          display: none;
+        }
+        .pdf-link {
+          display: inline;
+        }
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="dark min-h-dvh flex flex-col bg-[var(--bgColor)] text-[var(--textColor)] leading-[1.643] antialiased"
+  >
+    <script>
+      ;(() => {
+        window.site = {
+          theme:
+            localStorage.getItem('theme') ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          setTheme: (name) => {
+            document.body.classList.add(name === 'light' ? 'light' : 'dark')
+            document.body.classList.remove(name === 'light' ? 'dark' : 'light')
+            localStorage.setItem('theme', name)
+            window.site.theme = name
+            window.site.refreshThemeSwitch()
+          },
+          refreshThemeSwitch: () => {
+            const isLight = window.site.theme === 'light'
+            const themeSwitch = document.querySelector('[data-theme-switch]')
+
+            themeSwitch?.setAttribute(
+              'aria-label',
+              isLight ? 'Switch to dark mode' : 'Switch to light mode'
+            )
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true')
+          },
+        }
+
+        window.site.setTheme(window.site.theme)
+      })()
+    </script>
+
+    <button
+      aria-label="Switch to light mode"
+      aria-checked="true"
+      data-theme-switch
+      role="switch"
+      type="button"
+      class="appearance-none flex items-center justify-center bg-[var(--btnBgColor)] border border-[var(--btnBgColor)] text-[var(--btnTextColor)] rounded-[20px] px-2 py-[0.1em] outline-offset-[0.1em] absolute right-4 top-4"
+    >
+      <span aria-hidden="true" data-theme-switch-icon="dark">🌙</span>
+      <span aria-hidden="true" data-theme-switch-icon="light">🌞</span>
+    </button>
+
+    <nav class="my-6 py-2">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0" data-nav-wrap>
+    <a class="mr-5 absolute left-[-10000px] focus:static focus:left-auto" href="#content"
+      >Skip to content</a
+    >
+    <a class="mr-5" href="/">Home</a>
+    <a class="mr-5" href="https://github.com/sponsors/kutyel">Sponsor me</a>
+    <a class="mr-5" href="/atom.xml">RSS</a>
+  </div>
+</nav>
+
+
+<style>
+  bsky-comments {
+    --background-color: var(--bgColor);
+    --text-color: var(--textColor);
+    --link-color: var(--textLinkColor);
+    --link-hover-color: var(--textLinkHoverColor);
+    --comment-meta-color: #888;
+    --error-color: #ff4d4d;
+    --reply-border-color: var(--separatorColor);
+    --button-background-color: var(--btnBgColor);
+    --button-hover-background-color: rgba(var(--btnBgColor), 0.2);
+    --author-avatar-border-radius: 50%;
+  }
+</style>
+
+<main class="flex-1" id="content" tabindex="-1">
+  <article class="pb-10">
+    <header class="bg-[var(--headerBgColor)] mb-8 px-[1.3125rem] md:px-0 py-4 md:py-8">
+      <div class="mx-auto md:w-[600px]">
+        <h1 class="text-[1.7rem] md:text-[3rem] m-0 mb-4 font-normal leading-[1.2] text-[var(--h1Color)]">
+          Haskell for Elm developers: giving names to stuff (Part 2 - Applicative Functors)
+        </h1>
+        <div class="mx-auto md:w-[600px]">
+          <small class="italic">23/02/2023</small>
+          <small class="italic"> | 6 min read</small>
+          
+          <small class="italic"> (updated: 03/05/2023 15:22)</small>
+          
+          <div class="mt-2">[ <a title="All pages tagged &#39;haskell&#39;." href="/tags/haskell.html" rel="tag">haskell</a>, <a title="All pages tagged &#39;elm&#39;." href="/tags/elm.html" rel="tag">elm</a>, <a title="All pages tagged &#39;fp&#39;." href="/tags/fp.html" rel="tag">fp</a> ]</div>
+        </div>
+      </div>
+    </header>
+    <section class="mx-auto md:w-[600px] px-[1.3125rem] md:px-0"><p><img src="./images/haskell-elm.svg" alt="logo" width="300px"></p>
+<p>Since the previous post had some measure of success, I decided to continue the series! 🎉</p>
+<p>Without much preamble, let’s look at the typeclass definition in Haskell for Applicative Functors:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Functor</span> f) <span class="ot">=&gt;</span> <span class="dt">Applicative</span> f <span class="kw">where</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  pure ::</span> a <span class="ot">-&gt;</span> f a</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&lt;*&gt;) ::</span> f (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span></code></pre></div>
+<p>This looks a bit scarier 👻 at the beginning, but do not worry, we will explain every bit at a time.</p>
+<p>The first thing we can notice is that the typeclass definition has itself a typeclass constraint! This is new for us, we did not know that could happen (until now), and this is what the <code>class Functor f =&gt;</code> bit means.</p>
+<p><strong>What are the implications of this?</strong> Well, as you might have already guessed, it just means one simple thing: <em>every</em> Applicative Functor must be first a <em>valid Functor</em>, not a very big surprise, right? 😉</p>
+<p>The second thing we can notice is that, contrary to the <code>Functor</code> typeclass declaration that specified only a function to be implemented (<code>fmap</code>), now we have 2 functions every Applicative Functor must have to satisfy the instance: <code>pure</code>, and the mysterious <code>&lt;*&gt;</code> operator, which we will call the TIE fighter operator from now on (because I love the name and yes, I’m a big STAR WARS fan 🤓).</p>
+<p>Let’s talk about each of them separately but first, spoiler alert ⚠️, in Elm, some examples of Applicative Functors you use every day are: <code>List</code>, <code>Maybe</code>, <code>Result</code> and <code>Task</code>.</p>
+<h2 id="the-pure-function">The <code>pure</code> function</h2>
+<p>Out of the two needed functions, <code>pure</code> is probably the easiest to explain: it just “lifts” any value <code>a</code> into an Applicative Functor context <code>f</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pure</span><span class="ot"> ::</span> a <span class="ot">-&gt;</span> f a</span></code></pre></div>
+<p>What are some examples of this in Elm? For example, the <code>List.singleton</code> function!</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">List</span><span class="op">.</span><span class="fu">singleton</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">a</span></span></code></pre></div>
+<p>Okay, what about <code>Maybe</code>?</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">Just</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">a</span></span></code></pre></div>
+<p>This might be new for you, but <strong>data constructors are also functions!</strong> 🤯</p>
+<p>This means that for <code>Maybe</code> we just have <em>one</em> <code>pure</code> function (<code>Nothing</code> is just a value, not a function), and you probably can guess what is the <code>pure</code> implementation for <code>Result</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">Ok</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : <span class="fu">value</span> <span class="op">-&gt;</span> <span class="dt">Result</span> <span class="fu">error</span> <span class="fu">value</span></span></code></pre></div>
+<p>This example is a little harder to understand, because the <code>f</code> Applicative Functor <em>structure</em> is actually <code>Result error</code>, so that this matches:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pure</span><span class="ot"> ::</span> value <span class="ot">-&gt;</span> f            value</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Ok</span> <span class="op">:</span>    value <span class="ot">-&gt;</span> <span class="dt">Result</span> <span class="fu">error</span> value</span></code></pre></div>
+<p>Note that, because of this, the <code>Err</code> contructor/function is <em>not</em> a correct implementation, since the Applicative Functor structure is not preserved:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">Err</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : <span class="fu">error</span> <span class="op">-&gt;</span> <span class="dt">Result</span> <span class="fu">error</span> <span class="fu">value</span></span></code></pre></div>
+<p>You can probably see here that there is no <code>f a</code> structure, so only <code>Ok</code> could be considered the correct implementation of <code>pure</code> for <code>Result</code>.</p>
+<p>To keep with the Elm explanations, <code>Task.succeed</code> is the <code>pure</code> equivalent for the <code>Task</code> Applicative Functor:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="kw">import</span> <span class="dt">Task</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">Task</span><span class="op">.</span><span class="fu">succeed</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Task</span><span class="op">.</span><span class="dt">Task</span> <span class="fu">x</span> <span class="fu">a</span></span></code></pre></div>
+<h2 id="the-tie-fighter-operator-">The TIE fighter operator (<code>&lt;*&gt;</code>)</h2>
+<p>Now let us begin with the fun part:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&lt;*&gt;) ::</span> f (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span></code></pre></div>
+<p>This is an <em>infix operator</em> that takes a lifted function <code>f (a -&gt; b)</code> and a lifted value <code>f a</code> and somehow magically <em>applies</em> (that’s why sometimes this function is also refered to as <code>apply</code> or just <code>ap</code>) the lifted function to the lifted <code>a</code> to finally return a lifted <code>b</code> value (<code>f b</code>). But by now you should be wondering: <strong>how on Earth is this actually useful!? 🤔</strong></p>
+<p>Well, let’s have a peek at the actual implementation of the <code>Applicative</code> typeclass in <code>GHC.Base</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Functor</span> f) <span class="ot">=&gt;</span> <span class="dt">Applicative</span> f <span class="kw">where</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">{-# MINIMAL pure, ((&lt;*&gt;) | liftA2) #-}</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Lift a value.</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ot">  pure ::</span> a <span class="ot">-&gt;</span> f a</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Sequential application.</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&lt;*&gt;) ::</span> f (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&lt;*&gt;</span>) <span class="ot">=</span> liftA2 <span class="fu">id</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Lift a binary function to actions.</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ==== __Example__</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- &gt;&gt;&gt; liftA2 (,) (Just 3) (Just 5)</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Just (3,5)</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="ot">  liftA2 ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b <span class="ot">-&gt;</span> f c</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  liftA2 f x <span class="ot">=</span> (<span class="op">&lt;*&gt;</span>) (<span class="fu">fmap</span> f x)</span></code></pre></div>
+<p>First thing we notice is that there is a <a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/pragmas.html#minimal-pragma">MINIMAL pragma</a>, this tells GHC (the main compiler of Haskell) that the required functions that a type needs to implement in order to have a valid <code>Applicative</code> instance are <code>pure</code> and <code>&lt;*&gt;</code> OR <code>liftA2</code>.</p>
+<p>Second thing we can notice, is that <code>&lt;*&gt;</code> and <code>liftA2</code> are almost identical: they are defined in terms of each other! 🤯</p>
+<p>So, <code>liftA2</code> is basically:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>liftA2 f x <span class="ot">=</span> (<span class="op">&lt;*&gt;</span>) (<span class="fu">fmap</span> f x)</span></code></pre></div>
+<p>And, the TIE fighter operator is just:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">&lt;*&gt;</span>) <span class="ot">=</span> liftA2 <span class="fu">id</span></span></code></pre></div>
+<p>The <code>id</code> function is the silliest function in Haskell: <code>id :: a -&gt; a</code> and in Elm is properly called <code>identity</code>:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">identity</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : <span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">a</span></span></code></pre></div>
+<p>The fact that these two functions are defined in terms of each other, just means that you need to implement one of them, and you will <a href="https://www.reddit.com/r/haskell/comments/11a54oh/comment/j9szz9k/?utm_source=share&amp;utm_medium=web2x&amp;context=3">get the other one for free</a>. But, leaving that behind us, does not the type declaration of <code>liftA2</code> look familiar to us Elm developers? 👀</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ot">liftA2 ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b <span class="ot">-&gt;</span> f c</span></code></pre></div>
+<p>Besides, looking at the example code given, can we achieve something similar in Elm?</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- ==== __Example__</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- &gt;&gt;&gt; liftA2 (,) (Just 3) (Just 5)</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- Just (3,5)</span></span></code></pre></div>
+<p>The answer is: yes, we can! 🚀</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">Maybe</span><span class="op">.</span><span class="fu">map2</span> <span class="dt">Tuple</span><span class="op">.</span><span class="fu">pair</span> (<span class="dt">Just</span> <span class="dv">3</span>) (<span class="dt">Just</span> <span class="dv">5</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Just</span> (<span class="dv">3</span><span class="op">,</span><span class="dv">5</span>) : <span class="dt">Maybe</span> ( <span class="fu">number</span><span class="op">,</span> <span class="fu">number1</span> )</span></code></pre></div>
+<p>Remember how I told you on the previous post that infix operators were just superior in Haskell? We are not able to do this <code>(,)</code> in Elm, so we need to resign ourselves to just use <code>Tuple.pair : a -&gt; b -&gt; ( a, b )</code>, which does basically the same.</p>
+<p>If we query the Elm REPL for the type of <code>Maybe.map2</code>, we get:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dt">Maybe</span><span class="op">.</span><span class="fu">map2</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">value</span>) <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">value</span></span></code></pre></div>
+<p>Compare this to the type of <code>liftA2</code> again:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">liftA2</span>     <span class="op">::</span> (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">value</span>) <span class="op">-&gt;</span> <span class="fu">f</span> <span class="fu">a</span>     <span class="op">-&gt;</span> <span class="fu">f</span> <span class="fu">b</span>     <span class="op">-&gt;</span> <span class="fu">f</span> <span class="fu">c</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Maybe</span><span class="op">.</span><span class="fu">map2</span>  : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">value</span>) <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">value</span></span></code></pre></div>
+<p>You guessed it correctly: the <code>liftA2</code> equivalent in Elm are all the <code>*.map2</code> functions we can find!</p>
+<p>So, when we said before that <code>List</code>, <code>Maybe</code>, <code>Result</code> and <code>Task</code> were <strong>Applicative Functors in Elm</strong>, is because we have <code>List.map2</code>, <code>Maybe.map2</code>, <code>Result.map2</code> and <code>Task.map2</code>.</p>
+<p>This ties in nicely with an excellent article published by <a href="https://twitter.com/joelquen">Joël Quenneville</a> some time ago, called <a href="https://thoughtbot.com/blog/running-out-of-maps">“Running Out of Maps”</a> (very nice pun btw 😜).</p>
+<p>In that post, he explains that if anytime you run out of <code>mapN</code> functions, you can define this simple combinator:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">andMap</span> <span class="op">=</span> <span class="dt">Maybe</span><span class="op">.</span><span class="fu">map2</span> (<span class="op">|&gt;</span>)</span></code></pre></div>
+<p>And if we query again the Elm REPL for the type of <code>andMap</code> we get the following:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">andMap</span> <span class="op">=</span> <span class="dt">Maybe</span><span class="op">.</span><span class="fu">map2</span> (<span class="op">|&gt;</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="fu">function</span><span class="op">&gt;</span> : <span class="dt">Maybe</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">value</span>) <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">value</span></span></code></pre></div>
+<p>Am gonna casually remind you right now about the type declaration of the TIE fighter operator, in case you forgot:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&lt;*&gt;) ::</span> f (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span></code></pre></div>
+<p><strong>What can we draw from all this crazyness?</strong></p>
+<p>We just FOUND THE TIE FIGHTER OPERATOR IN ELM! It is just <code>flip andMap</code>!! 😎</p>
+<p><strong>So why all of this is important again and when the heck am I going to use Applicative Functors (I hear your mind saying 🧠💭)???</strong></p>
+<p>Well, if you have ever used the <code>Json.Decode.Extra</code> package, you might have probably written code like this:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">decoder</span> : <span class="dt">Decoder</span> <span class="dt">Document</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decoder</span> <span class="op">=</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Decode</span><span class="op">.</span><span class="fu">succeed</span> <span class="dt">Document</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">|&gt;</span> <span class="dt">Decode</span><span class="op">.</span><span class="fu">andMap</span> (<span class="dt">Decode</span><span class="op">.</span><span class="fu">field</span> <span class="st">&quot;id&quot;</span> <span class="dt">Decode</span><span class="op">.</span><span class="fu">string</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">|&gt;</span> <span class="dt">Decode</span><span class="op">.</span><span class="fu">andMap</span> (<span class="dt">Decode</span><span class="op">.</span><span class="fu">field</span> <span class="st">&quot;title&quot;</span> <span class="dt">Decode</span><span class="op">.</span><span class="fu">string</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">|&gt;</span> <span class="dt">Decode</span><span class="op">.</span><span class="fu">andMap</span> <span class="fu">documentTypeDecoder</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">|&gt;</span> <span class="dt">Decode</span><span class="op">.</span><span class="fu">andMap</span> (<span class="dt">Decode</span><span class="op">.</span><span class="fu">field</span> <span class="st">&quot;ctime&quot;</span> <span class="dt">Iso8601</span><span class="op">.</span><span class="fu">decoder</span>)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">|&gt;</span> <span class="dt">Decode</span><span class="op">.</span><span class="fu">andMap</span> (<span class="dt">Decode</span><span class="op">.</span><span class="fu">field</span> <span class="st">&quot;mtime&quot;</span> <span class="dt">Iso8601</span><span class="op">.</span><span class="fu">decoder</span>)</span></code></pre></div>
+<p>The exact same code in Haskell, using our beloved infix operators, would look like this:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ot">decoder ::</span> <span class="dt">Decoder</span> <span class="dt">Document</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>decoder <span class="ot">=</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Document</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;$&gt;</span> decodeStringField <span class="st">&quot;id&quot;</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;*&gt;</span> decodeStringField <span class="st">&quot;title&quot;</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;*&gt;</span> documentTypeDecoder</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;*&gt;</span> decodeIso8601Field <span class="st">&quot;ctime&quot;</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;*&gt;</span> decodeIso8601Field <span class="st">&quot;mtime&quot;</span></span></code></pre></div>
+<p>This means two things:</p>
+<ol>
+<li>You have been using Applicative Functors all along for a very long time probably without notice! 🥁🥁🥁</li>
+<li>Of course, this also means that <a href="https://package.elm-lang.org/packages/elm-community/json-extra/latest/Json-Decode-Extra#andMap">Json.Decode.Decoder</a> is also an Applicative Functor!! 👏🏻</li>
+</ol>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>Many people has made possible the production of this blogpost, I want to personally thank <a href="https://twitter.com/RobertWPearce">Robert Pearce</a> for his excellent <a href="https://robertwpearce.com/the-hakyll-nix-template-tutorial.html">Hakyll + Nix tutorial</a>, and <a href="https://twitter.com/domenkozar">Domen Kožar</a>, for all his work with <a href="https://www.cachix.org/">Cachix</a> and the <a href="https://nixos.org/">Nix</a> ecosystem in general (and for his infinite patience 😇).</p>
+<p>I would also like to thank <a href="https://twitter.com/bitemyapp">Chris Allen</a> and <a href="https://twitter.com/argumatronic">Julie Moronukie</a>, because together they created the <a href="https://haskellbook.com/">Haskell Book™️</a>, which is still in my opinion <strong>the best possible way to learn Haskell</strong> and it is actually the reason I am today working with Haskell.</p>
+<p>Could not be more grateful to all of them! 😍</p>
+<p>Enough bad puns for today, hope you learned something new! If you enjoyed this post and would like me to continue the series (<em>next up would probably be MOOONAAAAAADSSSS 👻🦇🦇🦇</em>), please share it in your social networks and <strong>follow me on <a href="https://twitter.com/FlavioCorpa">Twitter</a>!</strong> 🙌🏻</p></section>
+  </article>
+</main>
+
+ <footer class="py-14 bg-[var(--footerBgColor)] shrink-0">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem]">
+    <ul class="flex justify-center list-none" role="list">
+      <li class="mx-3" role="listitem">
+        <a href="/">Home</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="https://github.com/sponsors/kutyel/">Sponsor me</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="/atom.xml">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+
+
+<script src="https://gistcdn.githack.com/kutyel/41d12e099484fd390fb67168271fcdd9/raw/9be26e500525a2e4edacc53d3a8006aaddec0e15/bsky-comments.js"></script>
+
+
+    <script async>
+      ;(() => {
+        window.site.refreshThemeSwitch()
+        document.querySelector('[data-theme-switch]').addEventListener('click', (e) => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light')
+        })
+      })()
+    </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'
+    ></script>
+    <!-- End Cloudflare Web Analytics -->
+  </body>
+</html>

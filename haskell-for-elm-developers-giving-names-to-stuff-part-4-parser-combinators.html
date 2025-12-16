@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <title>Haskell for Elm developers: giving names to stuff (Part 4 - Parser combinators)</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!" />
+    
+    <meta name="author" content="Flavio Corpa" />
+     
+    <meta name="keywords" content="haskell,elm,functional,programming" />
+    
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU" />
+    <meta
+      http-equiv="origin-trial"
+      content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ=="
+    />
+
+    <meta property="og:site_name" content="flaviocorpa.com" />
+    <meta property="og:title" content="Haskell for Elm developers: giving names to stuff (Part 4 - Parser combinators)" />
+    <meta property="og:url" content="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-4-parser-combinators.html" />
+    <meta property="og:description" content="A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!" />
+    
+    <meta property="og:image" content="https://flaviocorpa.com./images/haskell-elm.png" />
+     
+    <meta property="og:type" content="article" />
+     
+    <meta name="twitter:image" content="https://flaviocorpa.com./images/haskell-elm.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <meta name="twitter:url" content="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-4-parser-combinators.html" />
+    <meta name="twitter:site" content="flaviocorpa.com" />
+    <meta name="twitter:title" content="Haskell for Elm developers: giving names to stuff (Part 4 - Parser combinators)" />
+    <meta name="twitter:description" content="A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!" />
+    
+    <meta name="twitter:creator" content="@FlavioCorpa" />
+    
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>"
+    />
+    <link rel="canonical" href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-4-parser-combinators.html" />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      /* Base resets */
+      :root {
+        color-scheme: light dark;
+      }
+      html {
+        box-sizing: border-box;
+      }
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
+      body {
+        font-family: Verdana, Helvetica, Arial, sans-serif;
+        margin: 0;
+      }
+      body,
+      input,
+      button {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      input,
+      button {
+        font: inherit;
+      }
+      /* Tailwind v4 */
+      @custom-variant dark (&:where(.dark, .dark *));
+
+      /* Light/Dark CSS variables ported from CSS folder */
+      body.light {
+        --authorTitleColor: #767676;
+        --bgColor: #fff;
+        --blockquoteBorderColor: #eee;
+        --btnBgColor: #287cb4;
+        --btnTextColor: #fff;
+        --iframeBorderColor: #e8e8e8;
+        --inlineCodeBgColor: rgba(255, 229, 100, 0.2);
+        --inlineCodeColor: #1a1a1a;
+        --inputBgColor: #fff;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #334249;
+        --secretGraphicColor: #1a1a1a;
+        --secretGraphicHoverColor: #206592;
+        --separatorColor: #f2f2f2;
+        --textColor: #334249;
+        --textLinkBorderColor: #287cb4;
+        --textLinkColor: #287cb4;
+        --textLinkHoverColor: #206592;
+        --deepBgColor: #011627;
+        --footerBgColor: #f5f5f5;
+        --footerLinkColor: #2676ac;
+        --h1Color: currentColor;
+        --headerBgColor: #c4dfff;
+      }
+      body.dark {
+        --separatorColor: #424857;
+        --authorTitleColor: hsla(0, 0%, 100%, 0.65);
+        --bgColor: #282c35;
+        --blockquoteBorderColor: var(--separatorColor);
+        --btnBgColor: #001627;
+        --btnTextColor: #fff;
+        --iframeBorderColor: var(--separatorColor);
+        --inlineCodeBgColor: rgba(115, 124, 153, 0.2);
+        --inlineCodeColor: #e2e4e9;
+        --inputBgColor: #282c35;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #fff;
+        --secretGraphicBorderLeftColor: #c693ea;
+        --secretGraphicColor: hsla(0, 0%, 100%, 0.88);
+        --secretGraphicHoverColor: rgba(255, 167, 196, 0.75);
+        --textColor: hsla(0, 0%, 100%, 0.88);
+        --textLinkBorderColor: #c693ea;
+        --textLinkColor: #c693ea;
+        --textLinkHoverColor: rgba(198, 147, 234, 0.8);
+        --deepBgColor: #011627;
+        --footerBgColor: #373c49;
+        --footerLinkColor: #c693ea;
+        --h1Color: var(--textColor);
+        --headerBgColor: var(--deepBgColor);
+      }
+
+      /* Minimal base styles moved from CSS folder */
+      a[href] {
+        text-decoration: none;
+        color: var(--textLinkColor);
+        box-shadow: 0 1px 0 0 currentColor;
+        word-wrap: break-word;
+      }
+      a[href]:hover,
+      a[href]:focus,
+      a[href]:visited {
+        color: var(--textLinkHoverColor);
+      }
+      h1 > a[href],
+      h1 > a[href]:hover,
+      h1 > a[href]:focus,
+      h1 > a[href]:visited {
+        color: inherit;
+      }
+      h1,
+      h2 {
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        font-size: 1.643rem;
+      }
+      h2::before {
+        content: '';
+        display: block;
+        height: 0;
+        border-top: 5px solid var(--separatorColor);
+        padding-bottom: 20px;
+      }
+      a[href].footnote-ref {
+        box-shadow: none;
+      }
+      img {
+        display: block;
+        height: auto;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 100%;
+        border: 0;
+      }
+
+      /* Theme switch icon visibility rules */
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='dark'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='light'] {
+        display: block;
+      }
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='light'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='dark'] {
+        display: none;
+      }
+
+      /* Code font stack */
+      code,
+      kbd,
+      pre,
+      samp {
+        font-family: JetBrains Mono, Consolas, Menlo, Monaco, source-code-pro, 'Courier New',
+          monospace;
+        font-size: 0.9em;
+        -webkit-font-feature-settings: normal;
+        font-feature-settings: normal;
+      }
+      pre code {
+        font-size: inherit;
+        line-height: 1.4rem;
+      }
+      .sourceCode:not(pre):not(code) {
+        background-color: var(--deepBgColor);
+        overflow: hidden;
+        margin: 1.25rem 0;
+        border-radius: 10px;
+      }
+      pre.sourceCode {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 1.3125rem;
+        margin: 0;
+        color: #fff;
+        background: none;
+        font-size: 0.8rem;
+        line-height: 1.4rem;
+      }
+      /* Optional line numbers support */
+      pre.numberSource.sourceCode > code {
+        counter-reset: source-line 0;
+      }
+      pre.numberSource.sourceCode > code > span {
+        counter-increment: source-line;
+      }
+      pre.numberSource.sourceCode > code > span > a {
+        box-shadow: none;
+      }
+      code.sourceCode > a.sourceLine:before {
+        display: inline-block;
+        content: attr(title);
+        text-align: right;
+        border-right: 1px solid rgba(128, 147, 147, 0.4);
+        color: rgb(128, 147, 147);
+        width: 30px;
+        padding-right: 10px;
+        margin-right: 10px;
+      }
+      @media (max-width: 667px) {
+        .sourceCode:not(pre):not(code) {
+          border-radius: 0;
+        }
+        code.sourceCode > a.sourceLine:before {
+          display: none;
+        }
+      }
+      :not(pre) > code {
+        border-radius: 0.3em;
+        background-color: var(--inlineCodeBgColor);
+        color: var(--inlineCodeColor);
+        padding: 0.15em 0.2em 0.05em;
+        white-space: normal;
+      }
+      /* Syntax token colors (Pandoc/Highlight) */
+      .co {
+        color: rgb(128, 147, 147);
+      }
+      .ch,
+      .st,
+      .vs {
+        color: rgb(236, 196, 141);
+      }
+      .va {
+        color: rgb(214, 222, 235);
+      }
+      .dv,
+      .bn,
+      .fl {
+        color: rgb(247, 140, 108);
+      }
+      .bu,
+      .cn,
+      .at,
+      .fu,
+      .dt {
+        color: rgb(130, 170, 255);
+      }
+      .im,
+      .op,
+      .kw,
+      .ot,
+      .cf {
+        color: #c693ea;
+      }
+
+      /* Typography & content spacing */
+      article p {
+        margin: 0;
+        line-height: 1.75;
+      }
+      article p + p {
+        margin-top: 1.75em;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+        font-size: 1.643rem;
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      hr {
+        height: 0;
+        border: none;
+        border-top: 5px solid var(--separatorColor);
+        margin: 1.75em 0;
+      }
+      blockquote {
+        margin-left: 1.5em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        padding-left: 1em;
+        border-left: 4px solid var(--blockquoteBorderColor);
+      }
+      blockquote em {
+        font-size: 1.286rem;
+      }
+      /* Lists */
+      article ul {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: disc outside;
+      }
+      article ol {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: decimal outside;
+      }
+      article li {
+        margin: 0.25em 0;
+      }
+      article li > ul,
+      article li > ol {
+        margin: 0.5em 0;
+      }
+      /* Media helpers */
+      iframe {
+        width: 100%;
+      }
+      .iframe--example {
+        border: 2px solid var(--iframeBorderColor);
+      }
+      .pdf {
+        margin: 1rem -6rem;
+        height: 30rem;
+        width: calc(100% + 12rem);
+      }
+      .pdf-link {
+        display: none;
+      }
+      @media (max-width: 800px) {
+        .pdf {
+          margin: 1rem 0;
+          width: 100%;
+        }
+      }
+      @media (max-width: 667px) {
+        .pdf {
+          display: none;
+        }
+        .pdf-link {
+          display: inline;
+        }
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="dark min-h-dvh flex flex-col bg-[var(--bgColor)] text-[var(--textColor)] leading-[1.643] antialiased"
+  >
+    <script>
+      ;(() => {
+        window.site = {
+          theme:
+            localStorage.getItem('theme') ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          setTheme: (name) => {
+            document.body.classList.add(name === 'light' ? 'light' : 'dark')
+            document.body.classList.remove(name === 'light' ? 'dark' : 'light')
+            localStorage.setItem('theme', name)
+            window.site.theme = name
+            window.site.refreshThemeSwitch()
+          },
+          refreshThemeSwitch: () => {
+            const isLight = window.site.theme === 'light'
+            const themeSwitch = document.querySelector('[data-theme-switch]')
+
+            themeSwitch?.setAttribute(
+              'aria-label',
+              isLight ? 'Switch to dark mode' : 'Switch to light mode'
+            )
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true')
+          },
+        }
+
+        window.site.setTheme(window.site.theme)
+      })()
+    </script>
+
+    <button
+      aria-label="Switch to light mode"
+      aria-checked="true"
+      data-theme-switch
+      role="switch"
+      type="button"
+      class="appearance-none flex items-center justify-center bg-[var(--btnBgColor)] border border-[var(--btnBgColor)] text-[var(--btnTextColor)] rounded-[20px] px-2 py-[0.1em] outline-offset-[0.1em] absolute right-4 top-4"
+    >
+      <span aria-hidden="true" data-theme-switch-icon="dark">🌙</span>
+      <span aria-hidden="true" data-theme-switch-icon="light">🌞</span>
+    </button>
+
+    <nav class="my-6 py-2">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0" data-nav-wrap>
+    <a class="mr-5 absolute left-[-10000px] focus:static focus:left-auto" href="#content"
+      >Skip to content</a
+    >
+    <a class="mr-5" href="/">Home</a>
+    <a class="mr-5" href="https://github.com/sponsors/kutyel">Sponsor me</a>
+    <a class="mr-5" href="/atom.xml">RSS</a>
+  </div>
+</nav>
+
+
+<style>
+  bsky-comments {
+    --background-color: var(--bgColor);
+    --text-color: var(--textColor);
+    --link-color: var(--textLinkColor);
+    --link-hover-color: var(--textLinkHoverColor);
+    --comment-meta-color: #888;
+    --error-color: #ff4d4d;
+    --reply-border-color: var(--separatorColor);
+    --button-background-color: var(--btnBgColor);
+    --button-hover-background-color: rgba(var(--btnBgColor), 0.2);
+    --author-avatar-border-radius: 50%;
+  }
+</style>
+
+<main class="flex-1" id="content" tabindex="-1">
+  <article class="pb-10">
+    <header class="bg-[var(--headerBgColor)] mb-8 px-[1.3125rem] md:px-0 py-4 md:py-8">
+      <div class="mx-auto md:w-[600px]">
+        <h1 class="text-[1.7rem] md:text-[3rem] m-0 mb-4 font-normal leading-[1.2] text-[var(--h1Color)]">
+          Haskell for Elm developers: giving names to stuff (Part 4 - Parser combinators)
+        </h1>
+        <div class="mx-auto md:w-[600px]">
+          <small class="italic">28/03/2024</small>
+          <small class="italic"> | 10 min read</small>
+          
+          <small class="italic"> (updated: 03/04/2024 11:15)</small>
+          
+          <div class="mt-2">[ <a title="All pages tagged &#39;haskell&#39;." href="/tags/haskell.html" rel="tag">haskell</a>, <a title="All pages tagged &#39;elm&#39;." href="/tags/elm.html" rel="tag">elm</a>, <a title="All pages tagged &#39;fp&#39;." href="/tags/fp.html" rel="tag">fp</a> ]</div>
+        </div>
+      </div>
+    </header>
+    <section class="mx-auto md:w-[600px] px-[1.3125rem] md:px-0"><p><img src="./images/haskell-elm.svg" alt="logo" width="300px"></p>
+<blockquote>
+<p>⚠️ DISCLAIMER ⚠️
+This is by no means a full in-depth explanation of parser combinators, as there are many papers on the subject. This post assumes you are somewhat familiar with <code>elm/parser</code>, and thus you are equipped with the tools you need to get familiar with parser combinators in Haskell!</p>
+</blockquote>
+<p>Hey! Long time no see, I’ve finally gathered my inner strength to be brave enough to write this post, yay! 🎉</p>
+<p>Even though this might not be a fully complete explanation of parser combinators, as said in the above disclaimer, you might want to have a refresher on what <code>Applicative</code> functors were:</p>
+<ul>
+<li><a href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-2-applicative-functors.html">Haskell for Elm developers: giving names to stuff (Part 2 - Applicative Functors)</a></li>
+</ul>
+<p>This will become relevant to this post, as you will soon notice, but first of all, another brief reminder before we get onto the good stuff.</p>
+<h2 id="what-is-a-parser">What is a Parser?</h2>
+<p>Basically speaking, a <em>parser</em> is a function that takes some text input and returns some <em>structure</em> (normally an Abstract Syntax Tree, aka: AST) as an output. A <em>parser combinator</em> is, thus, a higher-order function that takes parsers as input and returns a new parser as output.</p>
+<p>As this definition is better explained with examples, let’s have a look at the simplest possible definition of a parser in Haskell:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Parser</span> a <span class="ot">=</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> (a, <span class="dt">String</span>)</span></code></pre></div>
+<p>Although no <em>production ready</em> parser combinators library would be as naive, it serves well our purpose to understand the simple essence of it:</p>
+<ol>
+<li>Await a <code>String</code> value.</li>
+<li>Produce a result that may or not succeed (that’s why it returns a <code>Maybe</code>, although with this minimalistic design there is no possible way to know why the parser failed).</li>
+<li>Return a tuple of the value you want to parse and whatever’s left of the string that you did not consume to produce a value of type <code>a</code>.</li>
+</ol>
+<p>Some people like to think about parsers as somewhat simple machines that need a <strong>cursor</strong>, and that parse left to right the input and produce results as they traverse the text input, but this illustration might not be so accurate in certain implementations.</p>
+<p>For the Haskell curious (which I guess you are since you are reading this post), notice how the above definition of a <code>Parser</code> looks suspiciously familiar to the <code>State</code> monad:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">State</span> s a <span class="ot">=</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">State</span> {<span class="ot"> runState ::</span> s <span class="ot">-&gt;</span> (a, s) }</span></code></pre></div>
+<p>We could maybe dedicate a following blogpost on its own just to the <code>State</code> monad, but this is out of the scope of this post. Suffice to say that during the research for writing these lines I found that there’s actually a quite nice <a href="https://package.elm-lang.org/packages/folkertdev/elm-state/latest/State">Elm package</a> that implements the <code>State</code> monad! 🤯</p>
+<h2 id="how-are-parsers-defined-in-elm">How are parsers defined in Elm?</h2>
+<p>Now that we are getting a bit more familiar with the way a parser is constructed, let’s have a look at the <em>de facto</em> only parser library that exists for Elm, <code>elm/parser</code> and see how the <code>Parser</code> type is defined there:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Parser.Advanced.elm</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Parser</span> <span class="fu">context</span> <span class="fu">problem</span> <span class="fu">value</span> <span class="op">=</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Parser</span> (<span class="dt">State</span> <span class="fu">context</span> <span class="op">-&gt;</span> <span class="dt">PStep</span> <span class="fu">context</span> <span class="fu">problem</span> <span class="fu">value</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">PStep</span> <span class="fu">context</span> <span class="fu">problem</span> <span class="fu">value</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">=</span> <span class="dt">Good</span> <span class="dt">Bool</span> <span class="fu">value</span> (<span class="dt">State</span> <span class="fu">context</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Bad</span> <span class="dt">Bool</span> (<span class="dt">Bag</span> <span class="fu">context</span> <span class="fu">problem</span>)</span></code></pre></div>
+<p>If you squint your eyes hard enough, you can see the resemblance. For example, if we strip the <code>context</code> and <code>problem</code> type variables, which are used to give more information to the user about why a certain parser failed, and we simplify the <code>State</code> type that the author used here (not the <code>State</code> monad, do not be confused!), it will look like this:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Parser</span> <span class="fu">value</span> <span class="op">=</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Parser</span> (<span class="dt">String</span> <span class="op">-&gt;</span> <span class="dt">PStep</span> <span class="fu">value</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">PStep</span> <span class="fu">value</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">=</span> <span class="dt">Good</span> <span class="fu">value</span> <span class="dt">String</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Bad</span> <span class="dt">String</span></span></code></pre></div>
+<p>This looks a bit closer to the initial Haskell definition we looked at, and you can therefore now notice that <code>PStep</code> is just a sophisticated version of <code>Maybe</code> that will give you more information in case of failure.</p>
+<h2 id="the-hidden-typeclass">The hidden typeclass</h2>
+<p>The hidden secret of parser combinators, in my humble opinion, lies in the simple <code>oneOf</code> function:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">oneOf</span> : <span class="dt">List</span> (<span class="dt">Parser</span> <span class="fu">a</span>) <span class="op">-&gt;</span> <span class="dt">Parser</span> <span class="fu">a</span></span></code></pre></div>
+<p>When you are parsing stuff, sometimes you are parsing something AND something (that’s when the <code>Applicative</code> typeclass kicks in), but usually you also need to parse something OR something else. This is where the <code>oneOf</code> function comes in handy, for example in the <code>elm/json</code> library you have the following decoding function:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">maybe</span> : <span class="dt">Decoder</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Decoder</span> (<span class="dt">Maybe</span> <span class="fu">a</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">maybe</span> <span class="fu">decoder</span> <span class="op">=</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">oneOf</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    [ <span class="fu">map</span> <span class="dt">Just</span> <span class="fu">decoder</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="fu">succeed</span> <span class="dt">Nothing</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    ]</span></code></pre></div>
+<p>This simple decoder allows us to declare that you might parse something present in your input (or not), and appropriately represent that into a <code>Maybe</code> type. But, how would such combinator look in Haskell? 🤔</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">optional ::</span> <span class="dt">Alternative</span> f <span class="ot">=&gt;</span> f a <span class="ot">-&gt;</span> f (<span class="dt">Maybe</span> a)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>optional d <span class="ot">=</span> <span class="dt">Just</span> <span class="op">&lt;$&gt;</span> d <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> <span class="dt">Nothing</span></span></code></pre></div>
+<p>As you can see, the <code>maybe</code> decoder function is called <code>optional</code> in Haskell, but the interesting stuff is the typeclass constraint: <code>Alternative f =&gt;</code>. This is the magical final piece of the puzzle we need to understand to <em>get</em> parser combinators!</p>
+<p>Let’s have a look at simplified version of how the <code>Alternative</code> typeclass is defined in Haskell:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Applicative</span> f <span class="ot">=&gt;</span> <span class="dt">Alternative</span> f <span class="kw">where</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- The identity of &#39;&lt;|&gt;&#39;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  empty ::</span> f a</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- An associative binary operation</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&lt;|&gt;) ::</span> f a <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f a</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- One or more.</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="ot">  some ::</span> f a <span class="ot">-&gt;</span> f [a]</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Zero or more.</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="ot">  many ::</span> f a <span class="ot">-&gt;</span> f [a]</span></code></pre></div>
+<p>Since <code>some</code> and <code>many</code> are defined in terms of <code>&lt;|&gt;</code>, we can notice quickly that the relevant part is the new <code>&lt;|&gt;</code> operator, which does not have a name but by using the pipe I think it might convey the idea of a lifted OR (<code>|</code>) operator.</p>
+<p>So again, where in Elm we can express that we can parse one thing or another as items in a list given to <code>oneOf</code>, in Haskell there is the infix binary operator <code>&lt;|&gt;</code> to define all the possible things we want to parse.</p>
+<p>If you also noticed, <code>Alternative</code> requires an <code>Applicative</code> instance to also be present! So, in every possible Haskell implementation of <code>Parser</code>, mandatorily you are going to have this code blow:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> <span class="dt">Parser</span> <span class="kw">where</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ...</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Alternative</span> <span class="dt">Parser</span> <span class="kw">where</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ...</span></span></code></pre></div>
+<p>This is what makes parser combinators work: an <code>Applicative</code> instance, and an <code>Alternative</code> one, that is it! ✨</p>
+<h2 id="interesting-aha-moment">Interesting <em>aha!</em> moment</h2>
+<p>While scanning though the <code>elm/parser</code> library, you will find this code:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- INFIX OPERATORS</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">infix</span> <span class="kw">left</span> <span class="dv">5</span> (<span class="op">|=</span>) <span class="op">=</span> <span class="fu">keeper</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="kw">infix</span> <span class="kw">left</span> <span class="dv">6</span> (<span class="op">|.</span>) <span class="op">=</span> <span class="fu">ignorer</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">{-| Just like the [`(|=)`](Parser#|=) from the `Parser` module.</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">-}</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">keeper</span> : <span class="dt">Parser</span> <span class="fu">c</span> <span class="fu">x</span> (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="dt">Parser</span> <span class="fu">c</span> <span class="fu">x</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Parser</span> <span class="fu">c</span> <span class="fu">x</span> <span class="fu">b</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="fu">keeper</span> <span class="fu">parseFunc</span> <span class="fu">parseArg</span> <span class="op">=</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map2</span> (<span class="op">&lt;|</span>) <span class="fu">parseFunc</span> <span class="fu">parseArg</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">{-| Just like the [`(|.)`](Parser#|.) from the `Parser` module.</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">-}</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ignorer</span> : <span class="dt">Parser</span> <span class="fu">c</span> <span class="fu">x</span> <span class="fu">keep</span> <span class="op">-&gt;</span> <span class="dt">Parser</span> <span class="fu">c</span> <span class="fu">x</span> <span class="fu">ignore</span> <span class="op">-&gt;</span> <span class="dt">Parser</span> <span class="fu">c</span> <span class="fu">x</span> <span class="fu">keep</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ignorer</span> <span class="fu">keepParser</span> <span class="fu">ignoreParser</span> <span class="op">=</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map2</span> <span class="fu">always</span> <span class="fu">keepParser</span> <span class="fu">ignoreParser</span></span></code></pre></div>
+<p>Which is funny, because we CANNOT define infix operators in Elm, but Evan can 😜. Besides that, what is actually interesting is that, for conveniency, it is better to have infix operators for the <code>keeper</code> and <code>ignorer</code> (or the <code>eater</code> operator, as Tereza Sokol called it in <a href="https://youtu.be/M9ulswr1z0E?si=9LyCZ9lX298x2GYQ">her nice talk</a> 🤣) functions that allows us to consume or discard input, because it leads to somewhat more readable code™️.</p>
+<p>If we want to find those functions in Haskell, let me confess something right now: I did not show you in the previous <code>Applicative</code> post <strong>all</strong> there is to it regarding applicative functors, you have been lied to! 😈</p>
+<p>Here is the complete definition of the <code>Applicative</code> typeclass:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Functor</span> f) <span class="ot">=&gt;</span> <span class="dt">Applicative</span> f <span class="kw">where</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">{-# MINIMAL pure, ((&lt;*&gt;) | liftA2) #-}</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Lift a value.</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="ot">  pure ::</span> a <span class="ot">-&gt;</span> f a</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Sequential application.</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&lt;*&gt;) ::</span> f (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&lt;*&gt;</span>) <span class="ot">=</span> liftA2 <span class="fu">id</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Lift a binary function to actions.</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ==== __Example__</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- &gt;&gt;&gt; liftA2 (,) (Just 3) (Just 5)</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Just (3,5)</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="ot">  liftA2 ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b <span class="ot">-&gt;</span> f c</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  liftA2 f x <span class="ot">=</span> (<span class="op">&lt;*&gt;</span>) (<span class="fu">fmap</span> f x)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Sequence actions, discarding the value of the first argument.</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">--</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ==== __Examples__</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- If used in conjunction with the Applicative instance for &#39;Maybe&#39;,</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- you can chain Maybe computations, with a possible &quot;early return&quot;</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- in case of &#39;Nothing&#39;.</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>  <span class="co">--</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- &gt;&gt;&gt; Just 2 *&gt; Just 3</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Just 3</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>  <span class="co">--</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- &gt;&gt;&gt; Nothing *&gt; Just 3</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Nothing</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="ot">  (*&gt;) ::</span> f a <span class="ot">-&gt;</span> f b <span class="ot">-&gt;</span> f b</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>  a1 <span class="op">*&gt;</span> a2 <span class="ot">=</span> (<span class="fu">id</span> <span class="op">&lt;$</span> a1) <span class="op">&lt;*&gt;</span> a2</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- | Sequence actions, discarding the value of the second argument.</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&lt;*) ::</span> f a <span class="ot">-&gt;</span> f b <span class="ot">-&gt;</span> f a</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&lt;*</span>) <span class="ot">=</span> liftA2 <span class="fu">const</span></span></code></pre></div>
+<p>In case you did not notice, lets have the type signatures side by side now:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&lt;*&gt;) ::</span> f (a <span class="ot">-&gt;</span> b)          <span class="ot">-&gt;</span> f a          <span class="ot">-&gt;</span> f b</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>(<span class="op">|=</span>)  <span class="op">:</span> <span class="dt">Parser</span> c x (a <span class="ot">-&gt;</span> b)  <span class="ot">-&gt;</span> <span class="dt">Parser</span> c x a <span class="ot">-&gt;</span> <span class="dt">Parser</span> c x b</span></code></pre></div>
+<p>and…</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&lt;*) ::</span> f keep         <span class="ot">-&gt;</span> f ignore          <span class="ot">-&gt;</span> f keep</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>(<span class="op">|.</span>) <span class="op">:</span> <span class="dt">Parser</span> c x keep <span class="ot">-&gt;</span> <span class="dt">Parser</span> c x ignore <span class="ot">-&gt;</span> <span class="dt">Parser</span> c x keep</span></code></pre></div>
+<p>So this means that the <code>&lt;*</code> and the <code>&lt;*&gt;</code> operators are, respectively, the <code>ignorer</code> and <code>keeper</code> functions from <code>elm/parser</code>!! 🤯🤯🤯</p>
+<p>What about the <code>*&gt;</code> operator? Well, as you know, in Haskell we have this massive operator overflow, so it is exactly the same as <code>&lt;*</code> but it let’s us ignore the argument to the <em>left</em> of the operator, as we will now see in a REAL WORLD™️ parser code sample. 😉</p>
+<h2 id="a-real-worldtm-haskell-parser-example">A real world™️ Haskell parser example</h2>
+<p>To make sure we actually learned something about parser combinators in this post, let’s have a look at a portion of my <a href="https://github.com/higherkindness/avro-parser-haskell"><code>language-avro</code></a> Haskell library:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- | Parses a single import into the &#39;ImportType&#39; structure.</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ot">parseImport ::</span> <span class="dt">MonadParsec</span> <span class="dt">Char</span> <span class="dt">T.Text</span> m <span class="ot">=&gt;</span> m <span class="dt">ImportType</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>parseImport <span class="ot">=</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  reserved <span class="st">&quot;import&quot;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">*&gt;</span> ( (impHelper <span class="dt">IdlImport</span> <span class="st">&quot;idl&quot;</span> <span class="op">&lt;?&gt;</span> <span class="st">&quot;Import of type IDL&quot;</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>           <span class="op">&lt;|&gt;</span> (impHelper <span class="dt">ProtocolImport</span> <span class="st">&quot;protocol&quot;</span> <span class="op">&lt;?&gt;</span> <span class="st">&quot;Import of type protocol&quot;</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>           <span class="op">&lt;|&gt;</span> (impHelper <span class="dt">SchemaImport</span> <span class="st">&quot;schema&quot;</span> <span class="op">&lt;?&gt;</span> <span class="st">&quot;Import of type schema&quot;</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>       )</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="ot">    impHelper ::</span> <span class="dt">MonadParsec</span> <span class="dt">Char</span> <span class="dt">T.Text</span> m <span class="ot">=&gt;</span> (<span class="dt">T.Text</span> <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> <span class="dt">T.Text</span> <span class="ot">-&gt;</span> m a</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    impHelper ct t <span class="ot">=</span> ct <span class="op">&lt;$&gt;</span> (reserved t <span class="op">*&gt;</span> strlit <span class="op">&lt;*</span> symbol <span class="st">&quot;;&quot;</span>)</span></code></pre></div>
+<blockquote>
+<p>If you are curious regarding how such a parser would look with other libraries (like <code>trifecta</code>), you can have a look at <a href="https://github.com/kutyel/haskell-kata/commit/bde30daf28718eda7f35b22325a07ce29f8e9882">this code</a>, which is surprisingly similar to Elm!</p>
+</blockquote>
+<p>Before you freak out, let me explain to you what this piece of code is trying to parse: in the <a href="https://avro.apache.org/docs/1.11.1/idl-language/#imports">Avro IDL language</a> (which is used for example, in <a href="https://kafka.apache.org/">Kafka</a>), you can define imports of 3 different types:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode protobuf"><code class="sourceCode protobuf"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> idl <span class="st">&quot;foo.avdl&quot;</span>;</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> protocol <span class="st">&quot;foo.avpr&quot;</span>;</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> schema <span class="st">&quot;foo.avsc&quot;</span>;</span></code></pre></div>
+<p>To represent this in Haskell, first we need a data type that we want our parser to return:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- | Type for the possible import types in &#39;Protocol&#39;.</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">ImportType</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">IdlImport</span> <span class="dt">T.Text</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">ProtocolImport</span> <span class="dt">T.Text</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">SchemaImport</span> <span class="dt">T.Text</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> (<span class="dt">Eq</span>, <span class="dt">Show</span>, <span class="dt">Ord</span>)</span></code></pre></div>
+<p>And now we can proceed with the parsing stuff, you will notice a few interesting things</p>
+<ol>
+<li>There is a strange <code>reserved</code> combinator, which is a user defined combinator that is pretty clever and has the notion of comments/whitespace.</li>
+<li>Similarly, <code>strlit</code> is also user defined and it helps us to parse string literals.</li>
+<li>What the hell is <code>&lt;?&gt;</code> ?? Another crazy operator?? Well, do not worry, it is just to give proper error messages when the parser get’s stuck, the Elm equivalent would be the <code>problem : String -&gt; Parser a</code> function. 😉</li>
+<li>What is that scary <code>MonadParsec Char T.Text m =&gt; m</code> typeclass constrain? Well, I would gladly read that as just <code>Parser</code> in the example we were giving before, but since in my package I used the <a href="https://hackage.haskell.org/package/megaparsec"><code>megaparsec</code></a> library, I did not want to lie to you again and show you the real type of the parser (more on <code>megaparsec</code> later).</li>
+</ol>
+<p>Here is a similar parser, written with <code>elm/parser</code> as a reference!</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Parser</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">exposing</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        ( (<span class="op">|.</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> (<span class="op">|=</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="dt">Parser</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="fu">chompIf</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="fu">chompWhile</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="fu">getChompedString</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="fu">oneOf</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="fu">spaces</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="fu">succeed</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="fu">symbol</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Import</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    <span class="op">=</span> <span class="dt">Idl</span> <span class="dt">String</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">Protocol</span> <span class="dt">String</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">Schema</span> <span class="dt">String</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="fu">parser</span> : <span class="dt">Parser</span> <span class="dt">Import</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="fu">parser</span> <span class="op">=</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>        <span class="fu">importHelper</span> :</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>            (<span class="dt">String</span> <span class="op">-&gt;</span> <span class="dt">Import</span>)</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>            <span class="op">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>            <span class="op">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Import</span></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>        <span class="fu">importHelper</span> <span class="fu">ct</span> <span class="fu">t</span> <span class="op">=</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>            <span class="fu">succeed</span> <span class="fu">ct</span></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>                <span class="op">|.</span> <span class="fu">symbol</span> <span class="fu">t</span></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>                <span class="op">|.</span> <span class="fu">spaces</span></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>                <span class="op">|=</span> <span class="fu">strlit</span></span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>                <span class="op">|.</span> <span class="fu">symbol</span> <span class="st">&quot;;&quot;</span></span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span></span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">succeed</span> <span class="fu">identity</span></span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>        <span class="op">|.</span> <span class="fu">symbol</span> <span class="st">&quot;import&quot;</span></span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>        <span class="op">|.</span> <span class="fu">spaces</span></span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>        <span class="op">|=</span> <span class="fu">oneOf</span></span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a>            [ <span class="fu">importHelper</span> <span class="dt">Idl</span> <span class="st">&quot;idl&quot;</span></span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a>            <span class="op">,</span> <span class="fu">importHelper</span> <span class="dt">Protocol</span> <span class="st">&quot;protocol&quot;</span></span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a>            <span class="op">,</span> <span class="fu">importHelper</span> <span class="dt">Schema</span> <span class="st">&quot;schema&quot;</span></span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a>            ]</span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a><span class="fu">strlit</span> : <span class="dt">Parser</span> <span class="dt">String</span></span>
+<span id="cb17-47"><a href="#cb17-47" aria-hidden="true" tabindex="-1"></a><span class="fu">strlit</span> <span class="op">=</span></span>
+<span id="cb17-48"><a href="#cb17-48" aria-hidden="true" tabindex="-1"></a>    <span class="fu">getChompedString</span> <span class="op">&lt;|</span></span>
+<span id="cb17-49"><a href="#cb17-49" aria-hidden="true" tabindex="-1"></a>        <span class="fu">succeed</span> ()</span>
+<span id="cb17-50"><a href="#cb17-50" aria-hidden="true" tabindex="-1"></a>            <span class="op">|.</span> <span class="fu">chompIf</span> (\<span class="fu">c</span> <span class="op">-&gt;</span> <span class="fu">c</span> <span class="op">==</span> <span class="ch">&#39;&quot;&#39;</span>)</span>
+<span id="cb17-51"><a href="#cb17-51" aria-hidden="true" tabindex="-1"></a>            <span class="op">|.</span> <span class="fu">chompWhile</span> <span class="dt">Char</span><span class="op">.</span><span class="fu">isLower</span></span>
+<span id="cb17-52"><a href="#cb17-52" aria-hidden="true" tabindex="-1"></a>            <span class="op">|.</span> <span class="fu">chompIf</span> (\<span class="fu">c</span> <span class="op">-&gt;</span> <span class="fu">c</span> <span class="op">==</span> <span class="ch">&#39;.&#39;</span>)</span>
+<span id="cb17-53"><a href="#cb17-53" aria-hidden="true" tabindex="-1"></a>            <span class="op">|.</span> <span class="fu">chompWhile</span> <span class="dt">Char</span><span class="op">.</span><span class="fu">isLower</span></span>
+<span id="cb17-54"><a href="#cb17-54" aria-hidden="true" tabindex="-1"></a>            <span class="op">|.</span> <span class="fu">chompIf</span> (\<span class="fu">c</span> <span class="op">-&gt;</span> <span class="fu">c</span> <span class="op">==</span> <span class="ch">&#39;&quot;&#39;</span>)</span>
+<span id="cb17-55"><a href="#cb17-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-56"><a href="#cb17-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-57"><a href="#cb17-57" aria-hidden="true" tabindex="-1"></a><span class="fu">output</span> <span class="op">=</span></span>
+<span id="cb17-58"><a href="#cb17-58" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Parser</span><span class="op">.</span><span class="fu">run</span> <span class="fu">parser</span> <span class="st">&quot;import protocol \&quot;foo.avpr\&quot;;&quot;</span></span>
+<span id="cb17-59"><a href="#cb17-59" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- &gt; Ok (Protocol &quot;\&quot;foo.avpr\&quot;&quot;)</span></span></code></pre></div>
+<p>As you can see, the code is fairly similar, we only used the <code>oneOf</code> instead of the <code>&lt;|&gt;</code> operator, and the only complicated thing in Elm was figuring out how our <code>strlit</code> combinator had to look like. (Obviously this implementation is not perfect, but it is good enough for educational purposes).</p>
+<p>If you were able to understand the above Haskell code, congratulations, you know parser combinators already! 🎉🎉🎉</p>
+<h2 id="the-state-of-parsers-in-the-haskell-ecosystem">The state of parsers in the Haskell ecosystem</h2>
+<p>As opposed to Elm, where there is only one choice (<code>elm/parser</code>), the Haskell ecosystem is much more rich and diverse, each one with their different tradeoffs. Here is an <em>incomplete list</em> of parser combinator libraries I’m aware of:</p>
+<ul>
+<li>Parsec</li>
+<li>Trifecta</li>
+<li>Attoparsec</li>
+<li>Megaparsec</li>
+<li>Earley</li>
+<li>… (many, many more!!)</li>
+</ul>
+<p>The only one I’ve used in production and am a bit more familiar with is <code>megaparsec</code>, and I learned a lot regarding how to use it from <a href="https://markkarpov.com/tutorial/megaparsec.html">Mark Karpov excellent’s blogpost</a>. I really recommend it since it is quite performant and it has some really nice and smart combinators that will spare you a ton of work.</p>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>Special thanks to <a href="https://twitter.com/trupill">@serras</a> for technical proofreading this post again. 🙏🏻</p>
+<p>Hope <code>Parser</code> combinators finally clicked for you ✨ (if they had not already) and you learned something new. Ah! And in case you did not notice…</p>
+<blockquote>
+<p>JSON Decoders are actually parser combinators! 🤯🤯🤯</p>
+</blockquote>
+<p>So, as always, if you were doing JSON Decoders you were using parser combinators all along without noticing it! 😁</p>
+<p>If you enjoyed this post and would like me to continue the series, please consider <a href="https://github.com/sponsors/kutyel">sponsoring my work</a>, share it in your social networks and <strong>follow me on <a href="https://twitter.com/FlavioCorpa">Twitter</a>!</strong> 🙌🏻</p></section>
+  </article>
+</main>
+
+ <footer class="py-14 bg-[var(--footerBgColor)] shrink-0">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem]">
+    <ul class="flex justify-center list-none" role="list">
+      <li class="mx-3" role="listitem">
+        <a href="/">Home</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="https://github.com/sponsors/kutyel/">Sponsor me</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="/atom.xml">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+
+
+<script src="https://gistcdn.githack.com/kutyel/41d12e099484fd390fb67168271fcdd9/raw/9be26e500525a2e4edacc53d3a8006aaddec0e15/bsky-comments.js"></script>
+
+
+    <script async>
+      ;(() => {
+        window.site.refreshThemeSwitch()
+        document.querySelector('[data-theme-switch]').addEventListener('click', (e) => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light')
+        })
+      })()
+    </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'
+    ></script>
+    <!-- End Cloudflare Web Analytics -->
+  </body>
+</html>

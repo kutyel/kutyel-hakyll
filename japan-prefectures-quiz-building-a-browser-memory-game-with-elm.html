@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <title>Japan Prefectures Quiz: building a browser memory game with Elm</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A blogpost explaining the nice things about building browser games with functional programming!" />
+    
+    <meta name="author" content="Flavio Corpa" />
+     
+    <meta name="keywords" content="elm,functional,programming,game,development" />
+    
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU" />
+    <meta
+      http-equiv="origin-trial"
+      content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ=="
+    />
+
+    <meta property="og:site_name" content="flaviocorpa.com" />
+    <meta property="og:title" content="Japan Prefectures Quiz: building a browser memory game with Elm" />
+    <meta property="og:url" content="https://flaviocorpa.com/japan-prefectures-quiz-building-a-browser-memory-game-with-elm.html" />
+    <meta property="og:description" content="A blogpost explaining the nice things about building browser games with functional programming!" />
+    
+    <meta property="og:image" content="https://flaviocorpa.com./images/japan.png" />
+     
+    <meta property="og:type" content="article" />
+     
+    <meta name="twitter:image" content="https://flaviocorpa.com./images/japan.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <meta name="twitter:url" content="https://flaviocorpa.com/japan-prefectures-quiz-building-a-browser-memory-game-with-elm.html" />
+    <meta name="twitter:site" content="flaviocorpa.com" />
+    <meta name="twitter:title" content="Japan Prefectures Quiz: building a browser memory game with Elm" />
+    <meta name="twitter:description" content="A blogpost explaining the nice things about building browser games with functional programming!" />
+    
+    <meta name="twitter:creator" content="@FlavioCorpa" />
+    
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>"
+    />
+    <link rel="canonical" href="https://flaviocorpa.com/japan-prefectures-quiz-building-a-browser-memory-game-with-elm.html" />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      /* Base resets */
+      :root {
+        color-scheme: light dark;
+      }
+      html {
+        box-sizing: border-box;
+      }
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
+      body {
+        font-family: Verdana, Helvetica, Arial, sans-serif;
+        margin: 0;
+      }
+      body,
+      input,
+      button {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      input,
+      button {
+        font: inherit;
+      }
+      /* Tailwind v4 */
+      @custom-variant dark (&:where(.dark, .dark *));
+
+      /* Light/Dark CSS variables ported from CSS folder */
+      body.light {
+        --authorTitleColor: #767676;
+        --bgColor: #fff;
+        --blockquoteBorderColor: #eee;
+        --btnBgColor: #287cb4;
+        --btnTextColor: #fff;
+        --iframeBorderColor: #e8e8e8;
+        --inlineCodeBgColor: rgba(255, 229, 100, 0.2);
+        --inlineCodeColor: #1a1a1a;
+        --inputBgColor: #fff;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #334249;
+        --secretGraphicColor: #1a1a1a;
+        --secretGraphicHoverColor: #206592;
+        --separatorColor: #f2f2f2;
+        --textColor: #334249;
+        --textLinkBorderColor: #287cb4;
+        --textLinkColor: #287cb4;
+        --textLinkHoverColor: #206592;
+        --deepBgColor: #011627;
+        --footerBgColor: #f5f5f5;
+        --footerLinkColor: #2676ac;
+        --h1Color: currentColor;
+        --headerBgColor: #c4dfff;
+      }
+      body.dark {
+        --separatorColor: #424857;
+        --authorTitleColor: hsla(0, 0%, 100%, 0.65);
+        --bgColor: #282c35;
+        --blockquoteBorderColor: var(--separatorColor);
+        --btnBgColor: #001627;
+        --btnTextColor: #fff;
+        --iframeBorderColor: var(--separatorColor);
+        --inlineCodeBgColor: rgba(115, 124, 153, 0.2);
+        --inlineCodeColor: #e2e4e9;
+        --inputBgColor: #282c35;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #fff;
+        --secretGraphicBorderLeftColor: #c693ea;
+        --secretGraphicColor: hsla(0, 0%, 100%, 0.88);
+        --secretGraphicHoverColor: rgba(255, 167, 196, 0.75);
+        --textColor: hsla(0, 0%, 100%, 0.88);
+        --textLinkBorderColor: #c693ea;
+        --textLinkColor: #c693ea;
+        --textLinkHoverColor: rgba(198, 147, 234, 0.8);
+        --deepBgColor: #011627;
+        --footerBgColor: #373c49;
+        --footerLinkColor: #c693ea;
+        --h1Color: var(--textColor);
+        --headerBgColor: var(--deepBgColor);
+      }
+
+      /* Minimal base styles moved from CSS folder */
+      a[href] {
+        text-decoration: none;
+        color: var(--textLinkColor);
+        box-shadow: 0 1px 0 0 currentColor;
+        word-wrap: break-word;
+      }
+      a[href]:hover,
+      a[href]:focus,
+      a[href]:visited {
+        color: var(--textLinkHoverColor);
+      }
+      h1 > a[href],
+      h1 > a[href]:hover,
+      h1 > a[href]:focus,
+      h1 > a[href]:visited {
+        color: inherit;
+      }
+      h1,
+      h2 {
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        font-size: 1.643rem;
+      }
+      h2::before {
+        content: '';
+        display: block;
+        height: 0;
+        border-top: 5px solid var(--separatorColor);
+        padding-bottom: 20px;
+      }
+      a[href].footnote-ref {
+        box-shadow: none;
+      }
+      img {
+        display: block;
+        height: auto;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 100%;
+        border: 0;
+      }
+
+      /* Theme switch icon visibility rules */
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='dark'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='light'] {
+        display: block;
+      }
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='light'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='dark'] {
+        display: none;
+      }
+
+      /* Code font stack */
+      code,
+      kbd,
+      pre,
+      samp {
+        font-family: JetBrains Mono, Consolas, Menlo, Monaco, source-code-pro, 'Courier New',
+          monospace;
+        font-size: 0.9em;
+        -webkit-font-feature-settings: normal;
+        font-feature-settings: normal;
+      }
+      pre code {
+        font-size: inherit;
+        line-height: 1.4rem;
+      }
+      .sourceCode:not(pre):not(code) {
+        background-color: var(--deepBgColor);
+        overflow: hidden;
+        margin: 1.25rem 0;
+        border-radius: 10px;
+      }
+      pre.sourceCode {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 1.3125rem;
+        margin: 0;
+        color: #fff;
+        background: none;
+        font-size: 0.8rem;
+        line-height: 1.4rem;
+      }
+      /* Optional line numbers support */
+      pre.numberSource.sourceCode > code {
+        counter-reset: source-line 0;
+      }
+      pre.numberSource.sourceCode > code > span {
+        counter-increment: source-line;
+      }
+      pre.numberSource.sourceCode > code > span > a {
+        box-shadow: none;
+      }
+      code.sourceCode > a.sourceLine:before {
+        display: inline-block;
+        content: attr(title);
+        text-align: right;
+        border-right: 1px solid rgba(128, 147, 147, 0.4);
+        color: rgb(128, 147, 147);
+        width: 30px;
+        padding-right: 10px;
+        margin-right: 10px;
+      }
+      @media (max-width: 667px) {
+        .sourceCode:not(pre):not(code) {
+          border-radius: 0;
+        }
+        code.sourceCode > a.sourceLine:before {
+          display: none;
+        }
+      }
+      :not(pre) > code {
+        border-radius: 0.3em;
+        background-color: var(--inlineCodeBgColor);
+        color: var(--inlineCodeColor);
+        padding: 0.15em 0.2em 0.05em;
+        white-space: normal;
+      }
+      /* Syntax token colors (Pandoc/Highlight) */
+      .co {
+        color: rgb(128, 147, 147);
+      }
+      .ch,
+      .st,
+      .vs {
+        color: rgb(236, 196, 141);
+      }
+      .va {
+        color: rgb(214, 222, 235);
+      }
+      .dv,
+      .bn,
+      .fl {
+        color: rgb(247, 140, 108);
+      }
+      .bu,
+      .cn,
+      .at,
+      .fu,
+      .dt {
+        color: rgb(130, 170, 255);
+      }
+      .im,
+      .op,
+      .kw,
+      .ot,
+      .cf {
+        color: #c693ea;
+      }
+
+      /* Typography & content spacing */
+      article p {
+        margin: 0;
+        line-height: 1.75;
+      }
+      article p + p {
+        margin-top: 1.75em;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+        font-size: 1.643rem;
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      hr {
+        height: 0;
+        border: none;
+        border-top: 5px solid var(--separatorColor);
+        margin: 1.75em 0;
+      }
+      blockquote {
+        margin-left: 1.5em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        padding-left: 1em;
+        border-left: 4px solid var(--blockquoteBorderColor);
+      }
+      blockquote em {
+        font-size: 1.286rem;
+      }
+      /* Lists */
+      article ul {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: disc outside;
+      }
+      article ol {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: decimal outside;
+      }
+      article li {
+        margin: 0.25em 0;
+      }
+      article li > ul,
+      article li > ol {
+        margin: 0.5em 0;
+      }
+      /* Media helpers */
+      iframe {
+        width: 100%;
+      }
+      .iframe--example {
+        border: 2px solid var(--iframeBorderColor);
+      }
+      .pdf {
+        margin: 1rem -6rem;
+        height: 30rem;
+        width: calc(100% + 12rem);
+      }
+      .pdf-link {
+        display: none;
+      }
+      @media (max-width: 800px) {
+        .pdf {
+          margin: 1rem 0;
+          width: 100%;
+        }
+      }
+      @media (max-width: 667px) {
+        .pdf {
+          display: none;
+        }
+        .pdf-link {
+          display: inline;
+        }
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="dark min-h-dvh flex flex-col bg-[var(--bgColor)] text-[var(--textColor)] leading-[1.643] antialiased"
+  >
+    <script>
+      ;(() => {
+        window.site = {
+          theme:
+            localStorage.getItem('theme') ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          setTheme: (name) => {
+            document.body.classList.add(name === 'light' ? 'light' : 'dark')
+            document.body.classList.remove(name === 'light' ? 'dark' : 'light')
+            localStorage.setItem('theme', name)
+            window.site.theme = name
+            window.site.refreshThemeSwitch()
+          },
+          refreshThemeSwitch: () => {
+            const isLight = window.site.theme === 'light'
+            const themeSwitch = document.querySelector('[data-theme-switch]')
+
+            themeSwitch?.setAttribute(
+              'aria-label',
+              isLight ? 'Switch to dark mode' : 'Switch to light mode'
+            )
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true')
+          },
+        }
+
+        window.site.setTheme(window.site.theme)
+      })()
+    </script>
+
+    <button
+      aria-label="Switch to light mode"
+      aria-checked="true"
+      data-theme-switch
+      role="switch"
+      type="button"
+      class="appearance-none flex items-center justify-center bg-[var(--btnBgColor)] border border-[var(--btnBgColor)] text-[var(--btnTextColor)] rounded-[20px] px-2 py-[0.1em] outline-offset-[0.1em] absolute right-4 top-4"
+    >
+      <span aria-hidden="true" data-theme-switch-icon="dark">🌙</span>
+      <span aria-hidden="true" data-theme-switch-icon="light">🌞</span>
+    </button>
+
+    <nav class="my-6 py-2">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0" data-nav-wrap>
+    <a class="mr-5 absolute left-[-10000px] focus:static focus:left-auto" href="#content"
+      >Skip to content</a
+    >
+    <a class="mr-5" href="/">Home</a>
+    <a class="mr-5" href="https://github.com/sponsors/kutyel">Sponsor me</a>
+    <a class="mr-5" href="/atom.xml">RSS</a>
+  </div>
+</nav>
+
+
+<style>
+  bsky-comments {
+    --background-color: var(--bgColor);
+    --text-color: var(--textColor);
+    --link-color: var(--textLinkColor);
+    --link-hover-color: var(--textLinkHoverColor);
+    --comment-meta-color: #888;
+    --error-color: #ff4d4d;
+    --reply-border-color: var(--separatorColor);
+    --button-background-color: var(--btnBgColor);
+    --button-hover-background-color: rgba(var(--btnBgColor), 0.2);
+    --author-avatar-border-radius: 50%;
+  }
+</style>
+
+<main class="flex-1" id="content" tabindex="-1">
+  <article class="pb-10">
+    <header class="bg-[var(--headerBgColor)] mb-8 px-[1.3125rem] md:px-0 py-4 md:py-8">
+      <div class="mx-auto md:w-[600px]">
+        <h1 class="text-[1.7rem] md:text-[3rem] m-0 mb-4 font-normal leading-[1.2] text-[var(--h1Color)]">
+          Japan Prefectures Quiz: building a browser memory game with Elm
+        </h1>
+        <div class="mx-auto md:w-[600px]">
+          <small class="italic">05/11/2025</small>
+          <small class="italic"> | 6 min read</small>
+          
+          <small class="italic"> (updated: 16/12/2025 15:10)</small>
+          
+          <div class="mt-2">[ <a title="All pages tagged &#39;games&#39;." href="/tags/games.html" rel="tag">games</a>, <a title="All pages tagged &#39;elm&#39;." href="/tags/elm.html" rel="tag">elm</a>, <a title="All pages tagged &#39;fp&#39;." href="/tags/fp.html" rel="tag">fp</a>, <a title="All pages tagged &#39;web&#39;." href="/tags/web.html" rel="tag">web</a>, <a title="All pages tagged &#39;frontend&#39;." href="/tags/frontend.html" rel="tag">frontend</a> ]</div>
+        </div>
+      </div>
+    </header>
+    <section class="mx-auto md:w-[600px] px-[1.3125rem] md:px-0"><p><img src="./images/japan.png" alt="logo" width="500px"></p>
+<p>After going on a holiday with my wife’s cousin and her sons, I decided to build a few games to memorize things I’ve always wanted to know by heart, namely: the <a href="https://elm-countries-quiz.netlify.app/">flags of the world</a>, the prefectures of <a href="https://elm-japan.netlify.app/">Japan</a>, and the provinces of <a href="https://elm-spain.vercel.app/">Spain</a>. So I decided to build a game with Elm and what I learnt along the way is what I’ll be describing in this blogpost, although all games follow a very similar structure.</p>
+<h2 id="the-types">The Types</h2>
+<p>The whole code for the Japan prefectures game can be found <a href="https://github.com/kutyel/elm-japan-prefectures-quiz">here</a>, it’s completely Open Source! The first thing I wanted to do is define the model of the game:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Model</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">=</span> <span class="dt">Idle</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">Playing</span> <span class="dt">GameState</span> (<span class="dt">Toast</span><span class="op">.</span><span class="dt">Tray</span> <span class="dt">Toast</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">Finished</span> <span class="dt">Score</span> (<span class="dt">Toast</span><span class="op">.</span><span class="dt">Tray</span> <span class="dt">Toast</span>)</span></code></pre></div>
+<p>One benefit of working with <strong>Algebraic Data Types</strong> (ADT for short), is that you can define really nicely the minimal representation of data you want to have for your whole domain. In the above type, the game only has 3 phases: idle (the initial screen, where you select the game mode you want to play), the game state while you are actually playing and the finished state, where you just want to show the score to the user and maybe, the last toast message telling them wether their last guess was right or wrong.</p>
+<p>Let me introduce you now to the <code>Msg</code> type of the game:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Msg</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">=</span> <span class="dt">Start</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">Restart</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">ToastMsg</span> <span class="dt">Toast</span><span class="op">.</span><span class="dt">Msg</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">OnInput</span> <span class="dt">GameState</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">CheckAnswer</span> <span class="dt">GameState</span> (<span class="dt">Toast</span><span class="op">.</span><span class="dt">Tray</span> <span class="dt">Toast</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">RandomPrefecture</span> <span class="dt">Score</span> (<span class="dt">List</span> <span class="dt">Prefecture</span>)</span></code></pre></div>
+<p>This represents all the possible actions that can happen in your app, as you can see, there is one message that we need to display toast messages (<code>ToastMsg</code>), two others that need the <code>GameState</code> (<code>OnInput</code> and <code>CheckAnswer</code>) and the most important one of them: the one I use to generate the random list of prefectures to ask in the game: <code>RandomPrefecture</code>.</p>
+<p>For reference, the important <code>GameState</code> type is defined as follows:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="kw">alias</span> <span class="dt">GameState</span> <span class="op">=</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    { <span class="fu">currentPrefecture</span> : <span class="dt">Prefecture</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="fu">remainingPrefectures</span> : <span class="dt">List</span> <span class="dt">Prefecture</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="fu">guessedPrefectures</span> : <span class="dt">List</span> <span class="dt">Prefecture</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="fu">score</span> : <span class="dt">Score</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="fu">guess</span> : <span class="dt">String</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
+<p>This was only the initial design, later we will discuss how it was greatly improved using a different data structure!</p>
+<h2 id="dealing-with-randomness">Dealing with Randomness</h2>
+<p>As you already know, dealing with random values is a side effect, and Elm, being a purely functional programming language, does not like those, but we have our way of purely handling that, this was my first implementation:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Start</span> <span class="op">-&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">prefectureGenerator</span> : <span class="dt">Random</span><span class="op">.</span><span class="dt">Generator</span> ( <span class="dt">Maybe</span> <span class="dt">Prefecture</span><span class="op">,</span> <span class="dt">List</span> <span class="dt">Prefecture</span> )</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">prefectureGenerator</span> <span class="op">=</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>            <span class="dt">Random</span><span class="op">.</span><span class="dt">List</span><span class="op">.</span><span class="fu">choose</span> <span class="fu">allPrefectures</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    ( <span class="fu">model</span><span class="op">,</span> <span class="dt">Random</span><span class="op">.</span><span class="fu">generate</span> (<span class="dt">RandomPrefecture</span> (<span class="dt">Score</span> <span class="dv">0</span> <span class="dv">0</span>)) <span class="fu">prefectureGenerator</span> )</span></code></pre></div>
+<p>I used the <a href="https://package.elm-lang.org/packages/elm-community/random-extra/latest/Random-List#choose"><code>choose</code></a> function from the <code>random-extra</code> package, which has the following signature:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">choose</span> : <span class="dt">List</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Generator</span> ( <span class="dt">Maybe</span> <span class="fu">a</span><span class="op">,</span> <span class="dt">List</span> <span class="fu">a</span> )</span></code></pre></div>
+<p>And the logic was quite simple: every time I ask a user for a prefecture, I would just <em>choose</em> it from the list, and this function already extracts it from the remaining of the list. The Maybe in the first half of the tuple <code>( Maybe Prefecture , List Prefecture )</code> means that if the chosen option is a <code>Nothing</code>, you run out of options and you can finish the game. What was the downside of this approach? I needed to perform <strong>N number of side effects</strong>, where N is the length of the list of things I want to memorize in the game. Is there a cleaner way?</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Start</span> <span class="op">-&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">prefectureGenerator</span> : <span class="dt">Random</span><span class="op">.</span><span class="dt">Generator</span> (<span class="dt">List</span> <span class="dt">Prefecture</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">prefectureGenerator</span> <span class="op">=</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- the whole game revolves around this!</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>            <span class="dt">Random</span><span class="op">.</span><span class="dt">List</span><span class="op">.</span><span class="fu">shuffle</span> <span class="fu">allPrefectures</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    ( <span class="fu">model</span><span class="op">,</span> <span class="dt">Random</span><span class="op">.</span><span class="fu">generate</span> (<span class="dt">RandomPrefecture</span> (<span class="dt">Score</span> <span class="dv">0</span> <span class="dv">0</span>)) <span class="fu">prefectureGenerator</span> )</span></code></pre></div>
+<p>Yes, following the game logic, I just need to scrumble the list <strong>once</strong>! And therefore, I can just use the <a href="https://package.elm-lang.org/packages/elm-community/random-extra/latest/Random-List#shuffle"><code>shuffle</code></a> function from the same package and, since a List in Elm is simply a Linked List, I can <code>List.head</code> every item from the remaining list of prefectures in the game until I run out of options, a nice improvement!</p>
+<h2 id="enter-the-zipper-zipper_mouth_face">Enter the Zipper! 🤐</h2>
+<p>Conceptually, you might have noticed that the above <code>GameState</code> type seems a bit redundant: if we need to keep track of a list of guessed, not yet guessed, and current asked prefecture, do we have a better data structure that represents that? 🤔</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Zipper</span> <span class="fu">a</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">=</span> <span class="dt">Zipper</span> (<span class="dt">List</span> <span class="fu">a</span>) <span class="fu">a</span> (<span class="dt">List</span> <span class="fu">a</span>)</span></code></pre></div>
+<p>Indeed, the structure I really want is a <a href="https://package.elm-lang.org/packages/wernerdegroot/listzipper/4.0.0/">Zipper</a>! A zipper always has a focused item, a List before and after that, so this represents really nicely what I wanted to acomplish:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="kw">alias</span> <span class="dt">GameState</span> <span class="op">=</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    { <span class="fu">prefectures</span> : <span class="dt">Zipper</span> <span class="dt">Prefecture</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="fu">score</span> : <span class="dt">Score</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="fu">guess</span> : <span class="dt">String</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
+<p>A few changes I had to do to the logic of the game were, first in the way I initialize the game state:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">RandomPrefecture</span> <span class="fu">score</span> (<span class="fu">p</span> <span class="op">::</span> <span class="fu">ps</span>) <span class="op">-&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    ( <span class="dt">Playing</span> (<span class="dt">GameState</span> (<span class="dt">Zipper</span><span class="op">.</span><span class="fu">fromCons</span> <span class="fu">p</span> <span class="fu">ps</span>) <span class="fu">score</span> <span class="st">&quot;&quot;</span>) <span class="fu">emptyTray</span><span class="op">,</span> <span class="dt">Cmd</span><span class="op">.</span><span class="fu">none</span> )</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="dt">RandomPrefecture</span> <span class="fu">score</span> [] <span class="op">-&gt;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    ( <span class="dt">Finished</span> <span class="fu">score</span> <span class="fu">emptyTray</span><span class="op">,</span> <span class="dt">Cmd</span><span class="op">.</span><span class="fu">none</span> )</span></code></pre></div>
+<p>As you can see, since <strong>pattern matching</strong> is the way we do everything in Elm, I can construct nicely my first zipper when I come back from the random shuffle function by just using <code>Zipper.fromCons</code>.</p>
+<p>And then the update function after we guess every prefecture in the game:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>( <span class="cf">case</span> <span class="dt">Zipper</span><span class="op">.</span><span class="fu">next</span> <span class="fu">updatedCurrentPrefecture</span> <span class="cf">of</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Just</span> <span class="fu">remainingPrefectures</span> <span class="op">-&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Playing</span> (<span class="dt">GameState</span> <span class="fu">remainingPrefectures</span> <span class="fu">updatedGameScore</span> <span class="st">&quot;&quot;</span>) <span class="fu">tray</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Nothing</span> <span class="op">-&gt;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- if there is no Zipper.next, the game is over!</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Finished</span> <span class="fu">updatedGameScore</span> <span class="fu">tray</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="op">,</span> <span class="dt">Cmd</span><span class="op">.</span><span class="fu">none</span> )</span></code></pre></div>
+<p>Every time we guess a prefecture, we move to the <code>next</code>, and if that operation fails, it means we have finished the game!</p>
+<h2 id="separation-of-concerns">Separation of concerns</h2>
+<p>I added a few unit tests to my game, and I ended up with the following code:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span> : <span class="dt">Test</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span> <span class="op">=</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">describe</span> <span class="st">&quot;getPrefectureStatus tests&quot;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        [ <span class="fu">test</span> <span class="st">&quot;current prefecture is focused -&gt; color Focused&quot;</span> <span class="op">&lt;|</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>            \<span class="fu">_</span> <span class="op">-&gt;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                <span class="kw">let</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">zipper</span> : <span class="dt">Zipper</span> <span class="dt">Prefecture</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">zipper</span> <span class="op">=</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">Zipper</span><span class="op">.</span><span class="fu">singleton</span> <span class="fu">aomori</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">expectedStyles</span> : <span class="dt">List</span> (<span class="dt">Svg</span><span class="op">.</span><span class="dt">Attribute</span> <span class="fu">msg</span>)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">expectedStyles</span> <span class="op">=</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>                        <span class="co">-- this is bad!! 🤢</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>                        [ <span class="dt">SvgAttr</span><span class="op">.</span><span class="fu">fill</span> <span class="st">&quot;#422ad5&quot;</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>                        <span class="op">,</span> <span class="dt">SvgAttr</span><span class="op">.</span><span class="fu">class</span> <span class="st">&quot;animate-pulse&quot;</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>                        ]</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>                <span class="kw">in</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>                <span class="dt">Expect</span><span class="op">.</span><span class="fu">equal</span> <span class="fu">expectedStyles</span> (<span class="fu">getPrefectureStatus</span> <span class="dv">2</span> <span class="fu">zipper</span>)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="fu">test</span> <span class="st">&quot;prefecture not yet asked -&gt; color NotAsked&quot;</span> <span class="op">&lt;|</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- ... more tests</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>        ]</span></code></pre></div>
+<p>What was wrong with this code? Well, I was <strong>mixing</strong> visual representation of the game with the actual game logic, so, I needed to rewrite my functions to make my life easier for myself:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fillColor</span> : <span class="dt">Int</span> <span class="op">-&gt;</span> <span class="dt">Zipper</span> <span class="dt">Prefecture</span> <span class="op">-&gt;</span> <span class="dt">List</span> (<span class="dt">Svg</span><span class="op">.</span><span class="dt">Attribute</span> <span class="fu">msg</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fillColor</span> <span class="fu">id</span> <span class="op">=</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">getPrefectureStatus</span> <span class="fu">id</span> <span class="op">&gt;&gt;</span> <span class="fu">statusToColor</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">getPrefectureStatus</span> : <span class="dt">Int</span> <span class="op">-&gt;</span> <span class="dt">Zipper</span> <span class="dt">Prefecture</span> <span class="op">-&gt;</span> <span class="dt">Status</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">getPrefectureStatus</span> <span class="fu">id</span> <span class="fu">zipper</span> <span class="op">=</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- implementation of this function is not relevant now...</span></span></code></pre></div>
+<p>And the nicer resulting code looks now like this:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span> : <span class="dt">Test</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span> <span class="op">=</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">describe</span> <span class="st">&quot;getPrefectureStatus tests&quot;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        [ <span class="fu">test</span> <span class="st">&quot;current prefecture is focused -&gt; Focused state&quot;</span> <span class="op">&lt;|</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>            \<span class="fu">_</span> <span class="op">-&gt;</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                <span class="kw">let</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">zipper</span> : <span class="dt">Zipper</span> <span class="dt">Prefecture</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">zipper</span> <span class="op">=</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">Zipper</span><span class="op">.</span><span class="fu">singleton</span> <span class="fu">aomori</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>                <span class="kw">in</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>                <span class="dt">Expect</span><span class="op">.</span><span class="fu">equal</span> <span class="dt">Focused</span> (<span class="fu">getPrefectureStatus</span> <span class="dv">2</span> <span class="fu">zipper</span>)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="fu">test</span> <span class="st">&quot;prefecture not yet asked -&gt; NotAsked state&quot;</span> <span class="op">&lt;|</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- ... more tests</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>        ]</span></code></pre></div>
+<p>One nice implication of using functional languages, is that all the functions are pure, which means for every input I can <strong>always</strong> guarantee the same output, and that makes unit testing a breeze! ✨</p>
+<h2 id="the-ci-setup">The CI Setup</h2>
+<p>I have been learning Nix ❄️ recently for my Haskell development, so I wanted to use Nix too for my Elm needs. I updated my <a href="https://github.com/kutyel/elm-parcel-template">elm-parcel-template</a> to now use Nix and, as a nice side effect, I have a <strong>FREE, ZERO CONFIG CI</strong> thanks to <a href="https://nix-ci.com/">nix-ci.com</a> (it figures out automagically what it needs to do based on your <code>flake.nix</code> file, no extra config needed! ✨), check it out if you are interested, it is a really nice project!</p>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>I would like to thank a few people who helped me improve a few things in these games, namely:</p>
+<ul>
+<li><a href="https://github.com/AitorSoto">Aitor Soto</a> for making the game actually <a href="https://github.com/kutyel/elm-countries-quiz/pull/1">playable</a> and nice! 🙇🏼‍♂️</li>
+<li><a href="https://github.com/r-k-b">Robert K. Bell</a> from the Elm Slack for his help <a href="https://github.com/kutyel/elm-japan-prefectures-quiz/pull/1">setting up Nix</a> + Elm 🌳❤️</li>
+<li><a href="https://x.com/kerckhove_ts">Tom Sydney Kerckhove</a>, for creating the awesome Nix CI! 🙌🏻</li>
+</ul>
+<p>If you liked this blogpost and would like me to continue writing technical content, please consider <a href="https://github.com/sponsors/kutyel">sponsoring my work</a>, share it in your social networks and <strong>follow me on <a href="https://twitter.com/FlavioCorpa">Twitter</a> and <a href="https://bsky.app/profile/flaviocorpa.com">BlueSky 🦋</a>!</strong> 🙌🏻</p></section>
+  </article>
+</main>
+
+
+<bsky-comments post="at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3m4j72dng6k2u"></bsky-comments>
+ <footer class="py-14 bg-[var(--footerBgColor)] shrink-0">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem]">
+    <ul class="flex justify-center list-none" role="list">
+      <li class="mx-3" role="listitem">
+        <a href="/">Home</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="https://github.com/sponsors/kutyel/">Sponsor me</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="/atom.xml">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+
+
+<script src="https://gistcdn.githack.com/kutyel/41d12e099484fd390fb67168271fcdd9/raw/9be26e500525a2e4edacc53d3a8006aaddec0e15/bsky-comments.js"></script>
+
+
+    <script async>
+      ;(() => {
+        window.site.refreshThemeSwitch()
+        document.querySelector('[data-theme-switch]').addEventListener('click', (e) => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light')
+        })
+      })()
+    </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'
+    ></script>
+    <!-- End Cloudflare Web Analytics -->
+  </body>
+</html>

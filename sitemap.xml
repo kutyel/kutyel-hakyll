@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  <url>
+    <loc>https://flaviocorpa.com</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://flaviocorpa.com/japan-prefectures-quiz-building-a-browser-memory-game-with-elm.html</loc>
+    <lastmod>16/12/2025 15:10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://flaviocorpa.com/how-to-add-estimated-reading-time-to-your-hakyll-blog.html</loc>
+    <lastmod>16/09/2025</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://flaviocorpa.com/building-a-non-trivial-app-with-elm-and-with-svelte.html</loc>
+    <lastmod>04/06/2025</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://flaviocorpa.com/the-wish-of-the-cat.html</loc>
+    <lastmod>03/04/2025</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://flaviocorpa.com/my-journey-to-japanese-n3-level.html</loc>
+    <lastmod>06/11/2024 00:15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-5-semigroups-and-monoids.html</loc>
+    <lastmod>14/08/2024 15:15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-4-parser-combinators.html</loc>
+    <lastmod>03/04/2024 11:15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://flaviocorpa.com/do-you-even-effect-ap-bro.html</loc>
+    <lastmod>17/11/2023</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://flaviocorpa.com/taking-screenshots-with-elm-0-19.html</loc>
+    <lastmod>04/08/2023</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-3-monads.html</loc>
+    <lastmod>03/03/2023 12:57</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://flaviocorpa.com/declarative-uis-without-css-with-elm-ui.html</loc>
+    <lastmod>24/02/2023</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-2-applicative-functors.html</loc>
+    <lastmod>03/05/2023 15:22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-1-functors.html</loc>
+    <lastmod>27/01/2023</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>
