@@ -160,16 +160,22 @@ And of course, there are right-to-left variants too: `scanr` and `scanr1`.
 
 ## `scanl` in Elm!
 
-Here is the nice surprise: even though Elm does not have a built-in `scanl`, the community has got you covered! The excellent [`elm-community/list-extra`](https://package.elm-lang.org/packages/elm-community/list-extra/8.7.0/List-Extra#scanl) package provides both `scanl` and `scanl1`:
+Here is the nice surprise: even though Elm does not have a built-in `scanl`, the community has got you covered! The excellent [`elmcraft/core-extra`](https://package.elm-lang.org/packages/elmcraft/core-extra/latest/List-Extra#scanl) package provides: `scanl`, `scanl1`, `scanr` and `scanr1`:
 
 ```elm
-import List.Extra exposing (scanl, scanl1)
+import List.Extra exposing (scanl, scanl1, scanr, scanr1)
 
 scanl (+) 0 [ 1, 2, 3, 4 ]
 --> [ 0, 1, 3, 6, 10 ]
 
 scanl1 (+) [ 1, 2, 3 ]
 --> [ 1, 3, 6 ]
+
+scanr (+) 0 [ 1, 2, 3 ]
+--> [ 6, 5, 3, 0 ]
+
+scanr1 (+) [ 1, 2, 3 ]
+--> [ 6, 5, 3 ]
 ```
 
 The type signatures are exactly what you would expect:
