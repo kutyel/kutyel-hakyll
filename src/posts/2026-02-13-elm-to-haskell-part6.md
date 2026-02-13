@@ -183,6 +183,8 @@ The type signatures are exactly what you would expect:
 ```elm
 scanl  : (a -> b -> b) -> b -> List a -> List b
 scanl1 : (a -> a -> a) -> List a -> List a
+scanr  : (a -> b -> b) -> b -> List a -> List b
+scanr1 : (a -> a -> a) -> List a -> List a
 ```
 
 ## When is `scanl` useful?
