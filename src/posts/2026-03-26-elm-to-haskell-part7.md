@@ -203,7 +203,7 @@ This is handy when you want to write the data first and the function second, whi
 -- traverse: function first, data second
 traverse validatePositive [1, 2, 3]
 
--- for: data first, function second (feels more like Elm's |>!)
+-- for: data first, function second (feels more like Elm's `|>`!)
 for [1, 2, 3] validatePositive
 ```
 
