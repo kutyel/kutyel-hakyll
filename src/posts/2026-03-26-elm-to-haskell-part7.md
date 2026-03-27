@@ -66,7 +66,9 @@ class (Functor t, Foldable t) => Traversable t where
 
 There is quite a lot to unpack here, so let us go through it step by step.
 
-First, notice the typeclass constraints: `Functor t, Foldable t`. Remember from our [previous post about Foldable](https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-6-foldable.html) that `Foldable` lets you collapse a structure into a summary value? Well, `Traversable` builds on both `Functor` _and_ `Foldable`. You can think of it as the typeclass that lets you visit every element of a structure, run an effect on each one, and get back the same structure with all the results — but with the effect _pulled out to the top_. 🏗️
+First, notice the typeclass constraints: `Functor t, Foldable t`. The `Functor` one is easy to spot — `traverse f = sequenceA . fmap f` uses `fmap` directly. But why `Foldable`? Because every `Traversable` is automatically a `Foldable`: if you can traverse a structure running effects, you can certainly fold it too — just use an applicative that ignores the "shape-preserving" part and only accumulates values. In fact, `foldMap` is always derivable from `traverse`, which is why Haskell requires `Foldable` as a superclass: to make that relationship explicit rather than leaving it implicit. 🧩
+
+You can think of `Traversable` as the typeclass that lets you visit every element of a structure, run an effect on each one, and get back the same structure with all the results — but with the effect _pulled out to the top_. 🏗️
 
 Second, notice the `MINIMAL` pragma: you only need to implement **either** `traverse` or `sequenceA`, and you get the other for free, since they are defined in terms of each other!
 
