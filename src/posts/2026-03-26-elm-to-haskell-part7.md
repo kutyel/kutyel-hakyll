@@ -1,7 +1,7 @@
 ---
 author: 'Flavio Corpa'
 authorTwitter: '@FlavioCorpa'
-desc: 'A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!'
+desc: 'A series of blog posts for explaining Haskell to Elm developers interested in learning the language that powers the compiler for their favourite language!'
 image: ./images/haskell-elm.png
 keywords: 'haskell,elm,functional,programming'
 tags: haskell, elm, fp
