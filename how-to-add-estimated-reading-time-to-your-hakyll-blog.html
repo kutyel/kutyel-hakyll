@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <title>How to add estimated reading time to your Hakyll blog</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A small technical Haskell blogpost about the Hakyll platform!" />
+    
+    <meta name="author" content="Flavio Corpa" />
+     
+    <meta name="keywords" content="haskell,functional,programming" />
+    
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU" />
+    <meta
+      http-equiv="origin-trial"
+      content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ=="
+    />
+
+    <meta property="og:site_name" content="flaviocorpa.com" />
+    <meta property="og:title" content="How to add estimated reading time to your Hakyll blog" />
+    <meta property="og:url" content="https://flaviocorpa.com/how-to-add-estimated-reading-time-to-your-hakyll-blog.html" />
+    <meta property="og:description" content="A small technical Haskell blogpost about the Hakyll platform!" />
+     
+    <meta property="og:type" content="article" />
+     
+    <meta name="twitter:card" content="summary" />
+    
+    <meta name="twitter:url" content="https://flaviocorpa.com/how-to-add-estimated-reading-time-to-your-hakyll-blog.html" />
+    <meta name="twitter:site" content="flaviocorpa.com" />
+    <meta name="twitter:title" content="How to add estimated reading time to your Hakyll blog" />
+    <meta name="twitter:description" content="A small technical Haskell blogpost about the Hakyll platform!" />
+    
+    <meta name="twitter:creator" content="@FlavioCorpa" />
+    
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>"
+    />
+    <link rel="canonical" href="https://flaviocorpa.com/how-to-add-estimated-reading-time-to-your-hakyll-blog.html" />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      /* Base resets */
+      :root {
+        color-scheme: light dark;
+      }
+      html {
+        box-sizing: border-box;
+      }
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
+      body {
+        font-family: Verdana, Helvetica, Arial, sans-serif;
+        margin: 0;
+      }
+      body,
+      input,
+      button {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      input,
+      button {
+        font: inherit;
+      }
+      /* Tailwind v4 */
+      @custom-variant dark (&:where(.dark, .dark *));
+
+      /* Light/Dark CSS variables ported from CSS folder */
+      body.light {
+        --authorTitleColor: #767676;
+        --bgColor: #fff;
+        --blockquoteBorderColor: #eee;
+        --btnBgColor: #287cb4;
+        --btnTextColor: #fff;
+        --iframeBorderColor: #e8e8e8;
+        --inlineCodeBgColor: rgba(255, 229, 100, 0.2);
+        --inlineCodeColor: #1a1a1a;
+        --inputBgColor: #fff;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #334249;
+        --secretGraphicColor: #1a1a1a;
+        --secretGraphicHoverColor: #206592;
+        --separatorColor: #f2f2f2;
+        --textColor: #334249;
+        --textLinkBorderColor: #287cb4;
+        --textLinkColor: #287cb4;
+        --textLinkHoverColor: #206592;
+        --deepBgColor: #011627;
+        --footerBgColor: #f5f5f5;
+        --footerLinkColor: #2676ac;
+        --h1Color: currentColor;
+        --headerBgColor: #c4dfff;
+      }
+      body.dark {
+        --separatorColor: #424857;
+        --authorTitleColor: hsla(0, 0%, 100%, 0.65);
+        --bgColor: #282c35;
+        --blockquoteBorderColor: var(--separatorColor);
+        --btnBgColor: #001627;
+        --btnTextColor: #fff;
+        --iframeBorderColor: var(--separatorColor);
+        --inlineCodeBgColor: rgba(115, 124, 153, 0.2);
+        --inlineCodeColor: #e2e4e9;
+        --inputBgColor: #282c35;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #fff;
+        --secretGraphicBorderLeftColor: #c693ea;
+        --secretGraphicColor: hsla(0, 0%, 100%, 0.88);
+        --secretGraphicHoverColor: rgba(255, 167, 196, 0.75);
+        --textColor: hsla(0, 0%, 100%, 0.88);
+        --textLinkBorderColor: #c693ea;
+        --textLinkColor: #c693ea;
+        --textLinkHoverColor: rgba(198, 147, 234, 0.8);
+        --deepBgColor: #011627;
+        --footerBgColor: #373c49;
+        --footerLinkColor: #c693ea;
+        --h1Color: var(--textColor);
+        --headerBgColor: var(--deepBgColor);
+      }
+
+      /* Minimal base styles moved from CSS folder */
+      a[href] {
+        text-decoration: none;
+        color: var(--textLinkColor);
+        box-shadow: 0 1px 0 0 currentColor;
+        word-wrap: break-word;
+      }
+      a[href]:hover,
+      a[href]:focus,
+      a[href]:visited {
+        color: var(--textLinkHoverColor);
+      }
+      h1 > a[href],
+      h1 > a[href]:hover,
+      h1 > a[href]:focus,
+      h1 > a[href]:visited {
+        color: inherit;
+      }
+      h1,
+      h2 {
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        font-size: 1.643rem;
+      }
+      h2::before {
+        content: '';
+        display: block;
+        height: 0;
+        border-top: 5px solid var(--separatorColor);
+        padding-bottom: 20px;
+      }
+      a[href].footnote-ref {
+        box-shadow: none;
+      }
+      img {
+        display: block;
+        height: auto;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 100%;
+        border: 0;
+      }
+
+      /* Theme switch icon visibility rules */
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='dark'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='light'] {
+        display: block;
+      }
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='light'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='dark'] {
+        display: none;
+      }
+
+      /* Code font stack */
+      code,
+      kbd,
+      pre,
+      samp {
+        font-family: JetBrains Mono, Consolas, Menlo, Monaco, source-code-pro, 'Courier New',
+          monospace;
+        font-size: 0.9em;
+        -webkit-font-feature-settings: normal;
+        font-feature-settings: normal;
+      }
+      pre code {
+        font-size: inherit;
+        line-height: 1.4rem;
+      }
+      .sourceCode:not(pre):not(code) {
+        background-color: var(--deepBgColor);
+        overflow: hidden;
+        margin: 1.25rem 0;
+        border-radius: 10px;
+      }
+      pre.sourceCode {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 1.3125rem;
+        margin: 0;
+        color: #fff;
+        background: none;
+        font-size: 0.8rem;
+        line-height: 1.4rem;
+      }
+      /* Optional line numbers support */
+      pre.numberSource.sourceCode > code {
+        counter-reset: source-line 0;
+      }
+      pre.numberSource.sourceCode > code > span {
+        counter-increment: source-line;
+      }
+      pre.numberSource.sourceCode > code > span > a {
+        box-shadow: none;
+      }
+      code.sourceCode > a.sourceLine:before {
+        display: inline-block;
+        content: attr(title);
+        text-align: right;
+        border-right: 1px solid rgba(128, 147, 147, 0.4);
+        color: rgb(128, 147, 147);
+        width: 30px;
+        padding-right: 10px;
+        margin-right: 10px;
+      }
+      @media (max-width: 667px) {
+        .sourceCode:not(pre):not(code) {
+          border-radius: 0;
+        }
+        code.sourceCode > a.sourceLine:before {
+          display: none;
+        }
+      }
+      :not(pre) > code {
+        border-radius: 0.3em;
+        background-color: var(--inlineCodeBgColor);
+        color: var(--inlineCodeColor);
+        padding: 0.15em 0.2em 0.05em;
+        white-space: normal;
+      }
+      /* Syntax token colors (Pandoc/Highlight) */
+      .co {
+        color: rgb(128, 147, 147);
+      }
+      .ch,
+      .st,
+      .vs {
+        color: rgb(236, 196, 141);
+      }
+      .va {
+        color: rgb(214, 222, 235);
+      }
+      .dv,
+      .bn,
+      .fl {
+        color: rgb(247, 140, 108);
+      }
+      .bu,
+      .cn,
+      .at,
+      .fu,
+      .dt {
+        color: rgb(130, 170, 255);
+      }
+      .im,
+      .op,
+      .kw,
+      .ot,
+      .cf {
+        color: #c693ea;
+      }
+
+      /* Typography & content spacing */
+      article p {
+        margin: 0;
+        line-height: 1.75;
+      }
+      article p + p {
+        margin-top: 1.75em;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+        font-size: 1.643rem;
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      hr {
+        height: 0;
+        border: none;
+        border-top: 5px solid var(--separatorColor);
+        margin: 1.75em 0;
+      }
+      blockquote {
+        margin-left: 1.5em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        padding-left: 1em;
+        border-left: 4px solid var(--blockquoteBorderColor);
+      }
+      blockquote em {
+        font-size: 1.286rem;
+      }
+      /* Lists */
+      article ul {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: disc outside;
+      }
+      article ol {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: decimal outside;
+      }
+      article li {
+        margin: 0.25em 0;
+      }
+      article li > ul,
+      article li > ol {
+        margin: 0.5em 0;
+      }
+      /* Media helpers */
+      iframe {
+        width: 100%;
+      }
+      .iframe--example {
+        border: 2px solid var(--iframeBorderColor);
+      }
+      .pdf {
+        margin: 1rem -6rem;
+        height: 30rem;
+        width: calc(100% + 12rem);
+      }
+      .pdf-link {
+        display: none;
+      }
+      @media (max-width: 800px) {
+        .pdf {
+          margin: 1rem 0;
+          width: 100%;
+        }
+      }
+      @media (max-width: 667px) {
+        .pdf {
+          display: none;
+        }
+        .pdf-link {
+          display: inline;
+        }
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="dark min-h-dvh flex flex-col bg-[var(--bgColor)] text-[var(--textColor)] leading-[1.643] antialiased"
+  >
+    <script>
+      ;(() => {
+        window.site = {
+          theme:
+            localStorage.getItem('theme') ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          setTheme: (name) => {
+            document.body.classList.add(name === 'light' ? 'light' : 'dark')
+            document.body.classList.remove(name === 'light' ? 'dark' : 'light')
+            localStorage.setItem('theme', name)
+            window.site.theme = name
+            window.site.refreshThemeSwitch()
+          },
+          refreshThemeSwitch: () => {
+            const isLight = window.site.theme === 'light'
+            const themeSwitch = document.querySelector('[data-theme-switch]')
+
+            themeSwitch?.setAttribute(
+              'aria-label',
+              isLight ? 'Switch to dark mode' : 'Switch to light mode'
+            )
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true')
+          },
+        }
+
+        window.site.setTheme(window.site.theme)
+      })()
+    </script>
+
+    <button
+      aria-label="Switch to light mode"
+      aria-checked="true"
+      data-theme-switch
+      role="switch"
+      type="button"
+      class="appearance-none flex items-center justify-center bg-[var(--btnBgColor)] border border-[var(--btnBgColor)] text-[var(--btnTextColor)] rounded-[20px] px-2 py-[0.1em] outline-offset-[0.1em] absolute right-4 top-4"
+    >
+      <span aria-hidden="true" data-theme-switch-icon="dark">🌙</span>
+      <span aria-hidden="true" data-theme-switch-icon="light">🌞</span>
+    </button>
+
+    <nav class="my-6 py-2">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0" data-nav-wrap>
+    <a class="mr-5 absolute left-[-10000px] focus:static focus:left-auto" href="#content"
+      >Skip to content</a
+    >
+    <a class="mr-5" href="/">Home</a>
+    <a class="mr-5" href="https://github.com/sponsors/kutyel">Sponsor me</a>
+    <a class="mr-5" href="/atom.xml">RSS</a>
+  </div>
+</nav>
+
+
+<style>
+  bsky-comments {
+    --background-color: var(--bgColor);
+    --text-color: var(--textColor);
+    --link-color: var(--textLinkColor);
+    --link-hover-color: var(--textLinkHoverColor);
+    --comment-meta-color: #888;
+    --error-color: #ff4d4d;
+    --reply-border-color: var(--separatorColor);
+    --button-background-color: var(--btnBgColor);
+    --button-hover-background-color: rgba(var(--btnBgColor), 0.2);
+    --author-avatar-border-radius: 50%;
+  }
+</style>
+
+<main class="flex-1" id="content" tabindex="-1">
+  <article class="pb-10">
+    <header class="bg-[var(--headerBgColor)] mb-8 px-[1.3125rem] md:px-0 py-4 md:py-8">
+      <div class="mx-auto md:w-[600px]">
+        <h1 class="text-[1.7rem] md:text-[3rem] m-0 mb-4 font-normal leading-[1.2] text-[var(--h1Color)]">
+          How to add estimated reading time to your Hakyll blog
+        </h1>
+        <div class="mx-auto md:w-[600px]">
+          <small class="italic">16/09/2025</small>
+          <small class="italic"> | 1 min read</small>
+          
+          <div class="mt-2">[ <a title="All pages tagged &#39;haskell&#39;." href="/tags/haskell.html" rel="tag">haskell</a>, <a title="All pages tagged &#39;fp&#39;." href="/tags/fp.html" rel="tag">fp</a>, <a title="All pages tagged &#39;hakyll&#39;." href="/tags/hakyll.html" rel="tag">hakyll</a>, <a title="All pages tagged &#39;web&#39;." href="/tags/web.html" rel="tag">web</a> ]</div>
+        </div>
+      </div>
+    </header>
+    <section class="mx-auto md:w-[600px] px-[1.3125rem] md:px-0"><p>A while ago, I decided it was time to start blogging again, and I used <a href="https://robertwpearce.com/">Robert Pearce</a>’s excellent <a href="https://robertwpearce.com/the-hakyll-nix-template-tutorial.html">hakyll-nix-template</a> to bootstrap this blog and as a way to learn <a href="https://jaspervdj.be/hakyll/">Hakyll</a> and <a href="https://nix.dev/tutorials/nix-language.html">Nix</a> a little bit better. If it is your personal blog after all, you can use whatever you want, right? 😉</p>
+<p>If you also use Hakyll, you might have wondered how can we calculate the estimated reading time for each post in a simple way, so here is the Haskell code:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">readingTimeField ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Context</span> <span class="dt">String</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>readingTimeField key <span class="ot">=</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  field key calculate</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ot">    calculate ::</span> <span class="dt">Item</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Compiler</span> <span class="dt">String</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    calculate <span class="ot">=</span> <span class="fu">pure</span> <span class="op">.</span> withTagList acc <span class="op">.</span> itemBody</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    acc ts <span class="ot">=</span> [<span class="dt">TagText</span> <span class="op">.</span> <span class="fu">show</span> <span class="op">$</span> time ts]</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- M. Brysbaert, Journal of Memory and Language (2009) vol 109.</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- DOI: 10.1016/j.jml.2019.104047</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    time ts <span class="ot">=</span> <span class="fu">foldr</span> count <span class="dv">0</span> ts <span class="ot">`div`</span> <span class="dv">238</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    count (<span class="dt">TagText</span> s) n <span class="ot">=</span> n <span class="op">+</span> <span class="fu">length</span> (<span class="fu">words</span> s)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    count _ n <span class="ot">=</span> n</span></code></pre></div>
+<p>What’s funny about the above implementation is that I found an actual research <a href="https://www.sciencedirect.com/science/article/abs/pii/S0749596X19300786">paper</a> that tells us the average reading speed for adults and non-fiction, so I did not have to guess it!</p>
+<blockquote>
+<p>This is the actual code I’m using in my blog, you can have a look at the whole codebase <a href="https://github.com/kutyel/kutyel-hakyll">here</a>, its Open Source! 🕊️</p>
+</blockquote>
+<p>After creating the <code>readingTimeField</code> function, you can use it in your <code>postCtx</code> like this:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">postCtx ::</span> <span class="dt">Context</span> <span class="dt">String</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>postCtx <span class="ot">=</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  constField <span class="st">&quot;root&quot;</span> mySiteRoot</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;&gt;</span> constField <span class="st">&quot;siteName&quot;</span> mySiteName</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;&gt;</span> dateField <span class="st">&quot;date&quot;</span> <span class="st">&quot;%d/%m/%Y&quot;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;&gt;</span> readingTimeField <span class="st">&quot;readingtime&quot;</span> <span class="co">-- this is the new addition</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;&gt;</span> defaultContext</span></code></pre></div>
+<p>And finally, you can use it in your templates like this:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> class</span><span class="op">=</span><span class="st">&quot;info&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">small</span><span class="ot"> class</span><span class="op">=</span><span class="st">&quot;italic&quot;</span><span class="dt">&gt;</span>$date$<span class="dt">&lt;/</span><span class="kw">small</span><span class="dt">&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">small</span><span class="ot"> class</span><span class="op">=</span><span class="st">&quot;italic&quot;</span><span class="dt">&gt;</span> | $readingtime$ min read<span class="dt">&lt;/</span><span class="kw">small</span><span class="dt">&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">&lt;!-- ... --&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span></code></pre></div>
+<p>It is as simple as it gets, the end result looks like this:</p>
+<p><img src="./images/ert.png" alt="My frist Elm and Haskell blogpost showing an estimate of 6 min read" width="500px"></p>
+<p>Hope this was useful for you too! If you have any questions, feel free to reach out to me on <a href="https://twitter.com/FlavioCorpa">Twitter</a> or <a href="https://bsky.app/profile/flaviocorpa.com">BlueSky</a> 🦋.</p></section>
+  </article>
+</main>
+
+ <footer class="py-14 bg-[var(--footerBgColor)] shrink-0">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem]">
+    <ul class="flex justify-center list-none" role="list">
+      <li class="mx-3" role="listitem">
+        <a href="/">Home</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="https://github.com/sponsors/kutyel/">Sponsor me</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="/atom.xml">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+
+
+<script src="https://gistcdn.githack.com/kutyel/41d12e099484fd390fb67168271fcdd9/raw/9be26e500525a2e4edacc53d3a8006aaddec0e15/bsky-comments.js"></script>
+
+
+    <script async>
+      ;(() => {
+        window.site.refreshThemeSwitch()
+        document.querySelector('[data-theme-switch]').addEventListener('click', (e) => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light')
+        })
+      })()
+    </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'
+    ></script>
+    <!-- End Cloudflare Web Analytics -->
+  </body>
+</html>

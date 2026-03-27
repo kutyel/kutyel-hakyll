@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <title>Haskell for Elm developers: giving names to stuff (Part 7 - Traversable)</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A series of blog posts for explaining Haskell to Elm developers interested in learning the language that powers the compiler for their favourite language!" />
+    
+    <meta name="author" content="Flavio Corpa" />
+     
+    <meta name="keywords" content="haskell,elm,functional,programming" />
+    
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU" />
+    <meta
+      http-equiv="origin-trial"
+      content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ=="
+    />
+
+    <meta property="og:site_name" content="flaviocorpa.com" />
+    <meta property="og:title" content="Haskell for Elm developers: giving names to stuff (Part 7 - Traversable)" />
+    <meta property="og:url" content="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-7-traversable.html" />
+    <meta property="og:description" content="A series of blog posts for explaining Haskell to Elm developers interested in learning the language that powers the compiler for their favourite language!" />
+    
+    <meta property="og:image" content="https://flaviocorpa.com./images/haskell-elm.png" />
+     
+    <meta property="og:type" content="article" />
+     
+    <meta name="twitter:image" content="https://flaviocorpa.com./images/haskell-elm.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <meta name="twitter:url" content="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-7-traversable.html" />
+    <meta name="twitter:site" content="flaviocorpa.com" />
+    <meta name="twitter:title" content="Haskell for Elm developers: giving names to stuff (Part 7 - Traversable)" />
+    <meta name="twitter:description" content="A series of blog posts for explaining Haskell to Elm developers interested in learning the language that powers the compiler for their favourite language!" />
+    
+    <meta name="twitter:creator" content="@FlavioCorpa" />
+    
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>"
+    />
+    <link rel="canonical" href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-7-traversable.html" />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      /* Base resets */
+      :root {
+        color-scheme: light dark;
+      }
+      html {
+        box-sizing: border-box;
+      }
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
+      body {
+        font-family: Verdana, Helvetica, Arial, sans-serif;
+        margin: 0;
+      }
+      body,
+      input,
+      button {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      input,
+      button {
+        font: inherit;
+      }
+      /* Tailwind v4 */
+      @custom-variant dark (&:where(.dark, .dark *));
+
+      /* Light/Dark CSS variables ported from CSS folder */
+      body.light {
+        --authorTitleColor: #767676;
+        --bgColor: #fff;
+        --blockquoteBorderColor: #eee;
+        --btnBgColor: #287cb4;
+        --btnTextColor: #fff;
+        --iframeBorderColor: #e8e8e8;
+        --inlineCodeBgColor: rgba(255, 229, 100, 0.2);
+        --inlineCodeColor: #1a1a1a;
+        --inputBgColor: #fff;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #334249;
+        --secretGraphicColor: #1a1a1a;
+        --secretGraphicHoverColor: #206592;
+        --separatorColor: #f2f2f2;
+        --textColor: #334249;
+        --textLinkBorderColor: #287cb4;
+        --textLinkColor: #287cb4;
+        --textLinkHoverColor: #206592;
+        --deepBgColor: #011627;
+        --footerBgColor: #f5f5f5;
+        --footerLinkColor: #2676ac;
+        --h1Color: currentColor;
+        --headerBgColor: #c4dfff;
+      }
+      body.dark {
+        --separatorColor: #424857;
+        --authorTitleColor: hsla(0, 0%, 100%, 0.65);
+        --bgColor: #282c35;
+        --blockquoteBorderColor: var(--separatorColor);
+        --btnBgColor: #001627;
+        --btnTextColor: #fff;
+        --iframeBorderColor: var(--separatorColor);
+        --inlineCodeBgColor: rgba(115, 124, 153, 0.2);
+        --inlineCodeColor: #e2e4e9;
+        --inputBgColor: #282c35;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #fff;
+        --secretGraphicBorderLeftColor: #c693ea;
+        --secretGraphicColor: hsla(0, 0%, 100%, 0.88);
+        --secretGraphicHoverColor: rgba(255, 167, 196, 0.75);
+        --textColor: hsla(0, 0%, 100%, 0.88);
+        --textLinkBorderColor: #c693ea;
+        --textLinkColor: #c693ea;
+        --textLinkHoverColor: rgba(198, 147, 234, 0.8);
+        --deepBgColor: #011627;
+        --footerBgColor: #373c49;
+        --footerLinkColor: #c693ea;
+        --h1Color: var(--textColor);
+        --headerBgColor: var(--deepBgColor);
+      }
+
+      /* Minimal base styles moved from CSS folder */
+      a[href] {
+        text-decoration: none;
+        color: var(--textLinkColor);
+        box-shadow: 0 1px 0 0 currentColor;
+        word-wrap: break-word;
+      }
+      a[href]:hover,
+      a[href]:focus,
+      a[href]:visited {
+        color: var(--textLinkHoverColor);
+      }
+      h1 > a[href],
+      h1 > a[href]:hover,
+      h1 > a[href]:focus,
+      h1 > a[href]:visited {
+        color: inherit;
+      }
+      h1,
+      h2 {
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        font-size: 1.643rem;
+      }
+      h2::before {
+        content: '';
+        display: block;
+        height: 0;
+        border-top: 5px solid var(--separatorColor);
+        padding-bottom: 20px;
+      }
+      a[href].footnote-ref {
+        box-shadow: none;
+      }
+      img {
+        display: block;
+        height: auto;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 100%;
+        border: 0;
+      }
+
+      /* Theme switch icon visibility rules */
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='dark'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='light'] {
+        display: block;
+      }
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='light'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='dark'] {
+        display: none;
+      }
+
+      /* Code font stack */
+      code,
+      kbd,
+      pre,
+      samp {
+        font-family: JetBrains Mono, Consolas, Menlo, Monaco, source-code-pro, 'Courier New',
+          monospace;
+        font-size: 0.9em;
+        -webkit-font-feature-settings: normal;
+        font-feature-settings: normal;
+      }
+      pre code {
+        font-size: inherit;
+        line-height: 1.4rem;
+      }
+      .sourceCode:not(pre):not(code) {
+        background-color: var(--deepBgColor);
+        overflow: hidden;
+        margin: 1.25rem 0;
+        border-radius: 10px;
+      }
+      pre.sourceCode {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 1.3125rem;
+        margin: 0;
+        color: #fff;
+        background: none;
+        font-size: 0.8rem;
+        line-height: 1.4rem;
+      }
+      /* Optional line numbers support */
+      pre.numberSource.sourceCode > code {
+        counter-reset: source-line 0;
+      }
+      pre.numberSource.sourceCode > code > span {
+        counter-increment: source-line;
+      }
+      pre.numberSource.sourceCode > code > span > a {
+        box-shadow: none;
+      }
+      code.sourceCode > a.sourceLine:before {
+        display: inline-block;
+        content: attr(title);
+        text-align: right;
+        border-right: 1px solid rgba(128, 147, 147, 0.4);
+        color: rgb(128, 147, 147);
+        width: 30px;
+        padding-right: 10px;
+        margin-right: 10px;
+      }
+      @media (max-width: 667px) {
+        .sourceCode:not(pre):not(code) {
+          border-radius: 0;
+        }
+        code.sourceCode > a.sourceLine:before {
+          display: none;
+        }
+      }
+      :not(pre) > code {
+        border-radius: 0.3em;
+        background-color: var(--inlineCodeBgColor);
+        color: var(--inlineCodeColor);
+        padding: 0.15em 0.2em 0.05em;
+        white-space: normal;
+      }
+      /* Syntax token colors (Pandoc/Highlight) */
+      .co {
+        color: rgb(128, 147, 147);
+      }
+      .ch,
+      .st,
+      .vs {
+        color: rgb(236, 196, 141);
+      }
+      .va {
+        color: rgb(214, 222, 235);
+      }
+      .dv,
+      .bn,
+      .fl {
+        color: rgb(247, 140, 108);
+      }
+      .bu,
+      .cn,
+      .at,
+      .fu,
+      .dt {
+        color: rgb(130, 170, 255);
+      }
+      .im,
+      .op,
+      .kw,
+      .ot,
+      .cf {
+        color: #c693ea;
+      }
+
+      /* Typography & content spacing */
+      article p {
+        margin: 0;
+        line-height: 1.75;
+      }
+      article p + p {
+        margin-top: 1.75em;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+        font-size: 1.643rem;
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      hr {
+        height: 0;
+        border: none;
+        border-top: 5px solid var(--separatorColor);
+        margin: 1.75em 0;
+      }
+      blockquote {
+        margin-left: 1.5em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        padding-left: 1em;
+        border-left: 4px solid var(--blockquoteBorderColor);
+      }
+      blockquote em {
+        font-size: 1.286rem;
+      }
+      /* Lists */
+      article ul {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: disc outside;
+      }
+      article ol {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: decimal outside;
+      }
+      article li {
+        margin: 0.25em 0;
+      }
+      article li > ul,
+      article li > ol {
+        margin: 0.5em 0;
+      }
+      /* Media helpers */
+      iframe {
+        width: 100%;
+      }
+      .iframe--example {
+        border: 2px solid var(--iframeBorderColor);
+      }
+      .pdf {
+        margin: 1rem -6rem;
+        height: 30rem;
+        width: calc(100% + 12rem);
+      }
+      .pdf-link {
+        display: none;
+      }
+      @media (max-width: 800px) {
+        .pdf {
+          margin: 1rem 0;
+          width: 100%;
+        }
+      }
+      @media (max-width: 667px) {
+        .pdf {
+          display: none;
+        }
+        .pdf-link {
+          display: inline;
+        }
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="dark min-h-dvh flex flex-col bg-[var(--bgColor)] text-[var(--textColor)] leading-[1.643] antialiased"
+  >
+    <script>
+      ;(() => {
+        window.site = {
+          theme:
+            localStorage.getItem('theme') ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          setTheme: (name) => {
+            document.body.classList.add(name === 'light' ? 'light' : 'dark')
+            document.body.classList.remove(name === 'light' ? 'dark' : 'light')
+            localStorage.setItem('theme', name)
+            window.site.theme = name
+            window.site.refreshThemeSwitch()
+          },
+          refreshThemeSwitch: () => {
+            const isLight = window.site.theme === 'light'
+            const themeSwitch = document.querySelector('[data-theme-switch]')
+
+            themeSwitch?.setAttribute(
+              'aria-label',
+              isLight ? 'Switch to dark mode' : 'Switch to light mode'
+            )
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true')
+          },
+        }
+
+        window.site.setTheme(window.site.theme)
+      })()
+    </script>
+
+    <button
+      aria-label="Switch to light mode"
+      aria-checked="true"
+      data-theme-switch
+      role="switch"
+      type="button"
+      class="appearance-none flex items-center justify-center bg-[var(--btnBgColor)] border border-[var(--btnBgColor)] text-[var(--btnTextColor)] rounded-[20px] px-2 py-[0.1em] outline-offset-[0.1em] absolute right-4 top-4"
+    >
+      <span aria-hidden="true" data-theme-switch-icon="dark">🌙</span>
+      <span aria-hidden="true" data-theme-switch-icon="light">🌞</span>
+    </button>
+
+    <nav class="my-6 py-2">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0" data-nav-wrap>
+    <a class="mr-5 absolute left-[-10000px] focus:static focus:left-auto" href="#content"
+      >Skip to content</a
+    >
+    <a class="mr-5" href="/">Home</a>
+    <a class="mr-5" href="https://github.com/sponsors/kutyel">Sponsor me</a>
+    <a class="mr-5" href="/atom.xml">RSS</a>
+  </div>
+</nav>
+
+
+<style>
+  bsky-comments {
+    --background-color: var(--bgColor);
+    --text-color: var(--textColor);
+    --link-color: var(--textLinkColor);
+    --link-hover-color: var(--textLinkHoverColor);
+    --comment-meta-color: #888;
+    --error-color: #ff4d4d;
+    --reply-border-color: var(--separatorColor);
+    --button-background-color: var(--btnBgColor);
+    --button-hover-background-color: rgba(var(--btnBgColor), 0.2);
+    --author-avatar-border-radius: 50%;
+  }
+</style>
+
+<main class="flex-1" id="content" tabindex="-1">
+  <article class="pb-10">
+    <header class="bg-[var(--headerBgColor)] mb-8 px-[1.3125rem] md:px-0 py-4 md:py-8">
+      <div class="mx-auto md:w-[600px]">
+        <h1 class="text-[1.7rem] md:text-[3rem] m-0 mb-4 font-normal leading-[1.2] text-[var(--h1Color)]">
+          Haskell for Elm developers: giving names to stuff (Part 7 - Traversable)
+        </h1>
+        <div class="mx-auto md:w-[600px]">
+          <small class="italic">26/03/2026</small>
+          <small class="italic"> | 8 min read</small>
+          
+          <div class="mt-2">[ <a title="All pages tagged &#39;haskell&#39;." href="/tags/haskell.html" rel="tag">haskell</a>, <a title="All pages tagged &#39;elm&#39;." href="/tags/elm.html" rel="tag">elm</a>, <a title="All pages tagged &#39;fp&#39;." href="/tags/fp.html" rel="tag">fp</a> ]</div>
+        </div>
+      </div>
+    </header>
+    <section class="mx-auto md:w-[600px] px-[1.3125rem] md:px-0"><p><img src="./images/haskell-elm.svg" alt="logo" width="300px"></p>
+<p>Welcome back! In my <a href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-6-foldable.html">last post</a>, we explored the <code>Foldable</code> typeclass and how it showed up everywhere in Elm. And if you were paying attention, I teased at the very end that the next topic would be… <code>Traversable</code>! 🎉</p>
+<p>Today’s topic is one of my personal favourites and — spoiler alert ⚠️ — it is something you have absolutely been using in Elm all along!</p>
+<h2 id="a-familiar-pattern">A familiar pattern</h2>
+<p>Before we dive into the typeclass definition, let me show you some Elm code that might look familiar. Have you ever used the <a href="https://package.elm-lang.org/packages/elmcraft/core-extra/latest/Maybe-Extra#combine"><code>elmcraft/core-extra</code></a> package? It has a pair of very handy functions:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">{-| Combine a list of maybes into a single maybe (holding a list).</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">-}</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">combine</span> : <span class="dt">List</span> (<span class="dt">Maybe</span> <span class="fu">a</span>) <span class="op">-&gt;</span> <span class="dt">Maybe</span> (<span class="dt">List</span> <span class="fu">a</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">{-| Map a function producing maybes on a list</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">and combine those into a single maybe (holding a list).</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">Also known as `traverse` on lists.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">    combineMap f xs == combine (List.map f xs)</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">-}</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">combineMap</span> : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Maybe</span> (<span class="dt">List</span> <span class="fu">b</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">combineMap</span> <span class="fu">f</span> <span class="op">=</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">combine</span> <span class="op">&lt;&lt;</span> <span class="dt">List</span><span class="op">.</span><span class="fu">map</span> <span class="fu">f</span></span></code></pre></div>
+<p>The idea is simple but incredibly powerful: you have a <strong>list of inputs</strong>, a <strong>function that processes each input individually into a <code>Maybe</code></strong>, and you want to get back a <strong>single <code>Maybe</code> holding a list</strong> — or <code>Nothing</code> if anything goes wrong along the way.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">combineMap</span> <span class="dt">String</span><span class="op">.</span><span class="fu">toInt</span> [ <span class="st">&quot;1&quot;</span><span class="op">,</span> <span class="st">&quot;2&quot;</span><span class="op">,</span> <span class="st">&quot;3&quot;</span> ]</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- &gt; Just [1, 2, 3]</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">combineMap</span> <span class="dt">String</span><span class="op">.</span><span class="fu">toInt</span> [ <span class="st">&quot;1&quot;</span><span class="op">,</span> <span class="st">&quot;oops&quot;</span><span class="op">,</span> <span class="st">&quot;3&quot;</span> ]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- &gt; Nothing</span></span></code></pre></div>
+<p>Well, this pattern has a name, and that name is <strong><code>traverse</code></strong>! 🤓</p>
+<h2 id="what-is-traversable">What is <code>Traversable</code>?</h2>
+<p>Here is how the <code>Traversable</code> typeclass is defined in Haskell:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Functor</span> t, <span class="dt">Foldable</span> t) <span class="ot">=&gt;</span> <span class="dt">Traversable</span> t <span class="kw">where</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">{-# MINIMAL traverse | sequenceA #-}</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ot">  traverse ::</span> <span class="dt">Applicative</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f b) <span class="ot">-&gt;</span> t a <span class="ot">-&gt;</span> f (t b)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">traverse</span> f <span class="ot">=</span> <span class="fu">sequenceA</span> <span class="op">.</span> <span class="fu">fmap</span> f</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ot">  sequenceA ::</span> <span class="dt">Applicative</span> f <span class="ot">=&gt;</span> t (f a) <span class="ot">-&gt;</span> f (t a)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sequenceA</span> <span class="ot">=</span> <span class="fu">traverse</span> <span class="fu">id</span></span></code></pre></div>
+<p>There is quite a lot to unpack here, so let us go through it step by step.</p>
+<p>First, notice the typeclass constraints: <code>Functor t, Foldable t</code>. The <code>Functor</code> one is easy to spot — <code>traverse f = sequenceA . fmap f</code> uses <code>fmap</code> directly. But why <code>Foldable</code>? Because every <code>Traversable</code> is automatically a <code>Foldable</code>: if you can traverse a structure running effects, you can certainly fold it too — just use an applicative that ignores the “shape-preserving” part and only accumulates values. In fact, <code>foldMap</code> is always derivable from <code>traverse</code>, which is why Haskell requires <code>Foldable</code> as a superclass: to make that relationship explicit rather than leaving it implicit. 🧩</p>
+<p>You can think of <code>Traversable</code> as the typeclass that lets you visit every element of a structure, run an effect on each one, and get back the same structure with all the results — but with the effect <em>pulled out to the top</em>. 🏗️</p>
+<p>Second, notice the <code>MINIMAL</code> pragma: you only need to implement <strong>either</strong> <code>traverse</code> or <code>sequenceA</code>, and you get the other for free, since they are defined in terms of each other!</p>
+<p>Now let us look at <code>traverse</code> more closely:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span><span class="ot"> ::</span> (<span class="dt">Traversable</span> t, <span class="dt">Applicative</span> f) <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f b) <span class="ot">-&gt;</span> t a <span class="ot">-&gt;</span> f (t b)</span></code></pre></div>
+<p>Does that type signature look familiar? Compare it with our Elm <code>combineMap</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span><span class="ot">  ::</span> <span class="dt">Applicative</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f b)      <span class="ot">-&gt;</span> t a    <span class="ot">-&gt;</span> f (t b)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>combineMap <span class="op">:</span>                  (a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> b)   <span class="ot">-&gt;</span> <span class="dt">List</span> a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> (<span class="dt">List</span> b)</span></code></pre></div>
+<p><code>combineMap</code> is just <code>traverse</code> specialised to <code>List</code> as the container (<code>t</code>) and <code>Maybe</code> as the applicative effect (<code>f</code>)! 🤯🤯🤯</p>
+<h2 id="sequencea--sequence-flipping-the-types"><code>sequenceA</code> / <code>sequence</code>: flipping the types</h2>
+<p>Now let us talk about <code>sequenceA</code>, and its older sibling <a href="https://hackage.haskell.org/package/base-4.21.0.0/docs/Prelude.html#v:sequence"><code>sequence</code></a> from the Haskell Prelude:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sequenceA</span><span class="ot"> ::</span> (<span class="dt">Traversable</span> t, <span class="dt">Applicative</span> f) <span class="ot">=&gt;</span> t (f a) <span class="ot">-&gt;</span> f (t a)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sequence</span><span class="ot">  ::</span> (<span class="dt">Traversable</span> t, <span class="dt">Monad</span> m)       <span class="ot">=&gt;</span> t (m a) <span class="ot">-&gt;</span> m (t a)</span></code></pre></div>
+<p>The intuition here is beautiful: <code>sequenceA</code> <em>flips</em> the types around, turning <code>t (f a)</code> into <code>f (t a)</code>. In plain words: it takes “a list of Results” and turns it into “a Result of a list”:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">sequenceA</span> [<span class="dt">Just</span> <span class="dv">1</span>, <span class="dt">Just</span> <span class="dv">2</span>, <span class="dt">Just</span> <span class="dv">3</span>]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Just</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">sequenceA</span> [<span class="dt">Just</span> <span class="dv">1</span>, <span class="dt">Nothing</span>, <span class="dt">Just</span> <span class="dv">3</span>]</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Nothing</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">sequenceA</span> [<span class="dt">Right</span> <span class="dv">1</span>, <span class="dt">Right</span> <span class="dv">2</span>, <span class="dt">Right</span> <span class="dv">3</span>]</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="dt">Right</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">sequenceA</span> [<span class="dt">Right</span> <span class="dv">1</span>, <span class="dt">Left</span> <span class="st">&quot;oops&quot;</span>, <span class="dt">Right</span> <span class="dv">3</span>]</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="dt">Left</span> <span class="st">&quot;oops&quot;</span></span></code></pre></div>
+<p>And notice how <code>combine</code> from Elm’s <code>core-extra</code> is <em>exactly</em> this, specialised to <code>Maybe</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sequenceA</span><span class="ot"> ::</span> <span class="dt">Applicative</span> f <span class="ot">=&gt;</span> [f a]          <span class="ot">-&gt;</span> f [a]</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>combine   <span class="op">:</span>                   <span class="dt">List</span> (<span class="dt">Maybe</span> a) <span class="ot">-&gt;</span> <span class="dt">Maybe</span> (<span class="dt">List</span> a)</span></code></pre></div>
+<p>YOU HAVE BEEN USING <code>sequenceA</code> ALL ALONG! 🥁🥁🥁</p>
+<p>Now, <code>sequence</code> (the Monad variant) is what you see in the Elm <a href="https://package.elm-lang.org/packages/elm/core/1.0.5/Task#sequence"><code>Task.sequence</code></a> documentation:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sequence</span> : <span class="dt">List</span> (<span class="dt">Task</span> <span class="fu">x</span> <span class="fu">a</span>) <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="fu">x</span> (<span class="dt">List</span> <span class="fu">a</span>)</span></code></pre></div>
+<p>This is exactly <code>sequence</code> from Haskell, specialised to <code>Task</code>! You give it a list of tasks, and it runs them one by one, collecting all the results into a single <code>Task</code> wrapping a list. If any task fails, the whole thing short-circuits. The relationship is exactly the same as between <code>combine</code> and <code>combineMap</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> f  <span class="ot">=</span> <span class="fu">sequenceA</span> <span class="op">.</span> <span class="fu">fmap</span> f   <span class="co">-- like: combineMap f = combine &lt;&lt; List.map f</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sequenceA</span>   <span class="ot">=</span> <span class="fu">traverse</span> <span class="fu">id</span>          <span class="co">-- like: combine = combineMap identity</span></span></code></pre></div>
+<p>Same pattern, just finally given its proper name. ✨</p>
+<h2 id="a-real-world-elm-example">A real-world Elm example</h2>
+<p>A great practical example of where <code>traverse</code> shows up in the wild is in <a href="https://package.elm-lang.org/packages/jfmengels/elm-review/latest/">elm-review</a>. Imagine you have a list of fixes to apply to source code, where each fix can either succeed or fail:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compileFixes</span> : <span class="dt">List</span> <span class="dt">Fix</span> <span class="op">-&gt;</span> <span class="dt">Result</span> <span class="dt">Error</span> (<span class="dt">List</span> <span class="dt">CompiledFix</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">compileFixes</span> <span class="fu">fixes</span> <span class="op">=</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Result</span><span class="op">.</span><span class="dt">Extra</span><span class="op">.</span><span class="fu">combineMap</span> <span class="fu">compileFix</span> <span class="fu">fixes</span></span></code></pre></div>
+<p>The pattern is precisely: <strong>list of inputs + function that processes each input individually into a result → result holding a list, or an error if it happened anywhere</strong>. <code>traverse</code> in a nutshell! 🎯</p>
+<h2 id="implementing-traversable-for-a-custom-type">Implementing <code>Traversable</code> for a custom type</h2>
+<p>Let’s see how easy it is to implement <code>Traversable</code> for a custom Haskell type. Recall our binary tree from the previous post:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Tree</span> a</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">Leaf</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Node</span> (<span class="dt">Tree</span> a) a (<span class="dt">Tree</span> a)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> (<span class="dt">Functor</span>, <span class="dt">Foldable</span>)</span></code></pre></div>
+<p>Adding a <code>Traversable</code> instance is beautifully simple:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Traversable</span> <span class="dt">Tree</span> <span class="kw">where</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">traverse</span> _ <span class="dt">Leaf</span>         <span class="ot">=</span> <span class="fu">pure</span> <span class="dt">Leaf</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">traverse</span> f (<span class="dt">Node</span> l x r) <span class="ot">=</span> <span class="dt">Node</span> <span class="op">&lt;$&gt;</span> <span class="fu">traverse</span> f l <span class="op">&lt;*&gt;</span> f x <span class="op">&lt;*&gt;</span> <span class="fu">traverse</span> f r</span></code></pre></div>
+<p>Look at that! We are using <code>&lt;$&gt;</code> (<code>fmap</code>) and <code>&lt;*&gt;</code> (from <code>Applicative</code>). That is why <code>Traversable</code> requires <code>Functor</code>: we need to lift the <code>Node</code> constructor into the applicative context and then apply it to each traversed branch. 🧠</p>
+<p>Or, if we enable the language extensions, we can derive everything automatically:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# language DeriveFunctor, DeriveFoldable, DeriveTraversable #-}</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Tree</span> a</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">Leaf</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Node</span> (<span class="dt">Tree</span> a) a (<span class="dt">Tree</span> a)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> (<span class="dt">Functor</span>, <span class="dt">Foldable</span>, <span class="dt">Traversable</span>)</span></code></pre></div>
+<p>And now we can <code>traverse</code> over trees with any <code>Applicative</code> effect:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">traverse</span> (\x <span class="ot">-&gt;</span> <span class="kw">if</span> x <span class="op">&gt;</span> <span class="dv">0</span> <span class="kw">then</span> <span class="dt">Just</span> x <span class="kw">else</span> <span class="dt">Nothing</span>) (<span class="dt">Node</span> (<span class="dt">Node</span> <span class="dt">Leaf</span> <span class="dv">1</span> <span class="dt">Leaf</span>) <span class="dv">2</span> (<span class="dt">Node</span> <span class="dt">Leaf</span> <span class="dv">3</span> <span class="dt">Leaf</span>))</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Just</span> (<span class="dt">Node</span> (<span class="dt">Node</span> <span class="dt">Leaf</span> <span class="dv">1</span> <span class="dt">Leaf</span>) <span class="dv">2</span> (<span class="dt">Node</span> <span class="dt">Leaf</span> <span class="dv">3</span> <span class="dt">Leaf</span>))</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">traverse</span> (\x <span class="ot">-&gt;</span> <span class="kw">if</span> x <span class="op">&gt;</span> <span class="dv">0</span> <span class="kw">then</span> <span class="dt">Just</span> x <span class="kw">else</span> <span class="dt">Nothing</span>) (<span class="dt">Node</span> (<span class="dt">Node</span> <span class="dt">Leaf</span> (<span class="op">-</span><span class="dv">1</span>) <span class="dt">Leaf</span>) <span class="dv">2</span> (<span class="dt">Node</span> <span class="dt">Leaf</span> <span class="dv">3</span> <span class="dt">Leaf</span>))</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Nothing</span></span></code></pre></div>
+<h2 id="a-useful-derived-function-for">A useful derived function: <code>for</code></h2>
+<p>Haskell also provides a convenience function called <code>for</code>, which is just <code>traverse</code> with its arguments flipped:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">for ::</span> (<span class="dt">Traversable</span> t, <span class="dt">Applicative</span> f) <span class="ot">=&gt;</span> t a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> f b) <span class="ot">-&gt;</span> f (t b)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>for <span class="ot">=</span> <span class="fu">flip</span> <span class="fu">traverse</span></span></code></pre></div>
+<p>This is handy when you want to write the data first and the function second, which sometimes reads more naturally:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- traverse: function first, data second</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> validatePositive [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- for: data first, function second (feels more like Elm&#39;s `|&gt;`!)</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>for [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>] validatePositive</span></code></pre></div>
+<p>And of course, there are also <code>forM</code> (the Monad version), <code>mapM</code> and others — but they are all just specialised or flipped variants of the same idea. 😊</p>
+<h2 id="bonus-collecting-all-errors-gift">Bonus: collecting ALL errors 🎁</h2>
+<p>At this point, a very curious reader might ask: <em>“What if I want to collect ALL the errors, not just the first one? Like, end up with <code>Result (List err) (List ok)</code>?”</em></p>
+<p>This is a fantastic question! With plain <code>Result</code> / <code>Either</code>, <code>traverse</code> short-circuits on the very first error and does not process the rest. This is because <code>Either</code> is a <code>Monad</code>, and the sequential nature of monads means they <em>cannot</em> accumulate errors.</p>
+<p>To collect all errors, we need a different type. In Haskell, that type is <a href="https://hackage.haskell.org/package/validation-1.1.3/docs/Data-Validation.html"><code>Validation</code></a> from the <code>validation</code> package:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Validation</span> e a</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">Failure</span> e</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Success</span> a</span></code></pre></div>
+<p>The key insight is: <code>Validation</code> is an <strong><code>Applicative</code></strong> but <strong>NOT a <code>Monad</code></strong>! And that is precisely what enables error accumulation. Since <code>traverse</code> only requires an <code>Applicative</code> constraint (not a <code>Monad</code> one), you can plug <code>Validation</code> in and watch it collect all failures:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Validation</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="ot">validatePositive ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Validation</span> [<span class="dt">String</span>] <span class="dt">Int</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>validatePositive x</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> x <span class="op">&gt;</span> <span class="dv">0</span>    <span class="ot">=</span> <span class="dt">Success</span> x</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="dt">Failure</span> [<span class="st">&quot;Expected a positive number, got: &quot;</span> <span class="op">&lt;&gt;</span> <span class="fu">show</span> x]</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">traverse</span> validatePositive [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="dt">Success</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">traverse</span> validatePositive [<span class="dv">1</span>, <span class="op">-</span><span class="dv">2</span>, <span class="dv">3</span>, <span class="op">-</span><span class="dv">4</span>]</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="dt">Failure</span> [<span class="st">&quot;Expected a positive number, got: -2&quot;</span>,<span class="st">&quot;Expected a positive number, got: -4&quot;</span>]</span></code></pre></div>
+<p>ALL errors are accumulated! 🎉</p>
+<p>This is one of those beautiful insights that emerge from the typeclass hierarchy: <strong>whether you short-circuit or accumulate errors is not a property of <code>traverse</code> itself, but of the <code>Applicative</code> you use with it</strong>! ✨</p>
+<p>In Elm, <code>Result</code> always short-circuits (it behaves like a <code>Monad</code>), so to accumulate errors you would need a custom type similar to <code>Validation</code>. Some community packages take this approach for form validation. But this also reveals <em>why</em> such a type does not exist in <code>elm/core</code> — it is a fundamentally different beast from <code>Result</code>, since it cannot support <code>andThen</code> / monadic chaining.</p>
+<h2 id="the-typeclass-hierarchy">The typeclass hierarchy</h2>
+<p>Let us take a moment to appreciate how <code>Traversable</code> fits into the bigger picture:</p>
+<pre><code>            Functor                      Foldable
+        (can map over structure)   (can collapse structure, forgetting shape)
+                |                            |
+                +------------+---------------+
+                             |
+                       Traversable  (can traverse with effects, preserving shape)</code></pre>
+<p><code>Traversable</code> sits right at the intersection of <code>Functor</code> and <code>Foldable</code>, but adds something neither of them can do alone: <strong>running effects while preserving the container shape</strong>. If <code>Foldable</code> says <em>“I can visit all elements and forget the structure”</em>, <code>Traversable</code> says <em>“I can visit all elements, run an effect on each, and remember the structure”</em>. The extra power comes from the <code>Applicative</code> constraint on <code>f</code>. 🏆</p>
+<h2 id="it-is-always-traverse-male_detective">It is always <code>traverse</code>! 🕵️‍♂️</h2>
+<p>There is an old Haskell saying: <em>“The answer is always monads.”</em> But in my experience, once you have learned <code>traverse</code>, a new truth reveals itself: <strong>the answer is always <code>traverse</code></strong>! 😄</p>
+<p>JSON decoders? <code>traverse</code>. Form validation? <code>traverse</code>. Running a list of tasks? That is <code>sequence</code>, which is just <code>traverse id</code>. Applying a list of fixes? Also <code>traverse</code>. Even the humble <code>combineMap</code> you have been writing in Elm? <code>traverse</code>.</p>
+<p>Once you see it, you cannot unsee it. You are welcome. 🙃</p>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>Many thanks to <a href="https://twitter.com/jfmengels">@jfmengels</a> for the real-world elm-review inspiration, and to <a href="https://twitter.com/janiczek">@janiczek</a> for asking the excellent question about collecting all errors — both made this post much richer! 🙏🏻</p>
+<p>Special thanks as always to <a href="https://twitter.com/trupill">@serras</a> for technical proofreading. 🙏🏻</p>
+<p>Hope you enjoyed learning about <code>Traversable</code> — it is one of those typeclasses that once you see it, you start noticing it <em>everywhere</em>! 😄 If you found joy in this blogpost and would like me to continue the series, please consider <a href="https://github.com/sponsors/kutyel">sponsoring my work</a>, share it in your social networks and <strong>follow me on <a href="https://twitter.com/FlavioCorpa">Twitter</a>/<a href="https://bsky.app/profile/flaviocorpa.com">BlueSky!</a> 🦋</strong> 🙌🏻</p></section>
+  </article>
+</main>
+
+ <footer class="py-14 bg-[var(--footerBgColor)] shrink-0">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem]">
+    <ul class="flex justify-center list-none" role="list">
+      <li class="mx-3" role="listitem">
+        <a href="/">Home</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="https://github.com/sponsors/kutyel/">Sponsor me</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="/atom.xml">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+
+
+<script src="https://gistcdn.githack.com/kutyel/41d12e099484fd390fb67168271fcdd9/raw/9be26e500525a2e4edacc53d3a8006aaddec0e15/bsky-comments.js"></script>
+
+
+    <script async>
+      ;(() => {
+        window.site.refreshThemeSwitch()
+        document.querySelector('[data-theme-switch]').addEventListener('click', (e) => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light')
+        })
+      })()
+    </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'
+    ></script>
+    <!-- End Cloudflare Web Analytics -->
+  </body>
+</html>
