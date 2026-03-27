@@ -251,13 +251,12 @@ In Elm, `Result` always short-circuits (it behaves like a `Monad`), so to accumu
 Let us take a moment to appreciate how `Traversable` fits into the bigger picture:
 
 ```
-            Functor      (can map over structure)
-               |
-            Foldable     (can collapse structure, forgetting shape)
-               +
-            Functor
-               |
-            Traversable  (can traverse with effects, preserving shape)
+            Functor                      Foldable
+        (can map over structure)   (can collapse structure, forgetting shape)
+                |                            |
+                +------------+---------------+
+                             |
+                       Traversable  (can traverse with effects, preserving shape)
 ```
 
 `Traversable` sits right at the intersection of `Functor` and `Foldable`, but adds something neither of them can do alone: **running effects while preserving the container shape**. If `Foldable` says _"I can visit all elements and forget the structure"_, `Traversable` says _"I can visit all elements, run an effect on each, and remember the structure"_. The extra power comes from the `Applicative` constraint on `f`. 🏆
