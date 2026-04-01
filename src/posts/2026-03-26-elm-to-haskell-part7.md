@@ -47,7 +47,7 @@ combineMap String.toInt [ "1", "oops", "3" ]
 -- > Nothing
 ```
 
-Well, this pattern has a name, and that name is **`traverse`**! 🤓
+Well, this pattern of exchanging the positions of two type constructors has a name, and that name is **`traverse`**! 🤓
 
 ## What is `Traversable`?
 
