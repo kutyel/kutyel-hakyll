@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <title>Taking Screenshots with Elm 0.19</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="How I implemented recently screenshots for a webpage using the latest version of Elm!" />
+    
+    <meta name="author" content="Flavio Corpa" />
+     
+    <meta name="keywords" content="web,elm,functional,programming,screenshots" />
+    
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU" />
+    <meta
+      http-equiv="origin-trial"
+      content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ=="
+    />
+
+    <meta property="og:site_name" content="flaviocorpa.com" />
+    <meta property="og:title" content="Taking Screenshots with Elm 0.19" />
+    <meta property="og:url" content="https://flaviocorpa.com/taking-screenshots-with-elm-0-19.html" />
+    <meta property="og:description" content="How I implemented recently screenshots for a webpage using the latest version of Elm!" />
+    
+    <meta property="og:image" content="https://flaviocorpa.com./images/elm.jpg" />
+     
+    <meta property="og:type" content="article" />
+     
+    <meta name="twitter:image" content="https://flaviocorpa.com./images/elm.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <meta name="twitter:url" content="https://flaviocorpa.com/taking-screenshots-with-elm-0-19.html" />
+    <meta name="twitter:site" content="flaviocorpa.com" />
+    <meta name="twitter:title" content="Taking Screenshots with Elm 0.19" />
+    <meta name="twitter:description" content="How I implemented recently screenshots for a webpage using the latest version of Elm!" />
+    
+    <meta name="twitter:creator" content="@FlavioCorpa" />
+    
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>"
+    />
+    <link rel="canonical" href="https://flaviocorpa.com/taking-screenshots-with-elm-0-19.html" />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      /* Base resets */
+      :root {
+        color-scheme: light dark;
+      }
+      html {
+        box-sizing: border-box;
+      }
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
+      body {
+        font-family: Verdana, Helvetica, Arial, sans-serif;
+        margin: 0;
+      }
+      body,
+      input,
+      button {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      input,
+      button {
+        font: inherit;
+      }
+      /* Tailwind v4 */
+      @custom-variant dark (&:where(.dark, .dark *));
+
+      /* Light/Dark CSS variables ported from CSS folder */
+      body.light {
+        --authorTitleColor: #767676;
+        --bgColor: #fff;
+        --blockquoteBorderColor: #eee;
+        --btnBgColor: #287cb4;
+        --btnTextColor: #fff;
+        --iframeBorderColor: #e8e8e8;
+        --inlineCodeBgColor: rgba(255, 229, 100, 0.2);
+        --inlineCodeColor: #1a1a1a;
+        --inputBgColor: #fff;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #334249;
+        --secretGraphicColor: #1a1a1a;
+        --secretGraphicHoverColor: #206592;
+        --separatorColor: #f2f2f2;
+        --textColor: #334249;
+        --textLinkBorderColor: #287cb4;
+        --textLinkColor: #287cb4;
+        --textLinkHoverColor: #206592;
+        --deepBgColor: #011627;
+        --footerBgColor: #f5f5f5;
+        --footerLinkColor: #2676ac;
+        --h1Color: currentColor;
+        --headerBgColor: #c4dfff;
+      }
+      body.dark {
+        --separatorColor: #424857;
+        --authorTitleColor: hsla(0, 0%, 100%, 0.65);
+        --bgColor: #282c35;
+        --blockquoteBorderColor: var(--separatorColor);
+        --btnBgColor: #001627;
+        --btnTextColor: #fff;
+        --iframeBorderColor: var(--separatorColor);
+        --inlineCodeBgColor: rgba(115, 124, 153, 0.2);
+        --inlineCodeColor: #e2e4e9;
+        --inputBgColor: #282c35;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #fff;
+        --secretGraphicBorderLeftColor: #c693ea;
+        --secretGraphicColor: hsla(0, 0%, 100%, 0.88);
+        --secretGraphicHoverColor: rgba(255, 167, 196, 0.75);
+        --textColor: hsla(0, 0%, 100%, 0.88);
+        --textLinkBorderColor: #c693ea;
+        --textLinkColor: #c693ea;
+        --textLinkHoverColor: rgba(198, 147, 234, 0.8);
+        --deepBgColor: #011627;
+        --footerBgColor: #373c49;
+        --footerLinkColor: #c693ea;
+        --h1Color: var(--textColor);
+        --headerBgColor: var(--deepBgColor);
+      }
+
+      /* Minimal base styles moved from CSS folder */
+      a[href] {
+        text-decoration: none;
+        color: var(--textLinkColor);
+        box-shadow: 0 1px 0 0 currentColor;
+        word-wrap: break-word;
+      }
+      a[href]:hover,
+      a[href]:focus,
+      a[href]:visited {
+        color: var(--textLinkHoverColor);
+      }
+      h1 > a[href],
+      h1 > a[href]:hover,
+      h1 > a[href]:focus,
+      h1 > a[href]:visited {
+        color: inherit;
+      }
+      h1,
+      h2 {
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        font-size: 1.643rem;
+      }
+      h2::before {
+        content: '';
+        display: block;
+        height: 0;
+        border-top: 5px solid var(--separatorColor);
+        padding-bottom: 20px;
+      }
+      a[href].footnote-ref {
+        box-shadow: none;
+      }
+      img {
+        display: block;
+        height: auto;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 100%;
+        border: 0;
+      }
+
+      /* Theme switch icon visibility rules */
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='dark'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='light'] {
+        display: block;
+      }
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='light'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='dark'] {
+        display: none;
+      }
+
+      /* Code font stack */
+      code,
+      kbd,
+      pre,
+      samp {
+        font-family: JetBrains Mono, Consolas, Menlo, Monaco, source-code-pro, 'Courier New',
+          monospace;
+        font-size: 0.9em;
+        -webkit-font-feature-settings: normal;
+        font-feature-settings: normal;
+      }
+      pre code {
+        font-size: inherit;
+        line-height: 1.4rem;
+      }
+      .sourceCode:not(pre):not(code) {
+        background-color: var(--deepBgColor);
+        overflow: hidden;
+        margin: 1.25rem 0;
+        border-radius: 10px;
+      }
+      pre.sourceCode {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 1.3125rem;
+        margin: 0;
+        color: #fff;
+        background: none;
+        font-size: 0.8rem;
+        line-height: 1.4rem;
+      }
+      /* Optional line numbers support */
+      pre.numberSource.sourceCode > code {
+        counter-reset: source-line 0;
+      }
+      pre.numberSource.sourceCode > code > span {
+        counter-increment: source-line;
+      }
+      pre.numberSource.sourceCode > code > span > a {
+        box-shadow: none;
+      }
+      code.sourceCode > a.sourceLine:before {
+        display: inline-block;
+        content: attr(title);
+        text-align: right;
+        border-right: 1px solid rgba(128, 147, 147, 0.4);
+        color: rgb(128, 147, 147);
+        width: 30px;
+        padding-right: 10px;
+        margin-right: 10px;
+      }
+      @media (max-width: 667px) {
+        .sourceCode:not(pre):not(code) {
+          border-radius: 0;
+        }
+        code.sourceCode > a.sourceLine:before {
+          display: none;
+        }
+      }
+      :not(pre) > code {
+        border-radius: 0.3em;
+        background-color: var(--inlineCodeBgColor);
+        color: var(--inlineCodeColor);
+        padding: 0.15em 0.2em 0.05em;
+        white-space: normal;
+      }
+      /* Syntax token colors (Pandoc/Highlight) */
+      .co {
+        color: rgb(128, 147, 147);
+      }
+      .ch,
+      .st,
+      .vs {
+        color: rgb(236, 196, 141);
+      }
+      .va {
+        color: rgb(214, 222, 235);
+      }
+      .dv,
+      .bn,
+      .fl {
+        color: rgb(247, 140, 108);
+      }
+      .bu,
+      .cn,
+      .at,
+      .fu,
+      .dt {
+        color: rgb(130, 170, 255);
+      }
+      .im,
+      .op,
+      .kw,
+      .ot,
+      .cf {
+        color: #c693ea;
+      }
+
+      /* Typography & content spacing */
+      article p {
+        margin: 0;
+        line-height: 1.75;
+      }
+      article p + p {
+        margin-top: 1.75em;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+        font-size: 1.643rem;
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      hr {
+        height: 0;
+        border: none;
+        border-top: 5px solid var(--separatorColor);
+        margin: 1.75em 0;
+      }
+      blockquote {
+        margin-left: 1.5em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        padding-left: 1em;
+        border-left: 4px solid var(--blockquoteBorderColor);
+      }
+      blockquote em {
+        font-size: 1.286rem;
+      }
+      /* Lists */
+      article ul {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: disc outside;
+      }
+      article ol {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: decimal outside;
+      }
+      article li {
+        margin: 0.25em 0;
+      }
+      article li > ul,
+      article li > ol {
+        margin: 0.5em 0;
+      }
+      /* Media helpers */
+      iframe {
+        width: 100%;
+      }
+      .iframe--example {
+        border: 2px solid var(--iframeBorderColor);
+      }
+      .pdf {
+        margin: 1rem -6rem;
+        height: 30rem;
+        width: calc(100% + 12rem);
+      }
+      .pdf-link {
+        display: none;
+      }
+      @media (max-width: 800px) {
+        .pdf {
+          margin: 1rem 0;
+          width: 100%;
+        }
+      }
+      @media (max-width: 667px) {
+        .pdf {
+          display: none;
+        }
+        .pdf-link {
+          display: inline;
+        }
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="dark min-h-dvh flex flex-col bg-[var(--bgColor)] text-[var(--textColor)] leading-[1.643] antialiased"
+  >
+    <script>
+      ;(() => {
+        window.site = {
+          theme:
+            localStorage.getItem('theme') ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          setTheme: (name) => {
+            document.body.classList.add(name === 'light' ? 'light' : 'dark')
+            document.body.classList.remove(name === 'light' ? 'dark' : 'light')
+            localStorage.setItem('theme', name)
+            window.site.theme = name
+            window.site.refreshThemeSwitch()
+          },
+          refreshThemeSwitch: () => {
+            const isLight = window.site.theme === 'light'
+            const themeSwitch = document.querySelector('[data-theme-switch]')
+
+            themeSwitch?.setAttribute(
+              'aria-label',
+              isLight ? 'Switch to dark mode' : 'Switch to light mode'
+            )
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true')
+          },
+        }
+
+        window.site.setTheme(window.site.theme)
+      })()
+    </script>
+
+    <button
+      aria-label="Switch to light mode"
+      aria-checked="true"
+      data-theme-switch
+      role="switch"
+      type="button"
+      class="appearance-none flex items-center justify-center bg-[var(--btnBgColor)] border border-[var(--btnBgColor)] text-[var(--btnTextColor)] rounded-[20px] px-2 py-[0.1em] outline-offset-[0.1em] absolute right-4 top-4"
+    >
+      <span aria-hidden="true" data-theme-switch-icon="dark">🌙</span>
+      <span aria-hidden="true" data-theme-switch-icon="light">🌞</span>
+    </button>
+
+    <nav class="my-6 py-2">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0" data-nav-wrap>
+    <a class="mr-5 absolute left-[-10000px] focus:static focus:left-auto" href="#content"
+      >Skip to content</a
+    >
+    <a class="mr-5" href="/">Home</a>
+    <a class="mr-5" href="https://github.com/sponsors/kutyel">Sponsor me</a>
+    <a class="mr-5" href="/atom.xml">RSS</a>
+  </div>
+</nav>
+
+
+<style>
+  bsky-comments {
+    --background-color: var(--bgColor);
+    --text-color: var(--textColor);
+    --link-color: var(--textLinkColor);
+    --link-hover-color: var(--textLinkHoverColor);
+    --comment-meta-color: #888;
+    --error-color: #ff4d4d;
+    --reply-border-color: var(--separatorColor);
+    --button-background-color: var(--btnBgColor);
+    --button-hover-background-color: rgba(var(--btnBgColor), 0.2);
+    --author-avatar-border-radius: 50%;
+  }
+</style>
+
+<main class="flex-1" id="content" tabindex="-1">
+  <article class="pb-10">
+    <header class="bg-[var(--headerBgColor)] mb-8 px-[1.3125rem] md:px-0 py-4 md:py-8">
+      <div class="mx-auto md:w-[600px]">
+        <h1 class="text-[1.7rem] md:text-[3rem] m-0 mb-4 font-normal leading-[1.2] text-[var(--h1Color)]">
+          Taking Screenshots with Elm 0.19
+        </h1>
+        <div class="mx-auto md:w-[600px]">
+          <small class="italic">04/08/2023</small>
+          <small class="italic"> | 5 min read</small>
+          
+          <div class="mt-2">[ <a title="All pages tagged &#39;web&#39;." href="/tags/web.html" rel="tag">web</a>, <a title="All pages tagged &#39;elm&#39;." href="/tags/elm.html" rel="tag">elm</a>, <a title="All pages tagged &#39;fp&#39;." href="/tags/fp.html" rel="tag">fp</a>, <a title="All pages tagged &#39;screenshots&#39;." href="/tags/screenshots.html" rel="tag">screenshots</a>, <a title="All pages tagged &#39;frontend&#39;." href="/tags/frontend.html" rel="tag">frontend</a> ]</div>
+        </div>
+      </div>
+    </header>
+    <section class="mx-auto md:w-[600px] px-[1.3125rem] md:px-0"><p>Recently I had to implement frontend screenshots in an Elm app, and all the blog posts I could find were for outdated versions of Elm (&lt; 0.19)🌳, so here is how I managed to do it! Hopefully it helps someone else. 🤞🏻</p>
+<p>My only 2 constraints were the following:</p>
+<ul>
+<li>The endpoint I was using to store the screenshots only accepted mime type <code>image/jpeg</code>.</li>
+<li>I need to take a <em>sequence</em> of screenshots and focus on an individual bit of the UI, while hiding (in this case changing the HTML content to <code>REDACTED</code>) some parts of it.</li>
+</ul>
+<p>Obviously the code shown here can be simplified to fit your needs too but I wanted to present you something taken from the real world. 😉</p>
+<h2 id="going-outside-of-elm">Going outside of Elm</h2>
+<p>As you probably figured by now, this is not possible to do only in Elm, so we need to resort to <a href="https://guide.elm-lang.org/interop/ports.html">Ports</a> and a JavaScript library.</p>
+<p>After an incredible waste of time trying out different JS libs to accomplish this, I had to settle with <a href="https://github.com/niklasvh/html2canvas"><code>html2canvas</code></a>, as apparently this is the only working library that produces images out of the DOM, not HTML docs or any other file format. 🤷🏼‍♂️</p>
+<p>Now let’s get into the code part, we need at least 2 ports: one we will use to tell JS we want to take some screenshots, and another to receive back the response from outside of Elm.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- App.elm</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">port</span> <span class="fu">takeScreenshots</span> : <span class="dt">List</span> <span class="dt">DocumentId</span> <span class="op">-&gt;</span> <span class="dt">Cmd</span> <span class="fu">msg</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">port</span> <span class="fu">receiveScreenshotData</span> : (<span class="dt">List</span> <span class="dt">ImagePortData</span> <span class="op">-&gt;</span> <span class="fu">msg</span>) <span class="op">-&gt;</span> <span class="dt">Sub</span> <span class="fu">msg</span></span></code></pre></div>
+<p>The only important thing to highlight from the ports is that I had to construct a special type <code>ImagePortData</code> with the things I wanted to get back from JavaScript, here you have it defined for completion:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Data.elm</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="kw">alias</span> <span class="dt">ImagePortData</span> <span class="op">=</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    { <span class="fu">image</span> : <span class="dt">String</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="fu">time</span> : <span class="dt">String</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="fu">documentId</span> : <span class="dt">DocumentId</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
+<p>I wanted the timestamp from JS as an ISO String (this can also be done from the Elm side but anyway 🙄), the <code>documentId</code> was needed to hide/show parts of the UI I did not want to see in the screenshot and the <code>image</code> was the encoded <code>base64</code> string that JS was going to send me from the library.</p>
+<p>After that I just needed to add a couple of messages and a subscription, following The Elm Architecture principles:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- App.elm</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Msg</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">=</span> <span class="dt">NoOp</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- .. bunch of other msgs</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">TakeScreenshots</span> (<span class="dt">List</span> <span class="dt">DocumentId</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">ScreenshotsTaken</span> (<span class="dt">List</span> <span class="dt">ImagePortData</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">ScreenshotsSaved</span> (<span class="dt">Result</span> <span class="dt">Http</span><span class="op">.</span><span class="dt">Error</span> ())</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- ...</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">subscriptions</span> : <span class="dt">Model</span> <span class="op">-&gt;</span> <span class="dt">Sub</span> <span class="dt">Msg</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="fu">subscriptions</span> <span class="fu">model</span> <span class="op">=</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Sub</span><span class="op">.</span><span class="fu">batch</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        [ <span class="co">-- ... other subs</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="fu">receiveScreenshotData</span> <span class="dt">ScreenshotsTaken</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>        ]</span></code></pre></div>
+<p>You can probably use less <code>Msg</code>s, but in my case I used <code>TakeScreenshots</code> to ask JavaScript from Elm to take the screenshots, <code>ScreenshotsTaken</code> to receive the screenshot data back to Elm world and send them to the “save screenshots” endpoint, and finally a <code>ScreenshotsSaved</code> to do something after all this process is finished.</p>
+<p>I think to show the actual pattern match on <code>Msg</code> in the <code>update</code> function is not really useful as it entirely depends on what you want your Elm app to do, so it is skipped for brevity.</p>
+<p>The only bit of wiring that I needed to make is to modify the known <code>Config</code> (many real world Elm apps use this pattern, although you might not need it) type to accept a <code>msg</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Config.elm</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="kw">alias</span> <span class="dt">Config</span> <span class="fu">msg</span> <span class="op">=</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    { <span class="fu">host</span> : <span class="dt">String</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- other unrelated stuff</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="fu">takeScreenshots</span> : <span class="dt">List</span> <span class="dt">DocumentId</span> <span class="op">-&gt;</span> <span class="fu">msg</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
+<p>Another relevant bit of code was the actual call to the save screenshots endpoint, which you can have a look at here:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Data.elm</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">saveScreenshots</span> : <span class="dt">Config</span> <span class="fu">msg</span> <span class="op">-&gt;</span> <span class="dt">List</span> <span class="dt">ImagePortData</span> <span class="op">-&gt;</span> (<span class="dt">Result</span> <span class="dt">Http</span><span class="op">.</span><span class="dt">Error</span> () <span class="op">-&gt;</span> <span class="fu">msg</span>) <span class="op">-&gt;</span> <span class="dt">Cmd</span> <span class="fu">msg</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">saveScreenshots</span> { <span class="fu">host</span><span class="op">,</span> <span class="fu">token</span> } <span class="fu">listImgs</span> <span class="fu">resultMsg</span> <span class="op">=</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Http</span><span class="op">.</span><span class="fu">putWithHeaders</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        { <span class="fu">url</span> <span class="op">=</span> <span class="dt">Url</span><span class="op">.</span><span class="fu">crossOrigin</span> <span class="fu">host</span> [ <span class="st">&quot;store&quot;</span><span class="op">,</span> <span class="st">&quot;screenshots&quot;</span><span class="op">,</span> <span class="st">&quot;endpoint&quot;</span> ] []</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="fu">headers</span> <span class="op">=</span> [ <span class="dt">Http</span><span class="op">.</span><span class="fu">tokenHeader</span> <span class="fu">token</span> ]</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="fu">jsonBody</span> <span class="op">=</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>            <span class="fu">listImgs</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                <span class="op">|&gt;</span> <span class="dt">Encode</span><span class="op">.</span><span class="fu">list</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                    (\{ <span class="fu">image</span><span class="op">,</span> <span class="fu">time</span><span class="op">,</span> <span class="fu">documentId</span> } <span class="op">-&gt;</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">Encode</span><span class="op">.</span><span class="fu">object</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>                            [ ( <span class="st">&quot;document_id&quot;</span><span class="op">,</span> <span class="dt">Encode</span><span class="op">.</span><span class="fu">string</span> <span class="fu">documentId</span> )</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>                            <span class="op">,</span> ( <span class="st">&quot;screenshot&quot;</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>                              <span class="op">,</span> <span class="dt">Encode</span><span class="op">.</span><span class="fu">object</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>                                    [ ( <span class="st">&quot;image&quot;</span><span class="op">,</span> <span class="dt">Encode</span><span class="op">.</span><span class="fu">string</span> <span class="fu">image</span> )</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>                                    <span class="op">,</span> ( <span class="st">&quot;time&quot;</span><span class="op">,</span> <span class="dt">Encode</span><span class="op">.</span><span class="fu">string</span> <span class="fu">time</span> )</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>                                    ]</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>                              )</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>                            ]</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>                    )</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="fu">expect</span> <span class="op">=</span> <span class="dt">Http</span><span class="op">.</span><span class="fu">expectWhatever</span> <span class="fu">resultMsg</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        }</span></code></pre></div>
+<p>Do not focus too much on <code>Http.putWithHeaders</code>, as this is just a custom wrapper around the usual <code>Http.put</code> module stuff just making my life easier.</p>
+<p>I have to mention that, since <a href="https://github.com/elm/http/issues/56#issuecomment-462489112">Elm does not have a Blob type</a>, we can just use <code>String</code> to receive the encoded <code>base64</code> image data, and it will just work. 🪄</p>
+<h2 id="ok-but-where-is-the-javascript-thinking">Ok but where is the JavaScript? 🤔</h2>
+<p>Obviously I have just shown for now the Elm part of the code relevant to the screenshots, but the actual magic is performed in the JS side to make all of this work, here is the code:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> html2canvas <span class="im">from</span> <span class="st">&#39;html2canvas&#39;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="at">ports</span><span class="op">.</span><span class="at">takeScreenshots</span><span class="op">.</span><span class="fu">subscribe</span>((documentIds) <span class="kw">=&gt;</span> {</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> promisedScreenshots <span class="op">=</span> documentIds<span class="op">.</span><span class="fu">map</span>(<span class="kw">async</span> (documentId) <span class="kw">=&gt;</span> {</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// take the screenshot</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> canvas <span class="op">=</span> <span class="cf">await</span> <span class="fu">html2canvas</span>(<span class="bu">document</span><span class="op">.</span><span class="at">body</span><span class="op">,</span> {</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">useCORS</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">allowTaint</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">foreignObjectRendering</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>      <span class="co">// change all other documents to REDACTED</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>      <span class="dt">onclone</span><span class="op">:</span> (doc) <span class="kw">=&gt;</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        doc</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>          <span class="op">.</span><span class="fu">querySelectorAll</span>(<span class="vs">`[data-document-id]:not([data-document-id=&quot;</span><span class="sc">${</span>documentId<span class="sc">}</span><span class="vs">&quot;])`</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>          <span class="op">.</span><span class="fu">forEach</span>((node) <span class="kw">=&gt;</span> node<span class="op">.</span><span class="at">childNodes</span><span class="op">.</span><span class="fu">forEach</span>((c) <span class="kw">=&gt;</span> (c<span class="op">.</span><span class="at">textContent</span> <span class="op">=</span> <span class="st">&#39;REDACTED&#39;</span>)))<span class="op">,</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> image <span class="op">=</span> canvas<span class="op">.</span><span class="fu">toDataURL</span>(<span class="st">&#39;image/jpeg&#39;</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> time <span class="op">=</span> <span class="kw">new</span> <span class="bu">Date</span>()<span class="op">.</span><span class="fu">toISOString</span>()</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> { image<span class="op">,</span> time<span class="op">,</span> documentId }</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">// send it back to Elm</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="bu">Promise</span><span class="op">.</span><span class="fu">all</span>(promisedScreenshots)<span class="op">.</span><span class="fu">then</span>(app<span class="op">.</span><span class="at">ports</span><span class="op">.</span><span class="at">receiveScreenshotData</span><span class="op">.</span><span class="at">send</span>)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
+<p>There are a few things to say about this snippet:</p>
+<ol>
+<li><p>As I mentioned, I needed to produce a <strong>list</strong> of screenshots, so I used the given list of ids sent from Elm to map them into a list of screenshots in the line with <code>documentIds.map(async (documentId) =&gt; ...</code>. This produces a list of JS <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promises</a>, since the <code>html2canvas</code> call returns a Promise, so I needed to wait for all of them to resolve before sending the data back to Elm (this can be easily done with <code>Promise.all</code>, even using <code>async/await</code> I was not spared of having to do this unfortunately 😭). I did not get this part right at the beginning and received an obscure Elm compiler error message, but I can promise this is one of the very few <a href="https://github.com/elm/core/issues/1043">well know issues</a> were what is wrong is not completely obvious. 😅</p></li>
+<li><p>If you notice the actual call to <code>html2canvas</code>, you will notice it takes a second argument which is a JS object with some settings (I mostly only used <code>useCORS</code>, <code>allowTaint</code> and <code>foreignObjectRendering</code>), you can probably skip those but I noticed that this tweaks actually <strong>improved pretty much the overall quality of the screenshots</strong>, so I had to use them.</p></li>
+<li><p>Probably the most important setting I had to use is the <code>onclone</code> function, which is a callback you can use to manipulate the DOM <em>before</em> taking the actual screenshot, pretty handy for what I needed to do!</p></li>
+<li><p>If you have a closer look on my <code>querySelectorAll</code> line, you will notice a neat trick shamelessly <a href="https://stackoverflow.com/questions/25287229/cant-find-a-not-equal-css-attribute-selector/68520810#68520810">copied from StackOverflow</a> (yes I still use that from time to time, sorry chatGPT 🤣), that allowed me to perform some operations on the REST of the things I did not want to appear in the screenshot!</p></li>
+<li><p>Finally, if you pay attention to this bit: <code>canvas.toDataURL('image/jpeg')</code> you will notice that I am <a href="https://stackoverflow.com/questions/15685698/getting-binary-base64-data-from-html5-canvas-readasbinarystring/15685877#15685877">manually setting the image encoding</a> to the one my backend supported, the default for the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API">Canvas HTML API</a> is <code>image/png</code> by the way!</p></li>
+</ol>
+<hr />
+<p>Nothing else to say, this all worked out in the end and I suffered so much I just wanted to skip some of it to the next generation of Elm developers! 😘</p>
+<p>If you enjoyed reading this, please share it in your social networks and <strong>follow me on <a href="https://twitter.com/FlavioCorpa">Twitter</a>!</strong> 🙌🏻</p>
+<p>Happy coding! 😎🖖🏻</p></section>
+  </article>
+</main>
+
+ <footer class="py-14 bg-[var(--footerBgColor)] shrink-0">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem]">
+    <ul class="flex justify-center list-none" role="list">
+      <li class="mx-3" role="listitem">
+        <a href="/">Home</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="https://github.com/sponsors/kutyel/">Sponsor me</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="/atom.xml">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+
+
+<script src="https://gistcdn.githack.com/kutyel/41d12e099484fd390fb67168271fcdd9/raw/9be26e500525a2e4edacc53d3a8006aaddec0e15/bsky-comments.js"></script>
+
+
+    <script async>
+      ;(() => {
+        window.site.refreshThemeSwitch()
+        document.querySelector('[data-theme-switch]').addEventListener('click', (e) => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light')
+        })
+      })()
+    </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'
+    ></script>
+    <!-- End Cloudflare Web Analytics -->
+  </body>
+</html>
