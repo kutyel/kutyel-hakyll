@@ -107,6 +107,19 @@ main = hakyllWith config $ do
         >>= saveSnapshot blogSnapshot
         >>= loadAndApplyTemplate "templates/default.html" ctx
 
+  -- Unlisted drafts: rendered with the normal templates so they get a real,
+  -- shareable URL under /drafts/, but excluded from every listing (index,
+  -- sitemap, feeds, tags) because those all scan "posts/*" only. No snapshot
+  -- is saved (so feeds can't pick them up) and "noindex" keeps them out of
+  -- search engines. To publish for real, `git mv` the file into src/posts/.
+  match "drafts/*" $ do
+    let ctx = constField "noindex" "true" <> postCtxWithTags tags
+    route $ metadataRoute draftRoute
+    compile $
+      pandocCompilerCustom
+        >>= loadAndApplyTemplate "templates/post.html" ctx
+        >>= loadAndApplyTemplate "templates/default.html" ctx
+
   tagsRules tags $ \tag tagPattern -> do
     let title = "Posts tagged '" ++ tag ++ "'"
     route idRoute
@@ -308,3 +321,8 @@ fileNameFromTitle =
 titleRoute :: Metadata -> Routes
 titleRoute =
   constRoute . fileNameFromTitle
+
+-- | Like 'titleRoute', but namespaced under /drafts/ for unlisted previews.
+draftRoute :: Metadata -> Routes
+draftRoute =
+  constRoute . ("drafts/" <>) . fileNameFromTitle
