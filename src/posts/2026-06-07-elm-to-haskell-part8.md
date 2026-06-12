@@ -8,6 +8,7 @@ tags: haskell, elm, fp
 lang: 'en'
 title: 'Haskell for Elm developers: giving names to stuff (Part 8 - IO)'
 date: '2026-06-07T14:00:00Z'
+postId: 'at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3mnz52xzd3k2e'
 ---
 
 <img src="./images/haskell-elm.svg" alt="logo" width="300px">
@@ -19,6 +20,8 @@ Funnily enough, all the way back in [Part 1](https://flaviocorpa.com/haskell-for
 There is a famous question that every Elm developer eventually asks when they peek over the fence into Haskell: _"Wait... if Haskell is pure, how does it print to the screen, read files or make HTTP requests?"_ 🤔
 
 The answer is `IO`, and the beautiful thing is that the mental model is **exactly** the one you already have from Elm's `Task` and `Cmd`. Let me prove it to you! 😉
+
+Quick refresher before we dive in, since we will lean on both concepts: in Elm, a **`Task`** is a _composable description_ of an effect — you can chain tasks with `Task.andThen`, map over them, and they carry a typed error channel. A **`Cmd`** is the _one-shot instruction_ you actually hand to the Elm runtime from `init`/`update`; it is fire-and-forget, and the only way it talks back to you is through a message. The two meet at `Task.perform`/`Task.attempt`, which turn a `Task` into a `Cmd` — because the runtime only accepts `Cmd`s. Keep that pipeline (`Task` ➝ `Cmd` ➝ runtime) in mind: it maps directly onto what Haskell does with `IO` (which stands for Input/Output, btw!).
 
 ## The big misconception
 
@@ -39,7 +42,7 @@ Defining `greet` does **not** print anything. `greet` is just a value of type `I
 
 ## `IO` is a Monad (of course it is 🙃)
 
-If you have been following the series, you already know everything you need to _use_ `IO`, because — drum rolls 🥁🥁🥁 — `IO` is a `Monad`! (Go back and read [Part 3 - Monads!](https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-3-monads.html) if you need a refresher.)
+If you have been following the series, you already know everything you need to _use_ `IO`, because (you guessed it!) `IO` is a `Monad`! (Go back and read [Part 3 - Monads!](https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-3-monads.html) if you need a refresher.)
 
 That means it has all the machinery you already love:
 
@@ -148,11 +151,16 @@ Haskell's `IO`, on the other hand, has only **one** type parameter:
 IO a
 ```
 
-There is no error channel in the type. By default, `IO` can throw _runtime exceptions_ (think of reading a file that does not exist), which is closer to the "throw" mechanism of JavaScript than to Elm's principled `Result`. This is, honestly, one of the few places where Elm is _stricter and safer_ than vanilla Haskell. 😅
+There is no error channel in the type. So what happens when things go wrong? Haskell's `IO` actions can throw **runtime exceptions** — and to be precise (because "IO" and "exceptions" both get overloaded a lot), these come in two flavours:
 
-So how do disciplined Haskellers recover Elm-like safety? Two common ways:
+- **Exceptions from the outside world**: reading a file that does not exist, a network connection dropping, the disk being full... Operations like `readFile` signal failure by _throwing_ instead of returning an `Either`. This is closer to JavaScript's `throw` than to Elm's principled `Result`.
+- **Exceptions from pure code**: things like `head []`, `error "boom"` or an incomplete pattern match. These lurk inside lazily evaluated _pure_ values and only blow up when something (ultimately `main`) forces them.
 
-**1. Return an `Either` explicitly** (the "make errors values" approach, just like Elm's `Result`):
+That second flavour is the one with no Elm equivalent at all — in Elm, pure code simply _cannot_ throw — and it is honestly one of the few places where Elm is _stricter and safer_ than vanilla Haskell. 😅
+
+To be fair though, exceptions are not inherently evil! Some situations really _are_ exceptional, and insisting that every function must be total has its own costs: Elm keeps division total by deciding that `1 / 0 == Infinity` (and `1 // 0 == 0`! 🙈), which is [arguably weirder](https://github.com/elm/core/issues/1072) than just failing loudly. And real-world input/output is _so_ full of failure cases (permission denied! connection reset!) that having a mechanism to propagate them without threading `Either` through every single function can be a perfectly reasonable design.
+
+Still, when the failure is part of your _domain_ (the user typed an invalid age, the JSON did not parse), disciplined Haskellers reach for the same trick you know and love from Elm's `Result`: **make the error a value** by returning an `Either` explicitly:
 
 ```haskell
 import Text.Read (readMaybe)
@@ -166,16 +174,6 @@ readAge = do
 ```
 
 That `IO (Either String Int)` is morally _exactly_ Elm's `Task String Int`! The effect on the outside (`IO` / `Task`), the success-or-failure on the inside (`Either` / the two type params). ✨
-
-**2. Use `ExceptT e IO a`** (a monad transformer that bolts an error channel onto `IO`):
-
-```haskell
-import Control.Monad.Except
-
-readAge :: ExceptT String IO Int
-```
-
-Now `ExceptT String IO Int` lines up _perfectly_ with `Task String Int`: an effectful computation that either fails with a `String` or succeeds with an `Int`. Monad transformers are a topic for another day (👀), but it is nice to know that the exact shape of Elm's `Task` is just _one library import_ away!
 
 ## A REAL WORLD™️ example: fetching and parsing
 
@@ -244,7 +242,7 @@ Let's recap the mental model:
 - An `IO a` is a **description** of an effect, just like a `Task` — building it does nothing.
 - It is a **`Monad`**, so you compose it with `>>=` / `do` notation, exactly like `Task.andThen`.
 - It runs **only** when it becomes part of `main`, just like a `Task` runs only when the runtime gets it as a `Cmd`.
-- Vanilla `IO` lacks Elm's typed error channel, but `IO (Either e a)` or `ExceptT e IO a` recover the exact shape of `Task e a`.
+- Vanilla `IO` lacks Elm's typed error channel, but for the failures that belong to your domain, `IO (Either e a)` recovers the exact shape of `Task e a`.
 
 Purity is not the absence of effects — it is the discipline of treating effects as **values**. Elm taught you that lesson with `Task` and `Cmd`; Haskell just calls it `IO`. ✨
 
@@ -252,6 +250,6 @@ Purity is not the absence of effects — it is the discipline of treating effect
 
 As always, the goal of this series is to show that the scary-sounding Haskell concepts are things you _already know_ from Elm — we are just giving them their proper names. 😉
 
-Special thanks as always to [@serras](https://twitter.com/trupill) for technical proofreading. 🙏🏻
+Special thanks as always to [Christian Ekrem](https://github.com/cekrem) and to [Lucas David Traverso](https://github.com/ludat) for technical proofreading the draft version of this blogpost and adding their valuable feedback to it! 🙏🏻
 
 Hope `IO` finally clicked for you and that you now see it for what it really is: your trusty old `Task`/`Cmd` duo wearing a Haskell hat! 🎩 If you found joy in this blogpost and would like me to continue the series, please consider [sponsoring my work](https://github.com/sponsors/kutyel), share it in your social networks and **follow me on [Twitter](https://twitter.com/FlavioCorpa)/[BlueSky!](https://bsky.app/profile/flaviocorpa.com) 🦋** 🙌🏻
