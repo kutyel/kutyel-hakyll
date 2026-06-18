@@ -49,14 +49,14 @@ That means it has all the machinery you already love:
 ```haskell
 fmap  :: (a -> b) -> IO a -> IO b           -- Functor
 pure  :: a -> IO a                          -- Applicative
-(>>=) :: IO a -> (a -> IO b) -> IO b         -- Monad
+(>>=) :: IO a -> (a -> IO b) -> IO b        -- Monad
 ```
 
 And just like with `Task`, the way you chain effectful steps together is with the monadic bind (`>>=`), which is the equivalent of Elm's `Task.andThen`! Compare them side by side:
 
 ```haskell
-(>>=)       :: IO a    -> (a -> IO b)      -> IO b
-Task.andThen ::          (a -> Task x b)  -> Task x a -> Task x b   -- (args flipped)
+(>>=)        :: IO a             -> (a -> IO b) -> IO b
+Task.andThen :: (a -> Task x b)  -> Task x a    -> Task x b --(args flipped)
 ```
 
 So this little program that asks for your name and greets you (Elm runs in the browser, so there are no real console `Task`s — bear with me and imagine these `getLine`/`putLine` exist just to show the _shape_)...
@@ -198,8 +198,8 @@ In Haskell, the same shape, built from `IO` actions and finally plugged into `ma
 ```haskell
 fetchUser :: Text -> IO (Either Error User)
 fetchUser userId = do
-  response <- httpGet ("/users/" <> userId)   -- IO action
-  pure (decodeUser response)                   -- pure parsing
+  response <- httpGet ("/users/" <> userId) -- IO action
+  pure (decodeUser response)                -- pure parsing
 
 main :: IO ()
 main = do
@@ -223,10 +223,12 @@ This is why you can do delightful things like keep a `[IO ()]` — a plain list 
 
 ```haskell
 greetings :: [IO ()]
-greetings = map (\name -> putStrLn ("Hello, " <> name)) ["Evan", "Simon", "Flavio"]
+greetings = map
+  (\name -> putStrLn ("Hello, " <> name))
+  ["Evan", "Simon", "Flavio"]
 
 main :: IO ()
-main = sequence_ greetings   -- runs them one after another, top to bottom
+main = sequence_ greetings -- runs them one after another, top to bottom
 ```
 
 `sequence_` here is doing for `IO` _exactly_ what [`Task.sequence`](https://package.elm-lang.org/packages/elm/core/latest/Task#sequence) does for `Task`! It is `Traversable` and `Monad` all the way down — the same names, giving structure to the same ideas. 🥁
