@@ -8,12 +8,13 @@ tags: languages, japanese
 lang: 'jp'
 title: 'The wish of the cat'
 date: '2025-04-03T13:00:00Z'
+updated: '22/06/2026 14:00'
 postId: 'at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3llvwklpum225'
 ---
 
 # 猫の望み
 
-<img src="./images/nozomi.png" alt="An illustration of a buddhist monk playing the shamisen and a djinn orange cat coming out of it" width="700px">
+<img src="./images/nozomi_ai.png" alt="An illustration of a buddhist monk playing the shamisen and a djinn orange cat coming out of it" width="700px">
 
 <ruby>遥<rt>はる</rt></ruby>か<ruby>昔<rt>むかし</rt></ruby>、<ruby>江戸時代<rt>えどじだい</rt></ruby>、<ruby>宮島<rt>みやじま</rt></ruby>のとある<ruby>丘<rt>おか</rt></ruby>で...
 
