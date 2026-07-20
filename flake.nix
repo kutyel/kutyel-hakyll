@@ -9,7 +9,14 @@
   inputs.flake-utils.url = "github:numtide/flake-utils";
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
 
-  outputs = { self, nixpkgs, flake-utils }:
+  # Used only by ./shell.nix, to reuse the flake's devShell from non-flake
+  # tooling (the VS Code "Nix Env Selector" extension, or a bare `nix-shell`).
+  inputs.flake-compat = {
+    url = "github:edolstra/flake-compat";
+    flake = false;
+  };
+
+  outputs = { self, nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
