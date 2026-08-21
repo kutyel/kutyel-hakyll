@@ -10,6 +10,8 @@ title: 'Do not talk to your LLM, write to it!'
 date: '2026-09-21T14:00:00Z'
 ---
 
+<img src="./images/flavio-grok.jpg" alt="logo" width="500px">
+
 Every other week someone tells me that the real unlock for agentic coding is voice. Get a dictation tool, get a decent microphone, stop typing, just _talk_ to the agent while it works. The pitch is always the same: you speak at around 150 words per minute and you type at maybe half of that, so half of your bandwidth is going to waste.
 
 Voice-first is by now the dominant take, and I spent a couple of weeks living it: most of my prompts to [Claude Code](https://claude.com/claude-code) dictated, while working on Haskell at my day job. Then I went back to typing, because my results were noticeably better.
