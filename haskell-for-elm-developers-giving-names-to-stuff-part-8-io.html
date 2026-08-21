@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <title>Haskell for Elm developers: giving names to stuff (Part 8 - IO)</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A series of blog posts for explaining Haskell to Elm developers interested in learning the language that powers the compiler for their favourite language!" />
+    
+    
+    <meta name="author" content="Flavio Corpa" />
+     
+    <meta name="keywords" content="haskell,elm,functional,programming" />
+    
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU" />
+    <meta
+      http-equiv="origin-trial"
+      content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ=="
+    />
+
+    <meta property="og:site_name" content="flaviocorpa.com" />
+    <meta property="og:title" content="Haskell for Elm developers: giving names to stuff (Part 8 - IO)" />
+    <meta property="og:url" content="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-8-io.html" />
+    <meta property="og:description" content="A series of blog posts for explaining Haskell to Elm developers interested in learning the language that powers the compiler for their favourite language!" />
+    
+    <meta property="og:image" content="https://flaviocorpa.com./images/haskell-elm.png" />
+     
+    <meta property="og:type" content="article" />
+     
+    <meta name="twitter:image" content="https://flaviocorpa.com./images/haskell-elm.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <meta name="twitter:url" content="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-8-io.html" />
+    <meta name="twitter:site" content="flaviocorpa.com" />
+    <meta name="twitter:title" content="Haskell for Elm developers: giving names to stuff (Part 8 - IO)" />
+    <meta name="twitter:description" content="A series of blog posts for explaining Haskell to Elm developers interested in learning the language that powers the compiler for their favourite language!" />
+    
+    <meta name="twitter:creator" content="@FlavioCorpa" />
+    
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>"
+    />
+    <link rel="canonical" href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-8-io.html" />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      /* Base resets */
+      :root {
+        color-scheme: light dark;
+      }
+      html {
+        box-sizing: border-box;
+      }
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
+      body {
+        font-family: Verdana, Helvetica, Arial, sans-serif;
+        margin: 0;
+      }
+      body,
+      input,
+      button {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      input,
+      button {
+        font: inherit;
+      }
+      /* Tailwind v4 */
+      @custom-variant dark (&:where(.dark, .dark *));
+
+      /* Light/Dark CSS variables ported from CSS folder */
+      body.light {
+        --authorTitleColor: #767676;
+        --bgColor: #fff;
+        --blockquoteBorderColor: #eee;
+        --btnBgColor: #287cb4;
+        --btnTextColor: #fff;
+        --iframeBorderColor: #e8e8e8;
+        --inlineCodeBgColor: rgba(255, 229, 100, 0.2);
+        --inlineCodeColor: #1a1a1a;
+        --inputBgColor: #fff;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #334249;
+        --secretGraphicColor: #1a1a1a;
+        --secretGraphicHoverColor: #206592;
+        --separatorColor: #f2f2f2;
+        --textColor: #334249;
+        --textLinkBorderColor: #287cb4;
+        --textLinkColor: #287cb4;
+        --textLinkHoverColor: #206592;
+        --deepBgColor: #011627;
+        --footerBgColor: #f5f5f5;
+        --footerLinkColor: #2676ac;
+        --h1Color: currentColor;
+        --headerBgColor: #c4dfff;
+      }
+      body.dark {
+        --separatorColor: #424857;
+        --authorTitleColor: hsla(0, 0%, 100%, 0.65);
+        --bgColor: #282c35;
+        --blockquoteBorderColor: var(--separatorColor);
+        --btnBgColor: #001627;
+        --btnTextColor: #fff;
+        --iframeBorderColor: var(--separatorColor);
+        --inlineCodeBgColor: rgba(115, 124, 153, 0.2);
+        --inlineCodeColor: #e2e4e9;
+        --inputBgColor: #282c35;
+        --inputBorderColorFocus: #82aaff;
+        --inputColor: #fff;
+        --secretGraphicBorderLeftColor: #c693ea;
+        --secretGraphicColor: hsla(0, 0%, 100%, 0.88);
+        --secretGraphicHoverColor: rgba(255, 167, 196, 0.75);
+        --textColor: hsla(0, 0%, 100%, 0.88);
+        --textLinkBorderColor: #c693ea;
+        --textLinkColor: #c693ea;
+        --textLinkHoverColor: rgba(198, 147, 234, 0.8);
+        --deepBgColor: #011627;
+        --footerBgColor: #373c49;
+        --footerLinkColor: #c693ea;
+        --h1Color: var(--textColor);
+        --headerBgColor: var(--deepBgColor);
+      }
+
+      /* Minimal base styles moved from CSS folder */
+      a[href] {
+        text-decoration: none;
+        color: var(--textLinkColor);
+        box-shadow: 0 1px 0 0 currentColor;
+        word-wrap: break-word;
+      }
+      a[href]:hover,
+      a[href]:focus,
+      a[href]:visited {
+        color: var(--textLinkHoverColor);
+      }
+      h1 > a[href],
+      h1 > a[href]:hover,
+      h1 > a[href]:focus,
+      h1 > a[href]:visited {
+        color: inherit;
+      }
+      h1,
+      h2 {
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        font-size: 1.643rem;
+      }
+      h2::before {
+        content: '';
+        display: block;
+        height: 0;
+        border-top: 5px solid var(--separatorColor);
+        padding-bottom: 20px;
+      }
+      a[href].footnote-ref {
+        box-shadow: none;
+      }
+      img {
+        display: block;
+        height: auto;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 100%;
+        border: 0;
+      }
+
+      /* Theme switch icon visibility rules */
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='dark'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='light'] {
+        display: block;
+      }
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='light'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='dark'] {
+        display: none;
+      }
+
+      /* Code font stack */
+      code,
+      kbd,
+      pre,
+      samp {
+        font-family: JetBrains Mono, Consolas, Menlo, Monaco, source-code-pro, 'Courier New',
+          monospace;
+        font-size: 0.9em;
+        -webkit-font-feature-settings: normal;
+        font-feature-settings: normal;
+      }
+      pre code {
+        font-size: inherit;
+        line-height: 1.4rem;
+      }
+      .sourceCode:not(pre):not(code) {
+        background-color: var(--deepBgColor);
+        overflow: hidden;
+        margin: 1.25rem 0;
+        border-radius: 10px;
+      }
+      pre.sourceCode {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 1.3125rem;
+        margin: 0;
+        color: #fff;
+        background: none;
+        font-size: 0.8rem;
+        line-height: 1.4rem;
+      }
+      /* Optional line numbers support */
+      pre.numberSource.sourceCode > code {
+        counter-reset: source-line 0;
+      }
+      pre.numberSource.sourceCode > code > span {
+        counter-increment: source-line;
+      }
+      pre.numberSource.sourceCode > code > span > a {
+        box-shadow: none;
+      }
+      code.sourceCode > a.sourceLine:before {
+        display: inline-block;
+        content: attr(title);
+        text-align: right;
+        border-right: 1px solid rgba(128, 147, 147, 0.4);
+        color: rgb(128, 147, 147);
+        width: 30px;
+        padding-right: 10px;
+        margin-right: 10px;
+      }
+      @media (max-width: 667px) {
+        .sourceCode:not(pre):not(code) {
+          border-radius: 0;
+        }
+        code.sourceCode > a.sourceLine:before {
+          display: none;
+        }
+      }
+      :not(pre) > code {
+        border-radius: 0.3em;
+        background-color: var(--inlineCodeBgColor);
+        color: var(--inlineCodeColor);
+        padding: 0.15em 0.2em 0.05em;
+        white-space: normal;
+      }
+      /* Syntax token colors (Pandoc/Highlight) */
+      .co {
+        color: rgb(128, 147, 147);
+      }
+      .ch,
+      .st,
+      .vs {
+        color: rgb(236, 196, 141);
+      }
+      .va {
+        color: rgb(214, 222, 235);
+      }
+      .dv,
+      .bn,
+      .fl {
+        color: rgb(247, 140, 108);
+      }
+      .bu,
+      .cn,
+      .at,
+      .fu,
+      .dt {
+        color: rgb(130, 170, 255);
+      }
+      .im,
+      .op,
+      .kw,
+      .ot,
+      .cf {
+        color: #c693ea;
+      }
+
+      /* Typography & content spacing */
+      article p {
+        margin: 0;
+        line-height: 1.75;
+      }
+      article p + p {
+        margin-top: 1.75em;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+        font-size: 1.643rem;
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      hr {
+        height: 0;
+        border: none;
+        border-top: 5px solid var(--separatorColor);
+        margin: 1.75em 0;
+      }
+      blockquote {
+        margin-left: 1.5em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        padding-left: 1em;
+        border-left: 4px solid var(--blockquoteBorderColor);
+      }
+      blockquote em {
+        font-size: 1.286rem;
+      }
+      /* Lists */
+      article ul {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: disc outside;
+      }
+      article ol {
+        margin: 1em 0;
+        padding-left: 1.5em;
+        list-style: decimal outside;
+      }
+      article li {
+        margin: 0.25em 0;
+      }
+      article li > ul,
+      article li > ol {
+        margin: 0.5em 0;
+      }
+      /* Media helpers */
+      iframe {
+        width: 100%;
+      }
+      .iframe--example {
+        border: 2px solid var(--iframeBorderColor);
+      }
+      .pdf {
+        margin: 1rem -6rem;
+        height: 30rem;
+        width: calc(100% + 12rem);
+      }
+      .pdf-link {
+        display: none;
+      }
+      @media (max-width: 800px) {
+        .pdf {
+          margin: 1rem 0;
+          width: 100%;
+        }
+      }
+      @media (max-width: 667px) {
+        .pdf {
+          display: none;
+        }
+        .pdf-link {
+          display: inline;
+        }
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="dark min-h-dvh flex flex-col bg-[var(--bgColor)] text-[var(--textColor)] leading-[1.643] antialiased"
+  >
+    <script>
+      ;(() => {
+        window.site = {
+          theme:
+            localStorage.getItem('theme') ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          setTheme: (name) => {
+            document.body.classList.add(name === 'light' ? 'light' : 'dark')
+            document.body.classList.remove(name === 'light' ? 'dark' : 'light')
+            localStorage.setItem('theme', name)
+            window.site.theme = name
+            window.site.refreshThemeSwitch()
+          },
+          refreshThemeSwitch: () => {
+            const isLight = window.site.theme === 'light'
+            const themeSwitch = document.querySelector('[data-theme-switch]')
+
+            themeSwitch?.setAttribute(
+              'aria-label',
+              isLight ? 'Switch to dark mode' : 'Switch to light mode'
+            )
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true')
+          },
+        }
+
+        window.site.setTheme(window.site.theme)
+      })()
+    </script>
+
+    <button
+      aria-label="Switch to light mode"
+      aria-checked="true"
+      data-theme-switch
+      role="switch"
+      type="button"
+      class="appearance-none flex items-center justify-center bg-[var(--btnBgColor)] border border-[var(--btnBgColor)] text-[var(--btnTextColor)] rounded-[20px] px-2 py-[0.1em] outline-offset-[0.1em] absolute right-4 top-4"
+    >
+      <span aria-hidden="true" data-theme-switch-icon="dark">🌙</span>
+      <span aria-hidden="true" data-theme-switch-icon="light">🌞</span>
+    </button>
+
+    <nav class="my-6 py-2">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0" data-nav-wrap>
+    <a class="mr-5 absolute left-[-10000px] focus:static focus:left-auto" href="#content"
+      >Skip to content</a
+    >
+    <a class="mr-5" href="/">Home</a>
+    <a class="mr-5" href="https://github.com/sponsors/kutyel">Sponsor me</a>
+    <a class="mr-5" href="/atom.xml">RSS</a>
+  </div>
+</nav>
+
+
+<style>
+  bsky-comments {
+    --background-color: var(--bgColor);
+    --text-color: var(--textColor);
+    --link-color: var(--textLinkColor);
+    --link-hover-color: var(--textLinkHoverColor);
+    --comment-meta-color: #888;
+    --error-color: #ff4d4d;
+    --reply-border-color: var(--separatorColor);
+    --button-background-color: var(--btnBgColor);
+    --button-hover-background-color: rgba(var(--btnBgColor), 0.2);
+    --author-avatar-border-radius: 50%;
+  }
+</style>
+
+<main class="flex-1" id="content" tabindex="-1">
+  <article class="pb-10">
+    <header class="bg-[var(--headerBgColor)] mb-8 px-[1.3125rem] md:px-0 py-4 md:py-8">
+      <div class="mx-auto md:w-[600px]">
+        <h1 class="text-[1.7rem] md:text-[3rem] m-0 mb-4 font-normal leading-[1.2] text-[var(--h1Color)]">
+          Haskell for Elm developers: giving names to stuff (Part 8 - IO)
+        </h1>
+        <div class="mx-auto md:w-[600px]">
+          <small class="italic">07/06/2026</small>
+          <small class="italic"> | 10 min read</small>
+          
+          <div class="mt-2">[ <a title="All pages tagged &#39;haskell&#39;." href="/tags/haskell.html" rel="tag">haskell</a>, <a title="All pages tagged &#39;elm&#39;." href="/tags/elm.html" rel="tag">elm</a>, <a title="All pages tagged &#39;fp&#39;." href="/tags/fp.html" rel="tag">fp</a> ]</div>
+        </div>
+      </div>
+    </header>
+    <section class="mx-auto md:w-[600px] px-[1.3125rem] md:px-0"><p><img src="./images/haskell-elm.svg" alt="logo" width="300px"></p>
+<p>Welcome back! In my <a href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-7-traversable.html">last post</a>, we explored <code>Traversable</code> and discovered that “the answer is always <code>traverse</code>”. Today we are going to tackle something that scares a LOT of newcomers to Haskell, and yet — surprise, surprise! — you have been doing it in Elm all along: <strong><code>IO</code></strong>! 🎉</p>
+<p>Funnily enough, all the way back in <a href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-1-functors.html">Part 1</a> I promised I would eventually write about <code>IO</code>… only took me 8 posts to keep my word! 😅</p>
+<p>There is a famous question that every Elm developer eventually asks when they peek over the fence into Haskell: <em>“Wait… if Haskell is pure, how does it print to the screen, read files or make HTTP requests?”</em> 🤔</p>
+<p>The answer is <code>IO</code>, and the beautiful thing is that the mental model is <strong>exactly</strong> the one you already have from Elm’s <code>Task</code> and <code>Cmd</code>. Let me prove it to you! 😉</p>
+<p>Quick refresher before we dive in, since we will lean on both concepts: in Elm, a <strong><code>Task</code></strong> is a <em>composable description</em> of an effect — you can chain tasks with <code>Task.andThen</code>, map over them, and they carry a typed error channel. A <strong><code>Cmd</code></strong> is the <em>one-shot instruction</em> you actually hand to the Elm runtime from <code>init</code>/<code>update</code>; it is fire-and-forget, and the only way it talks back to you is through a message. The two meet at <code>Task.perform</code>/<code>Task.attempt</code>, which turn a <code>Task</code> into a <code>Cmd</code> — because the runtime only accepts <code>Cmd</code>s. Keep that pipeline (<code>Task</code> ➝ <code>Cmd</code> ➝ runtime) in mind: it maps directly onto what Haskell does with <code>IO</code> (which stands for Input/Output, btw!).</p>
+<h2 id="the-big-misconception">The big misconception</h2>
+<p>The most common misconception about <code>IO</code> is thinking that an <code>IO a</code> value <em>is</em> the side effect. It is not! An <code>IO a</code> is a <strong>description</strong> of an effectful computation that produces a value of type <code>a</code> when (and only when) it is eventually run.</p>
+<p>Does that sound familiar? It should! It is <em>precisely</em> how the Elm docs describe a <a href="https://package.elm-lang.org/packages/elm/core/latest/Task"><code>Task</code></a>:</p>
+<blockquote>
+<p>A task is a <em>description</em> of something that needs to be done. […] The actual benefit of a task is that it does not do anything until you give it to the runtime.</p>
+</blockquote>
+<p>Swap the word “task” for “IO action” and you have a perfect definition of <code>IO</code> in Haskell. An <code>IO a</code> value is a <strong>recipe</strong>, not the act of cooking. You can pass it around, store it in a list, combine it with other recipes — and <em>nothing happens</em> until the runtime decides to actually run it. 🍳</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">greet ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>greet <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello, Elm developer!&quot;</span></span></code></pre></div>
+<p>Defining <code>greet</code> does <strong>not</strong> print anything. <code>greet</code> is just a value of type <code>IO ()</code> — a description that says “when run, print this line”. Referential transparency is preserved! ✨</p>
+<h2 id="io-is-a-monad-of-course-it-is-upside_down_face"><code>IO</code> is a Monad (of course it is 🙃)</h2>
+<p>If you have been following the series, you already know everything you need to <em>use</em> <code>IO</code>, because (you guessed it!) <code>IO</code> is a <code>Monad</code>! (Go back and read <a href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-3-monads.html">Part 3 - Monads!</a> if you need a refresher.)</p>
+<p>That means it has all the machinery you already love:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span><span class="ot">  ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> b           <span class="co">-- Functor</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pure</span><span class="ot">  ::</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> a                          <span class="co">-- Applicative</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;=) ::</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> <span class="dt">IO</span> b) <span class="ot">-&gt;</span> <span class="dt">IO</span> b        <span class="co">-- Monad</span></span></code></pre></div>
+<p>And just like with <code>Task</code>, the way you chain effectful steps together is with the monadic bind (<code>&gt;&gt;=</code>), which is the equivalent of Elm’s <code>Task.andThen</code>! Compare them side by side:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;=)        ::</span> <span class="dt">IO</span> a             <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> <span class="dt">IO</span> b) <span class="ot">-&gt;</span> <span class="dt">IO</span> b</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Task.andThen<span class="ot"> ::</span> (a <span class="ot">-&gt;</span> <span class="dt">Task</span> x b)  <span class="ot">-&gt;</span> <span class="dt">Task</span> x a    <span class="ot">-&gt;</span> <span class="dt">Task</span> x b <span class="co">--(args flipped)</span></span></code></pre></div>
+<p>So this little program that asks for your name and greets you (Elm runs in the browser, so there are no real console <code>Task</code>s — bear with me and imagine these <code>getLine</code>/<code>putLine</code> exist just to show the <em>shape</em>)…</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Task</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">greetUser</span> : <span class="dt">Task</span> <span class="fu">x</span> ()</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">greetUser</span> <span class="op">=</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">getLine</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">|&gt;</span> <span class="dt">Task</span><span class="op">.</span><span class="fu">andThen</span> (\<span class="fu">name</span> <span class="op">-&gt;</span> <span class="fu">putLine</span> (<span class="st">&quot;Hello, &quot;</span> <span class="op">++</span> <span class="fu">name</span> <span class="op">++</span> <span class="st">&quot;!&quot;</span>))</span></code></pre></div>
+<p>…is, in Haskell, basically identical:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">greetUser ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>greetUser <span class="ot">=</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">getLine</span> <span class="op">&gt;&gt;=</span> \name <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> (<span class="st">&quot;Hello, &quot;</span> <span class="op">&lt;&gt;</span> name <span class="op">&lt;&gt;</span> <span class="st">&quot;!&quot;</span>)</span></code></pre></div>
+<p>And thanks to <code>do</code> notation (remember Part 3?), we can write it in that lovely imperative-looking style:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">greetUser ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>greetUser <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  name <span class="ot">&lt;-</span> <span class="fu">getLine</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> (<span class="st">&quot;Hello, &quot;</span> <span class="op">&lt;&gt;</span> name <span class="op">&lt;&gt;</span> <span class="st">&quot;!&quot;</span>)</span></code></pre></div>
+<p>That <code>name &lt;- getLine</code> is <em>exactly</em> the <code>do</code> notation desugaring of <code>&gt;&gt;=</code> we saw for <code>Task</code>. Same <code>Monad</code>, same intuition, different effect. 💜</p>
+<h2 id="so-where-is-the-cmd-enter-main">So where is the <code>Cmd</code>? Enter <code>main</code></h2>
+<p>Here is where the most interesting comparison lives. In Elm, you can build a <code>Task</code> all day long, but <strong>a <code>Task</code> never runs on its own</strong>. To actually make something happen, you have to hand it to the runtime by turning it into a <code>Cmd</code>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Task</span><span class="op">.</span><span class="fu">perform</span> : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">msg</span>) <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="dt">Never</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Cmd</span> <span class="fu">msg</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Task</span><span class="op">.</span><span class="fu">attempt</span> : (<span class="dt">Result</span> <span class="fu">x</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">msg</span>) <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="fu">x</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">Cmd</span> <span class="fu">msg</span></span></code></pre></div>
+<p>A <code>Cmd</code> is the Elm Architecture’s way of saying <em>“hey runtime, please go run this effect and send me a message back when you are done”</em>. <strong>You</strong> never run the effect — the Elm runtime does, at the boundary of your program. Your <code>update</code> function stays beautifully pure: it just <em>returns</em> <code>Cmd</code>s as data. 📨</p>
+<p>Haskell works <strong>exactly</strong> the same way, except the “boundary” has a name you already know:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span></code></pre></div>
+<p><code>main</code> is the single <code>IO</code> action that the Haskell runtime (the RTS) actually executes when your program starts. Everything you build is just data — descriptions of effects — until it becomes part of <code>main</code>. In other words:</p>
+<blockquote>
+<p><strong><code>main</code> is to Haskell what the Elm runtime is to Elm.</strong> It is the <em>one place</em> where descriptions of effects finally get run.</p>
+</blockquote>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="st">&quot;What is your name?&quot;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  name <span class="ot">&lt;-</span> <span class="fu">getLine</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> (<span class="st">&quot;Hello, &quot;</span> <span class="op">&lt;&gt;</span> name <span class="op">&lt;&gt;</span> <span class="st">&quot;!&quot;</span>)</span></code></pre></div>
+<p>The mapping is gorgeous once you see it:</p>
+<pre><code>Elm                                Haskell
+------------------------------     ------------------------------
+Task x a  (a description)          IO a  (a description)
+Task.andThen / Task.map            &gt;&gt;= / fmap  (it is a Monad)
+Cmd msg   (handed to the runtime)  being part of main
+the Elm runtime runs your Cmds     the RTS runs main</code></pre>
+<p>In Elm, the runtime is <em>hidden</em> and you talk to it through <code>Cmd</code>. In Haskell, the runtime is <em>explicit</em> and you talk to it through <code>main</code>. That is really the whole difference! 🤯</p>
+<p>So when Haskellers tell you <code>IO</code> is the way you “describe effects as data and let the runtime run them at the boundary”… drum rolls 🥁🥁🥁 … that is <strong>the Elm Architecture</strong>! YOU HAVE BEEN DOING <code>IO</code> ALL ALONG™️!!! 🎉</p>
+<h2 id="but-elms-task-has-an-error-type-and-io-doesnt-monocle_face">“But Elm’s <code>Task</code> has an error type and <code>IO</code> doesn’t!” 🧐</h2>
+<p>Sharp eye! This is the most important practical difference, so let us address it head on.</p>
+<p>Elm’s <code>Task</code> has <strong>two</strong> type parameters:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Task</span> <span class="fu">error</span> <span class="fu">value</span></span></code></pre></div>
+<p>The <code>error</code> channel is part of the type, which is why you have <code>Task.attempt : (Result x a -&gt; msg) -&gt; Task x a -&gt; Cmd msg</code> — when the runtime finishes, it hands you back a <code>Result</code> so you are <em>forced</em> to handle the failure case. Lovely and safe! 👏🏻</p>
+<p>Haskell’s <code>IO</code>, on the other hand, has only <strong>one</strong> type parameter:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">IO</span> a</span></code></pre></div>
+<p>There is no error channel in the type. So what happens when things go wrong? Haskell’s <code>IO</code> actions can throw <strong>runtime exceptions</strong> — and to be precise (because “IO” and “exceptions” both get overloaded a lot), these come in two flavours:</p>
+<ul>
+<li><strong>Exceptions from the outside world</strong>: reading a file that does not exist, a network connection dropping, the disk being full… Operations like <code>readFile</code> signal failure by <em>throwing</em> instead of returning an <code>Either</code>. This is closer to JavaScript’s <code>throw</code> than to Elm’s principled <code>Result</code>.</li>
+<li><strong>Exceptions from pure code</strong>: things like <code>head []</code>, <code>error "boom"</code> or an incomplete pattern match. These lurk inside lazily evaluated <em>pure</em> values and only blow up when something (ultimately <code>main</code>) forces them.</li>
+</ul>
+<p>That second flavour is the one with no Elm equivalent at all — in Elm, pure code simply <em>cannot</em> throw — and it is honestly one of the few places where Elm is <em>stricter and safer</em> than vanilla Haskell. 😅</p>
+<p>To be fair though, exceptions are not inherently evil! Some situations really <em>are</em> exceptional, and insisting that every function must be total has its own costs: Elm keeps division total by deciding that <code>1 / 0 == Infinity</code> (and <code>1 // 0 == 0</code>! 🙈), which is <a href="https://github.com/elm/core/issues/1072">arguably weirder</a> than just failing loudly. And real-world input/output is <em>so</em> full of failure cases (permission denied! connection reset!) that having a mechanism to propagate them without threading <code>Either</code> through every single function can be a perfectly reasonable design.</p>
+<p>Still, when the failure is part of your <em>domain</em> (the user typed an invalid age, the JSON did not parse), disciplined Haskellers reach for the same trick you know and love from Elm’s <code>Result</code>: <strong>make the error a value</strong> by returning an <code>Either</code> explicitly:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Text.Read</span> (readMaybe)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="ot">readAge ::</span> <span class="dt">IO</span> (<span class="dt">Either</span> <span class="dt">String</span> <span class="dt">Int</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>readAge <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  line <span class="ot">&lt;-</span> <span class="fu">getLine</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> <span class="op">$</span> <span class="kw">case</span> readMaybe line <span class="kw">of</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Just</span> n  <span class="ot">-&gt;</span> <span class="dt">Right</span> n</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="dt">Left</span> (<span class="st">&quot;Not a number: &quot;</span> <span class="op">&lt;&gt;</span> line)</span></code></pre></div>
+<p>That <code>IO (Either String Int)</code> is morally <em>exactly</em> Elm’s <code>Task String Int</code>! The effect on the outside (<code>IO</code> / <code>Task</code>), the success-or-failure on the inside (<code>Either</code> / the two type params). ✨</p>
+<h2 id="a-real-worldtm-example-fetching-and-parsing">A REAL WORLD™️ example: fetching and parsing</h2>
+<p>Let’s make this concrete with something you actually do every day: fetch some data and parse it. In Elm you would compose <code>Task</code>s and hand the result to the runtime as a <code>Cmd</code>:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Http</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Task</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fetchUser</span> : <span class="dt">String</span> <span class="op">-&gt;</span> <span class="dt">Task</span> <span class="dt">Http</span><span class="op">.</span><span class="dt">Error</span> <span class="dt">User</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">fetchUser</span> <span class="fu">id</span> <span class="op">=</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Http</span><span class="op">.</span><span class="fu">task</span> { <span class="co">{- ... -}</span> }</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">|&gt;</span> <span class="dt">Task</span><span class="op">.</span><span class="fu">andThen</span> <span class="fu">decodeUser</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="fu">loadUser</span> : <span class="dt">String</span> <span class="op">-&gt;</span> <span class="dt">Cmd</span> <span class="dt">Msg</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="fu">loadUser</span> <span class="fu">id</span> <span class="op">=</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Task</span><span class="op">.</span><span class="fu">attempt</span> <span class="dt">GotUser</span> (<span class="fu">fetchUser</span> <span class="fu">id</span>)</span></code></pre></div>
+<p>In Haskell, the same shape, built from <code>IO</code> actions and finally plugged into <code>main</code>:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fetchUser ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">Either</span> <span class="dt">Error</span> <span class="dt">User</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>fetchUser userId <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  response <span class="ot">&lt;-</span> httpGet (<span class="st">&quot;/users/&quot;</span> <span class="op">&lt;&gt;</span> userId) <span class="co">-- IO action</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> (decodeUser response)                <span class="co">-- pure parsing</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  result <span class="ot">&lt;-</span> fetchUser <span class="st">&quot;kutyel&quot;</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> result <span class="kw">of</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Left</span> err   <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> (<span class="st">&quot;Something went wrong: &quot;</span> <span class="op">&lt;&gt;</span> <span class="fu">show</span> err)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Right</span> user <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> (<span class="st">&quot;Welcome, &quot;</span> <span class="op">&lt;&gt;</span> userName user <span class="op">&lt;&gt;</span> <span class="st">&quot;!&quot;</span>)</span></code></pre></div>
+<p>Notice the same healthy separation Elm encourages: the <strong>effectful</strong> part (<code>httpGet</code>) lives in <code>IO</code>, the <strong>pure</strong> part (<code>decodeUser</code>) is just a normal function <code>a -&gt; Either Error User</code>. The <code>case</code> at the end is doing <em>by hand</em> what <code>Task.attempt</code>’s <code>GotUser</code> message + your <code>update</code> branch do for you in Elm. Same discipline, different syntax! 🎯</p>
+<h2 id="why-this-design-is-the-same-good-idea-in-both-languages">Why this design is the same good idea in both languages</h2>
+<p>Both Elm and Haskell are built on the same foundational insight:</p>
+<blockquote>
+<p><strong>Keep effects as inert data for as long as possible, and run them only at a single, well-defined boundary.</strong></p>
+</blockquote>
+<p>In Elm, that boundary is the runtime, and the “inert data” is <code>Cmd</code> (built from <code>Task</code>). In Haskell, that boundary is <code>main</code>, and the inert data is <code>IO</code>. The payoff is identical in both: the vast majority of your program stays <strong>pure</strong>, <strong>testable</strong> and <strong>easy to reason about</strong>, because building an <code>IO</code>/<code>Task</code> value has <em>no observable effect</em> — only the runtime running it does. 🧠</p>
+<p>This is why you can do delightful things like keep a <code>[IO ()]</code> — a plain list of effects you have not run yet — and then run them all at once with our old friend from last post, <code>traverse_</code> (the <code>Foldable</code>/<code>Traversable</code> cousin that discards results):</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">greetings ::</span> [<span class="dt">IO</span> ()]</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>greetings <span class="ot">=</span> <span class="fu">map</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  (\name <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> (<span class="st">&quot;Hello, &quot;</span> <span class="op">&lt;&gt;</span> name))</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  [<span class="st">&quot;Evan&quot;</span>, <span class="st">&quot;Simon&quot;</span>, <span class="st">&quot;Flavio&quot;</span>]</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">sequence_</span> greetings <span class="co">-- runs them one after another, top to bottom</span></span></code></pre></div>
+<p><code>sequence_</code> here is doing for <code>IO</code> <em>exactly</em> what <a href="https://package.elm-lang.org/packages/elm/core/latest/Task#sequence"><code>Task.sequence</code></a> does for <code>Task</code>! It is <code>Traversable</code> and <code>Monad</code> all the way down — the same names, giving structure to the same ideas. 🥁</p>
+<h2 id="wrapping-up">Wrapping up</h2>
+<p>So, the next time someone tells you <code>IO</code> is some scary, magical, impure escape hatch, you can smile knowingly and say:</p>
+<blockquote>
+<p>“Oh, you mean a <code>Task</code> that the runtime runs at <code>main</code> instead of at <code>Cmd</code>? Yeah, I have been doing that in Elm for years.” 😏</p>
+</blockquote>
+<p>Let’s recap the mental model:</p>
+<ul>
+<li>An <code>IO a</code> is a <strong>description</strong> of an effect, just like a <code>Task</code> — building it does nothing.</li>
+<li>It is a <strong><code>Monad</code></strong>, so you compose it with <code>&gt;&gt;=</code> / <code>do</code> notation, exactly like <code>Task.andThen</code>.</li>
+<li>It runs <strong>only</strong> when it becomes part of <code>main</code>, just like a <code>Task</code> runs only when the runtime gets it as a <code>Cmd</code>.</li>
+<li>Vanilla <code>IO</code> lacks Elm’s typed error channel, but for the failures that belong to your domain, <code>IO (Either e a)</code> recovers the exact shape of <code>Task e a</code>.</li>
+</ul>
+<p>Purity is not the absence of effects — it is the discipline of treating effects as <strong>values</strong>. Elm taught you that lesson with <code>Task</code> and <code>Cmd</code>; Haskell just calls it <code>IO</code>. ✨</p>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>As always, the goal of this series is to show that the scary-sounding Haskell concepts are things you <em>already know</em> from Elm — we are just giving them their proper names. 😉</p>
+<p>Special thanks as always to <a href="https://github.com/cekrem">Christian Ekrem</a> and to <a href="https://github.com/ludat">Lucas David Traverso</a> for technical proofreading the draft version of this blogpost and adding their valuable feedback to it! 🙏🏻</p>
+<p>Hope <code>IO</code> finally clicked for you and that you now see it for what it really is: your trusty old <code>Task</code>/<code>Cmd</code> duo wearing a Haskell hat! 🎩 If you found joy in this blogpost and would like me to continue the series, please consider <a href="https://github.com/sponsors/kutyel">sponsoring my work</a>, share it in your social networks and <strong>follow me on <a href="https://twitter.com/FlavioCorpa">Twitter</a>/<a href="https://bsky.app/profile/flaviocorpa.com">BlueSky!</a> 🦋</strong> 🙌🏻</p></section>
+  </article>
+</main>
+
+
+<bsky-comments post="at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3mnz52xzd3k2e"></bsky-comments>
+ <footer class="py-14 bg-[var(--footerBgColor)] shrink-0">
+  <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem]">
+    <ul class="flex justify-center list-none" role="list">
+      <li class="mx-3" role="listitem">
+        <a href="/">Home</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="https://github.com/sponsors/kutyel/">Sponsor me</a>
+      </li>
+      <li class="mx-3" role="listitem">
+        <a href="/atom.xml">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+
+
+<script src="https://gistcdn.githack.com/kutyel/41d12e099484fd390fb67168271fcdd9/raw/9be26e500525a2e4edacc53d3a8006aaddec0e15/bsky-comments.js"></script>
+
+
+    <script async>
+      ;(() => {
+        window.site.refreshThemeSwitch()
+        document.querySelector('[data-theme-switch]').addEventListener('click', (e) => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light')
+        })
+      })()
+    </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'
+    ></script>
+    <!-- End Cloudflare Web Analytics -->
+  </body>
+</html>
