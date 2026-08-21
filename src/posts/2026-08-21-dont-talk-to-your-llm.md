@@ -8,6 +8,7 @@ tags: llm, ai, prompting, writing, tools
 lang: 'en'
 title: 'Do not talk to your LLM, write to it!'
 date: '2026-09-21T14:00:00Z'
+postId: 'at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3mtlvwzuvx226'
 ---
 
 <img src="./images/flavio-grok.jpg" alt="logo" width="500px">
