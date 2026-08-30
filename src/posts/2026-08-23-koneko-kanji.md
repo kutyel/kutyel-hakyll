@@ -4,7 +4,7 @@ authorTwitter: '@FlavioCorpa'
 desc: 'Una nueva aplicación, diseñada para hispanohablantes, que usa un algoritmo de repetición espaciada para ayudarte a aprender kanji y vocabulario japonés.'
 image: ./images/koneko-flyer1.jpeg
 keywords: 'japonés,español,kanji,vocabulario,SRS,app,aprender,idiomas'
-tags: app, japonés, kanji, vocabulario, SRS, aprender, idiomas
+tags: japanese,languages,games,web,noken,haskell,elm
 lang: 'es'
 title: '¡Presentando Koneko Kanji!'
 date: '2026-08-23T21:00:00Z'
