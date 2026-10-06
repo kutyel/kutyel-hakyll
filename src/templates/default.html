@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="$if(lang)$$lang$$else$en$endif$" class="scroll-smooth">
   <head>
     <title>$title$</title>
     <meta charset="utf-8" />
@@ -48,132 +48,114 @@
     />
     <link rel="canonical" href="$root$$url$" />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+    />
+
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style type="text/tailwindcss">
-      /* Base resets */
+      @custom-variant dark (&:where(.dark, .dark *));
+
+      @theme {
+        --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+        --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+      }
+
+      /* ---------------------------------------------------------------
+         Design tokens. The old variable names at the bottom of each block
+         are kept because <bsky-comments> and older posts read them.
+         --------------------------------------------------------------- */
+      body.light {
+        --bg: #fafaf8;
+        --surface: #f1f1ed;
+        --fg: #1b1e23;
+        --muted: #636b78;
+        --faint: #a0a6b0;
+        --border: #e4e4df;
+        --accent: #7c3aed;
+        --accent-soft: rgba(124, 58, 237, 0.08);
+        --code-bg: #0f131a;
+        --inline-code-bg: rgba(124, 58, 237, 0.08);
+        --selection: rgba(124, 58, 237, 0.18);
+      }
+      body.dark {
+        --bg: #0c0f14;
+        --surface: #141820;
+        --fg: #e4e7ed;
+        --muted: #8a92a0;
+        --faint: #565e6c;
+        --border: #20262f;
+        --accent: #c693ea;
+        --accent-soft: rgba(198, 147, 234, 0.09);
+        --code-bg: #0f131a;
+        --inline-code-bg: rgba(198, 147, 234, 0.1);
+        --selection: rgba(198, 147, 234, 0.25);
+      }
+      body.light,
+      body.dark {
+        --bgColor: var(--bg);
+        --textColor: var(--fg);
+        --textLinkColor: var(--accent);
+        --textLinkHoverColor: var(--fg);
+        --separatorColor: var(--border);
+        --btnBgColor: var(--surface);
+        --deepBgColor: var(--code-bg);
+        --authorTitleColor: var(--muted);
+      }
+
+      /* ---------------------------------------------------------------
+         Base
+         --------------------------------------------------------------- */
       :root {
         color-scheme: light dark;
       }
       html {
         box-sizing: border-box;
+        -webkit-text-size-adjust: 100%;
       }
+      *,
       *::before,
       *::after {
         box-sizing: inherit;
       }
       body {
-        font-family: Verdana, Helvetica, Arial, sans-serif;
         margin: 0;
-      }
-      body,
-      input,
-      button {
+        font-family: var(--font-sans);
+        background: var(--bg);
+        color: var(--fg);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        transition: background-color 0.2s ease, color 0.2s ease;
+      }
+      ::selection {
+        background: var(--selection);
       }
       input,
       button {
         font: inherit;
       }
-      /* Tailwind v4 */
-      @custom-variant dark (&:where(.dark, .dark *));
-
-      /* Light/Dark CSS variables ported from CSS folder */
-      body.light {
-        --authorTitleColor: #767676;
-        --bgColor: #fff;
-        --blockquoteBorderColor: #eee;
-        --btnBgColor: #287cb4;
-        --btnTextColor: #fff;
-        --iframeBorderColor: #e8e8e8;
-        --inlineCodeBgColor: rgba(255, 229, 100, 0.2);
-        --inlineCodeColor: #1a1a1a;
-        --inputBgColor: #fff;
-        --inputBorderColorFocus: #82aaff;
-        --inputColor: #334249;
-        --secretGraphicColor: #1a1a1a;
-        --secretGraphicHoverColor: #206592;
-        --separatorColor: #f2f2f2;
-        --textColor: #334249;
-        --textLinkBorderColor: #287cb4;
-        --textLinkColor: #287cb4;
-        --textLinkHoverColor: #206592;
-        --deepBgColor: #011627;
-        --footerBgColor: #f5f5f5;
-        --footerLinkColor: #2676ac;
-        --h1Color: currentColor;
-        --headerBgColor: #c4dfff;
-      }
-      body.dark {
-        --separatorColor: #424857;
-        --authorTitleColor: hsla(0, 0%, 100%, 0.65);
-        --bgColor: #282c35;
-        --blockquoteBorderColor: var(--separatorColor);
-        --btnBgColor: #001627;
-        --btnTextColor: #fff;
-        --iframeBorderColor: var(--separatorColor);
-        --inlineCodeBgColor: rgba(115, 124, 153, 0.2);
-        --inlineCodeColor: #e2e4e9;
-        --inputBgColor: #282c35;
-        --inputBorderColorFocus: #82aaff;
-        --inputColor: #fff;
-        --secretGraphicBorderLeftColor: #c693ea;
-        --secretGraphicColor: hsla(0, 0%, 100%, 0.88);
-        --secretGraphicHoverColor: rgba(255, 167, 196, 0.75);
-        --textColor: hsla(0, 0%, 100%, 0.88);
-        --textLinkBorderColor: #c693ea;
-        --textLinkColor: #c693ea;
-        --textLinkHoverColor: rgba(198, 147, 234, 0.8);
-        --deepBgColor: #011627;
-        --footerBgColor: #373c49;
-        --footerLinkColor: #c693ea;
-        --h1Color: var(--textColor);
-        --headerBgColor: var(--deepBgColor);
-      }
-
-      /* Minimal base styles moved from CSS folder */
-      a[href] {
-        text-decoration: none;
-        color: var(--textLinkColor);
-        box-shadow: 0 1px 0 0 currentColor;
-        word-wrap: break-word;
-      }
-      a[href]:hover,
-      a[href]:focus,
-      a[href]:visited {
-        color: var(--textLinkHoverColor);
-      }
-      h1 > a[href],
-      h1 > a[href]:hover,
-      h1 > a[href]:focus,
-      h1 > a[href]:visited {
+      a {
         color: inherit;
+        text-decoration: none;
       }
-      h1,
-      h2 {
-        font-weight: 400;
-        line-height: 1.2;
-      }
-      h2 {
-        margin-bottom: 0.5em;
-        font-size: 1.643rem;
-      }
-      h2::before {
-        content: '';
-        display: block;
-        height: 0;
-        border-top: 5px solid var(--separatorColor);
-        padding-bottom: 20px;
-      }
-      a[href].footnote-ref {
-        box-shadow: none;
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 2px;
       }
       img {
         display: block;
         height: auto;
+        max-width: 100%;
         margin-left: auto;
         margin-right: auto;
-        max-width: 100%;
         border: 0;
       }
 
@@ -187,47 +169,187 @@
         display: none;
       }
 
-      /* Code font stack */
+      /* Tags rendered by Hakyll come as "a, b, c": drop the commas. */
+      .tag-list {
+        font-size: 0;
+      }
+      .tag-list a {
+        display: inline-block;
+        margin: 0 0.4rem 0.4rem 0;
+        padding: 0.1rem 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        line-height: 1.5;
+        color: var(--muted);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        transition: color 0.15s, border-color 0.15s;
+      }
+      .tag-list a::before {
+        content: '#';
+        color: var(--faint);
+      }
+      .tag-list a:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      /* ---------------------------------------------------------------
+         Long-form content (post bodies)
+         --------------------------------------------------------------- */
+      .prose {
+        font-size: 1.0625rem;
+        line-height: 1.75;
+      }
+      .prose p {
+        margin: 0;
+      }
+      .prose p + p {
+        margin-top: 1.4em;
+      }
+      .prose a[href] {
+        color: var(--accent);
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+        text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+        word-wrap: break-word;
+        transition: text-decoration-color 0.15s;
+      }
+      .prose a[href]:hover {
+        text-decoration-color: var(--accent);
+      }
+      .prose a[href].footnote-ref,
+      .prose a[href].footnote-back {
+        text-decoration: none;
+      }
+      .prose h2,
+      .prose h3,
+      .prose h4 {
+        font-weight: 600;
+        line-height: 1.25;
+        letter-spacing: -0.015em;
+        margin: 2.2em 0 0.7em;
+        scroll-margin-top: 5rem;
+      }
+      .prose h2 {
+        font-size: 1.5rem;
+      }
+      .prose h3 {
+        font-size: 1.2rem;
+      }
+      .prose h2::before,
+      .prose h3::before {
+        font-family: var(--font-mono);
+        font-weight: 400;
+        color: var(--faint);
+        margin-right: 0.5ch;
+      }
+      .prose h2::before {
+        content: '##';
+      }
+      .prose h3::before {
+        content: '###';
+      }
+      .prose hr {
+        height: 0;
+        border: none;
+        border-top: 1px dashed var(--border);
+        margin: 2.5em 0;
+      }
+      .prose blockquote {
+        margin: 1.5em 0;
+        padding: 0.25em 0 0.25em 1.1em;
+        border-left: 2px solid var(--accent);
+        color: var(--muted);
+      }
+      .prose blockquote em {
+        font-size: 1.15em;
+      }
+      .prose ul,
+      .prose ol {
+        margin: 1em 0;
+        padding-left: 1.5em;
+      }
+      .prose ul {
+        list-style: disc outside;
+      }
+      .prose ol {
+        list-style: decimal outside;
+      }
+      .prose li {
+        margin: 0.3em 0;
+      }
+      .prose li::marker {
+        color: var(--faint);
+      }
+      .prose li > ul,
+      .prose li > ol {
+        margin: 0.4em 0;
+      }
+      .prose img {
+        border-radius: 10px;
+        margin-top: 1.75em;
+        margin-bottom: 1.75em;
+      }
+      .prose table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.92em;
+        margin: 1.5em 0;
+      }
+      .prose th,
+      .prose td {
+        text-align: left;
+        padding: 0.45em 0.75em;
+        border-bottom: 1px solid var(--border);
+      }
+      .prose th {
+        font-weight: 600;
+      }
+      .prose .footnotes {
+        margin-top: 3em;
+        font-size: 0.9em;
+        color: var(--muted);
+      }
+
+      /* Code */
       code,
       kbd,
       pre,
       samp {
-        font-family: JetBrains Mono, Consolas, Menlo, Monaco, source-code-pro, 'Courier New',
-          monospace;
-        font-size: 0.9em;
-        -webkit-font-feature-settings: normal;
+        font-family: var(--font-mono);
+        font-size: 0.88em;
         font-feature-settings: normal;
       }
       pre code {
         font-size: inherit;
-        line-height: 1.4rem;
+        line-height: 1.6;
       }
       .sourceCode:not(pre):not(code) {
-        background-color: var(--deepBgColor);
+        position: relative;
+        background-color: var(--code-bg);
+        border: 1px solid var(--border);
         overflow: hidden;
-        margin: 1.25rem 0;
+        margin: 1.5rem 0;
         border-radius: 10px;
       }
       pre.sourceCode {
         width: 100%;
         overflow-x: auto;
         overflow-y: hidden;
-        padding: 1.3125rem;
+        padding: 1.1rem 1.25rem;
         margin: 0;
-        color: #fff;
+        color: #e4e7ed;
         background: none;
-        font-size: 0.8rem;
-        line-height: 1.4rem;
+        font-size: 0.82rem;
+        line-height: 1.6;
       }
-      /* Optional line numbers support */
       pre.numberSource.sourceCode > code {
         counter-reset: source-line 0;
       }
       pre.numberSource.sourceCode > code > span {
         counter-increment: source-line;
-      }
-      pre.numberSource.sourceCode > code > span > a {
-        box-shadow: none;
       }
       code.sourceCode > a.sourceLine:before {
         display: inline-block;
@@ -239,24 +361,51 @@
         padding-right: 10px;
         margin-right: 10px;
       }
+      [data-copy] {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        padding: 0.15rem 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: #8a92a0;
+        background: #1a1f29;
+        border: 1px solid #2a313d;
+        border-radius: 6px;
+        opacity: 0;
+        cursor: pointer;
+        transition: opacity 0.15s, color 0.15s;
+      }
+      .sourceCode:hover [data-copy],
+      [data-copy]:focus-visible {
+        opacity: 1;
+      }
+      [data-copy]:hover {
+        color: #e4e7ed;
+      }
       @media (max-width: 667px) {
         .sourceCode:not(pre):not(code) {
           border-radius: 0;
+          border-left: 0;
+          border-right: 0;
+          margin-left: -1rem;
+          margin-right: -1rem;
         }
         code.sourceCode > a.sourceLine:before {
           display: none;
         }
       }
       :not(pre) > code {
-        border-radius: 0.3em;
-        background-color: var(--inlineCodeBgColor);
-        color: var(--inlineCodeColor);
-        padding: 0.15em 0.2em 0.05em;
+        border-radius: 4px;
+        background-color: var(--inline-code-bg);
+        color: var(--fg);
+        padding: 0.1em 0.35em;
         white-space: normal;
       }
-      /* Syntax token colors (Pandoc/Highlight) */
+      /* Syntax token colors (Pandoc) */
       .co {
         color: rgb(128, 147, 147);
+        font-style: italic;
       }
       .ch,
       .st,
@@ -286,62 +435,13 @@
         color: #c693ea;
       }
 
-      /* Typography & content spacing */
-      article p {
-        margin: 0;
-        line-height: 1.75;
-      }
-      article p + p {
-        margin-top: 1.75em;
-      }
-      h2 {
-        margin-bottom: 0.5em;
-        margin-block-start: 0.83em;
-        margin-block-end: 0.83em;
-        font-size: 1.643rem;
-        font-weight: 400;
-        line-height: 1.2;
-      }
-      hr {
-        height: 0;
-        border: none;
-        border-top: 5px solid var(--separatorColor);
-        margin: 1.75em 0;
-      }
-      blockquote {
-        margin-left: 1.5em;
-        margin-top: 1em;
-        margin-bottom: 1em;
-        padding-left: 1em;
-        border-left: 4px solid var(--blockquoteBorderColor);
-      }
-      blockquote em {
-        font-size: 1.286rem;
-      }
-      /* Lists */
-      article ul {
-        margin: 1em 0;
-        padding-left: 1.5em;
-        list-style: disc outside;
-      }
-      article ol {
-        margin: 1em 0;
-        padding-left: 1.5em;
-        list-style: decimal outside;
-      }
-      article li {
-        margin: 0.25em 0;
-      }
-      article li > ul,
-      article li > ol {
-        margin: 0.5em 0;
-      }
       /* Media helpers */
       iframe {
         width: 100%;
       }
       .iframe--example {
-        border: 2px solid var(--iframeBorderColor);
+        border: 1px solid var(--border);
+        border-radius: 10px;
       }
       .pdf {
         margin: 1rem -6rem;
@@ -365,19 +465,15 @@
           display: inline;
         }
       }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+          animation: none !important;
+        }
+      }
     </style>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
-      rel="stylesheet"
-    />
   </head>
-  <body
-    class="dark min-h-dvh flex flex-col bg-[var(--bgColor)] text-[var(--textColor)] leading-[1.643] antialiased"
-  >
+  <body class="dark min-h-dvh flex flex-col leading-[1.65]">
     <script>
       ;(() => {
         window.site = {
@@ -407,25 +503,31 @@
       })()
     </script>
 
-    <button
-      aria-label="Switch to light mode"
-      aria-checked="true"
-      data-theme-switch
-      role="switch"
-      type="button"
-      class="appearance-none flex items-center justify-center bg-[var(--btnBgColor)] border border-[var(--btnBgColor)] text-[var(--btnTextColor)] rounded-[20px] px-2 py-[0.1em] outline-offset-[0.1em] absolute right-4 top-4"
-    >
-      <span aria-hidden="true" data-theme-switch-icon="dark">🌙</span>
-      <span aria-hidden="true" data-theme-switch-icon="light">🌞</span>
-    </button>
-
     $body$
 
     <script async>
       ;(() => {
         window.site.refreshThemeSwitch()
-        document.querySelector('[data-theme-switch]').addEventListener('click', (e) => {
+        document.querySelector('[data-theme-switch]')?.addEventListener('click', () => {
           window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light')
+        })
+
+        // "copy" button on every code block
+        document.querySelectorAll('div.sourceCode').forEach((block) => {
+          const button = document.createElement('button')
+          button.type = 'button'
+          button.textContent = 'copy'
+          button.setAttribute('data-copy', '')
+          button.addEventListener('click', async () => {
+            try {
+              await navigator.clipboard.writeText(block.querySelector('pre').innerText)
+              button.textContent = 'copied'
+            } catch {
+              button.textContent = 'error'
+            }
+            setTimeout(() => (button.textContent = 'copy'), 1500)
+          })
+          block.appendChild(button)
         })
       })()
     </script>

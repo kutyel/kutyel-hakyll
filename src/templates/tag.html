@@ -1,18 +1,27 @@
 $partial("templates/nav.html")$
 
 <main class="flex-1" id="content" tabindex="-1">
-  <section class="mt-5">
-    <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0">
-      <h2 class="mt-8 text-[1.643rem] font-normal leading-[1.2] before:block before:h-0 before:pb-5 before:border-t-[5px] before:border-[var(--separatorColor)]">$title$</h2>
-      <ul class="m-0 p-0 list-none">
-        $for(posts)$
-        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
-          <div><a href="$url$">$title$</a></div>
-          <small>$date$</small>
-        </li>
-        $endfor$
-      </ul>
-    </div>
+  <section class="mx-auto max-w-[720px] px-4 sm:px-6 pt-12 sm:pt-16">
+    <a
+      href="/#posts"
+      class="font-mono text-xs text-[var(--faint)] hover:text-[var(--accent)] transition-colors"
+      >← cd ~/posts</a
+    >
+    <h1 class="mt-5 mb-10 text-[2rem] font-semibold tracking-[-0.025em] leading-tight">$title$</h1>
+    <ul class="m-0 p-0 list-none" role="list">
+      $for(posts)$
+      <li>
+        <a
+          href="$url$"
+          class="group grid grid-cols-[5.5rem_1fr] sm:grid-cols-[6.5rem_1fr_auto] gap-x-4 items-baseline -mx-3 px-3 py-2.5 rounded-lg hover:bg-[var(--surface)] transition-colors"
+        >
+          <time datetime="$isodate$" class="font-mono text-xs text-[var(--faint)] tabular-nums">$isodate$</time>
+          <span class="text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors">$title$</span>
+          <span class="hidden sm:inline font-mono text-xs text-[var(--faint)]">$readingtime$</span>
+        </a>
+      </li>
+      $endfor$
+    </ul>
   </section>
 </main>
 

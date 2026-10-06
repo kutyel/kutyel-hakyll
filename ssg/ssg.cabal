@@ -16,6 +16,7 @@ executable hakyll-site
     , slugger
     , tagsoup
     , text
+    , time
 
   ghc-options:      -Wall -threaded
   default-language: Haskell2010

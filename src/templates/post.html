@@ -1,43 +1,79 @@
 $partial("templates/nav.html")$
 
+<div
+  data-progress
+  aria-hidden="true"
+  class="fixed top-0 left-0 z-50 h-[2px] w-full origin-left scale-x-0 bg-[var(--accent)]"
+></div>
+
 <style>
   bsky-comments {
-    --background-color: var(--bgColor);
-    --text-color: var(--textColor);
-    --link-color: var(--textLinkColor);
-    --link-hover-color: var(--textLinkHoverColor);
-    --comment-meta-color: #888;
+    --background-color: var(--bg);
+    --text-color: var(--fg);
+    --link-color: var(--accent);
+    --link-hover-color: var(--fg);
+    --comment-meta-color: var(--muted);
     --error-color: #ff4d4d;
-    --reply-border-color: var(--separatorColor);
-    --button-background-color: var(--btnBgColor);
-    --button-hover-background-color: rgba(var(--btnBgColor), 0.2);
+    --reply-border-color: var(--border);
+    --button-background-color: var(--surface);
+    --button-hover-background-color: var(--accent-soft);
     --author-avatar-border-radius: 50%;
   }
 </style>
 
 <main class="flex-1" id="content" tabindex="-1">
-  <article class="pb-10">
-    <header class="bg-[var(--headerBgColor)] mb-8 px-[1.3125rem] md:px-0 py-4 md:py-8">
-      <div class="mx-auto md:w-[600px]">
-        <h1 class="text-[1.7rem] md:text-[3rem] m-0 mb-4 font-normal leading-[1.2] text-[var(--h1Color)]">
-          $title$
-        </h1>
-        <div class="mx-auto md:w-[600px]">
-          <small class="italic">$date$</small>
-          <small class="italic"> | $readingtime$</small>
-          $if(updated)$
-          <small class="italic"> (updated: $updated$)</small>
-          $endif$
-          <div class="mt-2">[ $tags$ ]</div>
-        </div>
+  <article class="mx-auto max-w-[720px] px-4 sm:px-6">
+    <header class="pt-12 sm:pt-16 pb-8 mb-10 border-b border-[var(--border)]">
+      <a
+        href="/#posts"
+        class="font-mono text-xs text-[var(--faint)] hover:text-[var(--accent)] transition-colors"
+        >← cd ~/posts</a
+      >
+      <h1
+        class="mt-5 mb-5 text-[2rem] sm:text-[2.6rem] font-semibold leading-[1.12] tracking-[-0.025em] text-balance"
+      >
+        $title$
+      </h1>
+      <div
+        class="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-[var(--muted)] mb-4"
+      >
+        <time datetime="$isodate$">$isodate$</time>
+        <span class="text-[var(--faint)]">·</span>
+        <span>$readingtime$</span>
+        $if(updated)$
+        <span class="text-[var(--faint)]">·</span>
+        <span>updated $updated$</span>
+        $endif$ $if(langbadge)$
+        <span class="text-[var(--faint)]">·</span>
+        <span class="px-1.5 rounded border border-[var(--border)] text-[10px]">$langbadge$</span>
+        $endif$
       </div>
+      <div class="tag-list">$tags$</div>
     </header>
-    <section class="mx-auto md:w-[600px] px-[1.3125rem] md:px-0">$body$</section>
+    <section class="prose">$body$</section>
   </article>
+
+  $if(postId)$
+  <div class="mx-auto max-w-[720px] px-4 sm:px-6 mt-16">
+    <h2 class="font-mono text-xs uppercase tracking-[0.15em] text-[var(--faint)] mb-4">
+      // comments via bluesky
+    </h2>
+    <bsky-comments post="$postId$"></bsky-comments>
+  </div>
+  $endif$
 </main>
 
-$if(postId)$
-<bsky-comments post="$postId$"></bsky-comments>
-$endif$ $partial("templates/footer.html")$
+$partial("templates/footer.html")$
 
+<script>
+  ;(() => {
+    const bar = document.querySelector('[data-progress]')
+    const update = () => {
+      const max = document.documentElement.scrollHeight - innerHeight
+      bar.style.transform = 'scaleX(' + (max > 0 ? scrollY / max : 0) + ')'
+    }
+    addEventListener('scroll', update, { passive: true })
+    update()
+  })()
+</script>
 <script src="https://gistcdn.githack.com/kutyel/41d12e099484fd390fb67168271fcdd9/raw/9be26e500525a2e4edacc53d3a8006aaddec0e15/bsky-comments.js"></script>

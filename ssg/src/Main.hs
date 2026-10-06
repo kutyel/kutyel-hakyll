@@ -1,10 +1,13 @@
 {-# LANGUAGE ImportQualifiedPost #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-import Data.List (isPrefixOf, isSuffixOf)
+import Data.Char (toUpper)
+import Data.Function (on)
+import Data.List (groupBy, isPrefixOf, isSuffixOf)
 import Data.Maybe (fromMaybe)
 import Data.Text qualified as T
 import Data.Text.Slugger qualified as Slugger
+import Data.Time.Format qualified as Time
 import Hakyll
 import System.FilePath (takeFileName)
 import Text.HTML.TagSoup (Tag (..))
@@ -144,6 +147,8 @@ main = hakyllWith config $ do
 
       let indexCtx =
             listField "posts" postCtx (pure posts)
+              <> postsByYearField "years" posts
+              <> constField "postCount" (show (length posts))
               <> constField "root" mySiteRoot
               <> constField "siteName" mySiteName
               <> defaultContext
@@ -202,11 +207,43 @@ postCtx =
   constField "root" mySiteRoot
     <> constField "siteName" mySiteName
     <> dateField "date" "%d/%m/%Y"
+    <> dateField "isodate" "%Y-%m-%d"
+    <> dateField "monthday" "%b %d"
     <> readingTimeField "readingtime"
+    <> langBadgeField "langbadge"
     <> defaultContext
 
 postCtxWithTags :: Tags -> Context String
 postCtxWithTags tags = tagsField "tags" tags `mappend` postCtx
+
+-- | Groups posts (already sorted, most recent first) by year, so the index
+-- can render one section per year.
+postsByYearField :: String -> [Item String] -> Context a
+postsByYearField key posts =
+  listField key yearCtx (byYear <$> traverse withYear posts)
+  where
+    withYear p = do
+      utc <- getItemUTC Time.defaultTimeLocale (itemIdentifier p)
+      pure (Time.formatTime Time.defaultTimeLocale "%Y" utc, p)
+
+    byYear tagged =
+      [ Item (fromFilePath y) (y, map snd g)
+        | g@((y, _) : _) <- groupBy ((==) `on` fst) tagged
+      ]
+
+    yearCtx =
+      field "year" (pure . fst . itemBody)
+        <> field "count" (pure . show . length . snd . itemBody)
+        <> listFieldWith "posts" postCtx (pure . snd . itemBody)
+
+-- | Uppercased "lang" metadata, only for posts not written in English.
+langBadgeField :: String -> Context a
+langBadgeField key =
+  field key $ \item -> do
+    lang <- getMetadataField (itemIdentifier item) "lang"
+    case lang of
+      Just l | l /= "en" -> pure (map toUpper l)
+      _ -> noResult "English post"
 
 titleCtx :: Context String
 titleCtx =

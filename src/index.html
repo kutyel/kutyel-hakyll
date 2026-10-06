@@ -4,120 +4,299 @@ desc: Functional programming, Haskell & Elm, Chess & stuff
 lang: en
 ---
 
-<main class="flex-1">
-  <header class="relative my-10 md:m-13">
-    <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0">
-      <img
-        alt="me playing chess!"
-        class="absolute right-4 md:right-0 top-4 md:top-0 rounded-[10%] md:m-0 w-[100px] md:w-[150px]"
-        decoding="async"
-        loading="lazy"
-        src="./images/avatar.jpg"
-      />
-      <h1 class="m-0 font-normal leading-[1.2] text-2xl md:text-5xl">Flavio Corpa</h1>
-      <h3 class="m-0 font-normal leading-[1.2] text-base text-[var(--authorTitleColor)]">
-        Senior Software Engineer
-      </h3>
-      <div class="flex mt-5 max-w-[450px] gap-[10px] items-center">
-        <a href="https://bsky.app/profile/flaviocorpa.com">
-          <i class="fa-brands fa-bluesky"></i>
-        </a>
-        <a href="https://twitter.com/FlavioCorpa">
-          <i class="fa-brands fa-twitter"></i>
-        </a>
-        <a href="https://github.com/kutyel">
-          <i class="fa-brands fa-github"></i>
-        </a>
-        <a href="https://www.youtube.com/c/FlavioCorpaR%C3%ADos">
-          <i class="fa-brands fa-youtube"></i>
-        </a>
-        <a href="https://www.linkedin.com/in/flaviocorpa">
-          <i class="fa-brands fa-linkedin"></i>
-        </a>
-        <a href="https://dl.acm.org/profile/99659565902">
-          <strong>ACM</strong>
-        </a>
+$partial("templates/nav.html")$
+
+<canvas
+  data-particles
+  aria-hidden="true"
+  class="pointer-events-none fixed inset-0 -z-10 w-full h-full"
+></canvas>
+
+<main id="content" tabindex="-1" class="flex-1">
+  <header class="relative">
+    <div class="relative mx-auto max-w-[720px] px-4 sm:px-6 pt-14 sm:pt-20 pb-14">
+      <div class="flex items-start justify-between gap-6">
+        <div class="min-w-0">
+          <p class="m-0 mb-4 font-mono text-xs text-[var(--faint)]">
+            <span class="text-[var(--accent)]">λ</span> whoami
+          </p>
+          <h1 class="m-0 text-[2.4rem] sm:text-[3.25rem] font-semibold leading-none tracking-[-0.035em]">
+            Flavio Corpa
+          </h1>
+          <p class="mt-4 mb-0 max-w-[30rem] text-[1.05rem] sm:text-lg text-[var(--muted)] leading-relaxed">
+            Senior Software Engineer. I write about
+            <span class="text-[var(--fg)]">functional programming</span>,
+            <span class="text-[var(--fg)]">Haskell &amp; Elm</span>, chess, and learning
+            <span class="text-[var(--fg)]" lang="ja">日本語</span>.
+          </p>
+        </div>
+        <figure class="shrink-0 m-0">
+          <img
+            alt="Portrait of Flavio Corpa, thinking during a chess game"
+            class="m-0 w-24 h-[7.5rem] sm:w-40 sm:h-50 object-cover object-top rounded-xl ring-1 ring-[var(--border)] shadow-[0_12px_32px_-12px_rgba(0,0,0,0.45)]"
+            decoding="async"
+            fetchpriority="high"
+            width="640"
+            height="800"
+            src="./images/fla-portrait.jpg"
+          />
+          <figcaption class="mt-2 font-mono text-[10px] text-[var(--faint)] text-right">
+            photo: Ismael Nieto
+          </figcaption>
+        </figure>
       </div>
+
+      <ul class="flex flex-wrap md:flex-nowrap gap-2 sm:gap-1.5 mt-8 mb-0 p-0 list-none font-mono text-xs" role="list">
+        <li>
+          <a class="inline-flex items-center gap-2 sm:gap-1.5 px-3 sm:px-2.5 py-1.5 rounded-md border border-[var(--border)] bg-[var(--bg)] text-[var(--muted)] hover:text-[var(--fg)] hover:border-[var(--faint)] transition-colors" href="https://github.com/kutyel"
+            ><i class="fa-brands fa-github" aria-hidden="true"></i>github</a
+          >
+        </li>
+        <li>
+          <a class="inline-flex items-center gap-2 sm:gap-1.5 px-3 sm:px-2.5 py-1.5 rounded-md border border-[var(--border)] bg-[var(--bg)] text-[var(--muted)] hover:text-[var(--fg)] hover:border-[var(--faint)] transition-colors" href="https://bsky.app/profile/flaviocorpa.com"
+            ><i class="fa-brands fa-bluesky" aria-hidden="true"></i>bluesky</a
+          >
+        </li>
+        <li>
+          <a class="inline-flex items-center gap-2 sm:gap-1.5 px-3 sm:px-2.5 py-1.5 rounded-md border border-[var(--border)] bg-[var(--bg)] text-[var(--muted)] hover:text-[var(--fg)] hover:border-[var(--faint)] transition-colors" href="https://www.youtube.com/c/FlavioCorpaR%C3%ADos"
+            ><i class="fa-brands fa-youtube" aria-hidden="true"></i>youtube</a
+          >
+        </li>
+        <li>
+          <a class="inline-flex items-center gap-2 sm:gap-1.5 px-3 sm:px-2.5 py-1.5 rounded-md border border-[var(--border)] bg-[var(--bg)] text-[var(--muted)] hover:text-[var(--fg)] hover:border-[var(--faint)] transition-colors" href="https://www.tiktok.com/@konekokanji"
+            ><i class="fa-brands fa-tiktok" aria-hidden="true"></i>tiktok</a
+          >
+        </li>
+        <li>
+          <a class="inline-flex items-center gap-2 sm:gap-1.5 px-3 sm:px-2.5 py-1.5 rounded-md border border-[var(--border)] bg-[var(--bg)] text-[var(--muted)] hover:text-[var(--fg)] hover:border-[var(--faint)] transition-colors" href="https://www.linkedin.com/in/flaviocorpa"
+            ><i class="fa-brands fa-linkedin" aria-hidden="true"></i>linkedin</a
+          >
+        </li>
+        <li>
+          <a class="inline-flex items-center gap-2 sm:gap-1.5 px-3 sm:px-2.5 py-1.5 rounded-md border border-[var(--border)] bg-[var(--bg)] text-[var(--muted)] hover:text-[var(--fg)] hover:border-[var(--faint)] transition-colors" href="https://twitter.com/FlavioCorpa"
+            ><i class="fa-brands fa-x-twitter" aria-hidden="true"></i>twitter</a
+          >
+        </li>
+        <li>
+          <a class="inline-flex items-center gap-2 sm:gap-1.5 px-3 sm:px-2.5 py-1.5 rounded-md border border-[var(--border)] bg-[var(--bg)] text-[var(--muted)] hover:text-[var(--fg)] hover:border-[var(--faint)] transition-colors" href="https://dl.acm.org/profile/99659565902"
+            ><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>acm</a
+          >
+        </li>
+      </ul>
     </div>
   </header>
 
-  <section class="mt-5">
-    <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0">
-      <h2
-        class="mt-8 text-[1.643rem] font-normal leading-[1.2] before:block before:h-0 before:pb-5 before:border-t-[5px] before:border-[var(--separatorColor)]"
-      >
-        Blog Posts
+  <script>
+    // Tiny starfield behind the home page: drifting, twinkling particles that
+    // link up when close and gently move away from the pointer.
+    ;(() => {
+      const canvas = document.querySelector('[data-particles]')
+      if (!canvas || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+      const ctx = canvas.getContext('2d')
+      const LINK = 110
+      const REPEL = 120
+      let w = 0
+      let h = 0
+      let particles = []
+      let pointer = null
+      let fg = '#fff'
+      let accent = '#c693ea'
+
+      const readColors = () => {
+        const style = getComputedStyle(document.body)
+        fg = style.getPropertyValue('--fg').trim() || fg
+        accent = style.getPropertyValue('--accent').trim() || accent
+      }
+
+      const resize = () => {
+        const dpr = Math.min(devicePixelRatio || 1, 2)
+        const widthChanged = innerWidth !== w
+        w = innerWidth
+        h = innerHeight
+        canvas.width = w * dpr
+        canvas.height = h * dpr
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+        // Mobile browsers fire resize when the address bar hides; only
+        // reseed when the width really changed.
+        if (!widthChanged) return
+        const count = Math.round(Math.min(120, (w * h) / 8000))
+        particles = Array.from({ length: count }, () => ({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.22,
+          vy: (Math.random() - 0.5) * 0.22,
+          r: Math.random() * 1.3 + 0.35,
+          phase: Math.random() * Math.PI * 2,
+          accent: Math.random() < 0.15,
+        }))
+      }
+
+      const frame = (t) => {
+        ctx.clearRect(0, 0, w, h)
+
+        for (const p of particles) {
+          if (pointer) {
+            const dx = p.x - pointer.x
+            const dy = p.y - pointer.y
+            const d = Math.hypot(dx, dy)
+            if (d < REPEL && d > 0) {
+              p.x += (dx / d) * (1 - d / REPEL) * 1.2
+              p.y += (dy / d) * (1 - d / REPEL) * 1.2
+            }
+          }
+          p.x = (p.x + p.vx + w) % w
+          p.y = (p.y + p.vy + h) % h
+
+          ctx.globalAlpha = 0.35 + 0.3 * Math.sin(t / 900 + p.phase)
+          ctx.fillStyle = p.accent ? accent : fg
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, p.accent ? p.r + 0.4 : p.r, 0, Math.PI * 2)
+          ctx.fill()
+        }
+
+        ctx.strokeStyle = fg
+        ctx.lineWidth = 0.6
+        for (let i = 0; i < particles.length; i++) {
+          const a = particles[i]
+          for (let j = i + 1; j < particles.length; j++) {
+            const b = particles[j]
+            const d = Math.hypot(a.x - b.x, a.y - b.y)
+            if (d < LINK) {
+              ctx.globalAlpha = (1 - d / LINK) * 0.16
+              ctx.beginPath()
+              ctx.moveTo(a.x, a.y)
+              ctx.lineTo(b.x, b.y)
+              ctx.stroke()
+            }
+          }
+        }
+
+        requestAnimationFrame(frame)
+      }
+
+      addEventListener('pointermove', (e) => (pointer = { x: e.clientX, y: e.clientY }))
+      document.addEventListener('pointerleave', () => (pointer = null))
+      addEventListener('resize', resize)
+      new MutationObserver(readColors).observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class'],
+      })
+      readColors()
+      resize()
+      requestAnimationFrame(frame)
+    })()
+  </script>
+
+  <section id="posts" class="mx-auto max-w-[720px] px-4 sm:px-6 scroll-mt-20">
+    <div class="flex items-baseline justify-between pb-3 mb-6 border-b border-[var(--border)]">
+      <h2 class="m-0 font-mono text-xs font-normal uppercase tracking-[0.15em] text-[var(--faint)]">
+        // posts
       </h2>
-      <ul class="m-0 p-0 list-none">
+      <span class="font-mono text-xs text-[var(--faint)]">$postCount$ entries</span>
+    </div>
+
+    $for(years)$
+    <div class="grid sm:grid-cols-[4.5rem_1fr] gap-x-4 mb-8">
+      <h3 class="m-0 mb-1 sm:pt-2.5 font-mono text-sm font-normal text-[var(--faint)] sm:sticky sm:top-20 self-start">
+        $year$
+      </h3>
+      <ul class="m-0 p-0 list-none" role="list">
         $for(posts)$
-        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
-          <div><a href="$url$">$title$</a></div>
-          <small>$date$</small>
+        <li>
+          <a
+            href="$url$"
+            class="group grid grid-cols-[1fr_auto] gap-x-4 items-baseline -mx-3 px-3 py-2.5 rounded-lg hover:bg-[var(--surface)] transition-colors"
+          >
+            <span class="text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors">
+              $title$ $if(langbadge)$<span
+                class="ml-1 align-middle px-1 rounded border border-[var(--border)] font-mono text-[10px] text-[var(--muted)]"
+                >$langbadge$</span
+              >$endif$
+            </span>
+            <span class="font-mono text-xs text-[var(--faint)] whitespace-nowrap tabular-nums">
+              <span class="hidden sm:inline">$readingtime$ ·</span>
+              <time datetime="$isodate$">$monthday$</time>
+            </span>
+          </a>
         </li>
         $endfor$
       </ul>
     </div>
+    $endfor$
   </section>
 
-  <section class="mt-5">
-    <div class="relative mx-auto md:w-[600px] w-auto px-[1.3125rem] md:px-0">
-      <h2
-        class="mt-8 text-[1.643rem] font-normal leading-[1.2] before:block before:h-0 before:pb-5 before:border-t-[5px] before:border-[var(--separatorColor)]"
-      >
-        Talks
+  <section id="talks" class="mx-auto max-w-[720px] px-4 sm:px-6 mt-16 scroll-mt-20">
+    <div class="flex items-baseline justify-between pb-3 mb-6 border-b border-[var(--border)]">
+      <h2 class="m-0 font-mono text-xs font-normal uppercase tracking-[0.15em] text-[var(--faint)]">
+        // talks
       </h2>
-      <ul class="m-0 p-0 list-none">
-        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
-          <div>
-            <a href="https://youtu.be/GDITBmIzCDs?si=icOImK_jm9EOeVVc"
-              >Describing microservices using modern Haskell (Haskell Symposium 2020)</a
-            >
-          </div>
-          <small>12/09/2020</small>
-        </li>
-        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
-          <div>
-            <a href="https://youtu.be/5IcG_BCGxEY?si=7nvOFZs10ESE50Zs"
-              >What happens if you let the creator of React design a programming language (LambdAle
-              2019)</a
-            >
-          </div>
-          <small>11/10/2019</small>
-        </li>
-        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
-          <div>
-            <a href="https://youtu.be/IoVaArsh6tM?si=RfDmTovdbR9M9Krh"
-              >Functional lenses in JavaScript (Lambda World 2018)</a
-            >
-          </div>
-          <small>03/12/2018</small>
-        </li>
-        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
-          <div>
-            <a href="https://youtu.be/VMH5fEg1NXQ?si=waAeaiVzzpTijAjb"
-              >Lambdas, lambdas everywhere (React Alicante 2018)</a
-            >
-          </div>
-          <small>19/09/2018</small>
-        </li>
-        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
-          <div>
-            <a href="https://youtu.be/47E4iXOxCbg?si=LU0UfDEphDZmJiK_"
-              >Case study: Lucentum, creating your own React component library (React Alicante
-              2017)</a
-            >
-          </div>
-          <small>09/11/2017</small>
-        </li>
-        <li class="mb-5 border-s-[3px] px-5 py-1 border-[var(--separatorColor)]">
-          <div>
-            <a href="https://youtu.be/zTvPzu0RWzQ?si=38W9UlEQMfI5ffsi&t=2"
-              >Programación funcional en JavaScript (Codemotion 2016)</a
-            >
-          </div>
-          <small>18/11/2016</small>
-        </li>
-      </ul>
+      <span class="font-mono text-xs text-[var(--faint)]">6 entries</span>
     </div>
+
+    <ul class="m-0 p-0 list-none" role="list">
+      <li>
+        <a href="https://youtu.be/GDITBmIzCDs?si=icOImK_jm9EOeVVc" class="group grid sm:grid-cols-[4.5rem_1fr_auto] gap-x-4 items-baseline -mx-3 px-3 py-2.5 rounded-lg hover:bg-[var(--surface)] transition-colors">
+          <time datetime="2020-09-12" class="font-mono text-sm text-[var(--faint)]">2020</time>
+          <span>
+            <span class="block text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors">Describing microservices using modern Haskell</span>
+            <span class="block font-mono text-xs text-[var(--muted)]">Haskell Symposium</span>
+          </span>
+          <i class="hidden sm:inline fa-brands fa-youtube text-[var(--faint)] group-hover:text-[var(--accent)] transition-colors" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://youtu.be/5IcG_BCGxEY?si=7nvOFZs10ESE50Zs" class="group grid sm:grid-cols-[4.5rem_1fr_auto] gap-x-4 items-baseline -mx-3 px-3 py-2.5 rounded-lg hover:bg-[var(--surface)] transition-colors">
+          <time datetime="2019-10-11" class="font-mono text-sm text-[var(--faint)]">2019</time>
+          <span>
+            <span class="block text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors">What happens if you let the creator of React design a programming language</span>
+            <span class="block font-mono text-xs text-[var(--muted)]">LambdAle</span>
+          </span>
+          <i class="hidden sm:inline fa-brands fa-youtube text-[var(--faint)] group-hover:text-[var(--accent)] transition-colors" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://youtu.be/IoVaArsh6tM?si=RfDmTovdbR9M9Krh" class="group grid sm:grid-cols-[4.5rem_1fr_auto] gap-x-4 items-baseline -mx-3 px-3 py-2.5 rounded-lg hover:bg-[var(--surface)] transition-colors">
+          <time datetime="2018-12-03" class="font-mono text-sm text-[var(--faint)]">2018</time>
+          <span>
+            <span class="block text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors">Functional lenses in JavaScript</span>
+            <span class="block font-mono text-xs text-[var(--muted)]">Lambda World</span>
+          </span>
+          <i class="hidden sm:inline fa-brands fa-youtube text-[var(--faint)] group-hover:text-[var(--accent)] transition-colors" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://youtu.be/VMH5fEg1NXQ?si=waAeaiVzzpTijAjb" class="group grid sm:grid-cols-[4.5rem_1fr_auto] gap-x-4 items-baseline -mx-3 px-3 py-2.5 rounded-lg hover:bg-[var(--surface)] transition-colors">
+          <time datetime="2018-09-19" class="font-mono text-sm text-[var(--faint)]">2018</time>
+          <span>
+            <span class="block text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors">Lambdas, lambdas everywhere</span>
+            <span class="block font-mono text-xs text-[var(--muted)]">React Alicante</span>
+          </span>
+          <i class="hidden sm:inline fa-brands fa-youtube text-[var(--faint)] group-hover:text-[var(--accent)] transition-colors" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://youtu.be/47E4iXOxCbg?si=LU0UfDEphDZmJiK_" class="group grid sm:grid-cols-[4.5rem_1fr_auto] gap-x-4 items-baseline -mx-3 px-3 py-2.5 rounded-lg hover:bg-[var(--surface)] transition-colors">
+          <time datetime="2017-11-09" class="font-mono text-sm text-[var(--faint)]">2017</time>
+          <span>
+            <span class="block text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors">Case study: Lucentum, creating your own React component library</span>
+            <span class="block font-mono text-xs text-[var(--muted)]">React Alicante</span>
+          </span>
+          <i class="hidden sm:inline fa-brands fa-youtube text-[var(--faint)] group-hover:text-[var(--accent)] transition-colors" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li>
+        <a href="https://youtu.be/zTvPzu0RWzQ?si=38W9UlEQMfI5ffsi&t=2" class="group grid sm:grid-cols-[4.5rem_1fr_auto] gap-x-4 items-baseline -mx-3 px-3 py-2.5 rounded-lg hover:bg-[var(--surface)] transition-colors">
+          <time datetime="2016-11-18" class="font-mono text-sm text-[var(--faint)]">2016</time>
+          <span>
+            <span class="block text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors" lang="es">Programación funcional en JavaScript</span>
+            <span class="block font-mono text-xs text-[var(--muted)]">Codemotion</span>
+          </span>
+          <i class="hidden sm:inline fa-brands fa-youtube text-[var(--faint)] group-hover:text-[var(--accent)] transition-colors" aria-hidden="true"></i>
+        </a>
+      </li>
+    </ul>
   </section>
 </main>
+
+$partial("templates/footer.html")$
