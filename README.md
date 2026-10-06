@@ -100,9 +100,8 @@ editor. Two ways to wire that up:
   `shell.nix` (which re-exports the flake's dev shell). No extra system tooling
   required — this is what the bundled `.vscode/` recommends.
 * **Any editor / terminal — direnv (editor-agnostic).** Install
-  [`direnv`](https://direnv.net) and
-  [`nix-direnv`](https://github.com/nix-community/nix-direnv), then run `direnv
-  allow` in this directory. The bundled `.envrc` (`use flake`) loads the dev
+  [`direnv`](https://direnv.net), then run `direnv allow` in this directory.
+  The bundled `.envrc` (`use flake`) loads the dev
   shell in your terminal and any editor with direnv integration (Emacs `envrc`,
   vim, etc.).
 
