@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <title>Haskell for Elm developers: giving names to stuff (Part 1 - Functors)</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!" />
+    
+    
+    <meta name="author" content="Flavio Corpa" />
+     
+    <meta name="keywords" content="haskell,elm,functional,programming" />
+    
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU" />
+    <meta
+      http-equiv="origin-trial"
+      content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ=="
+    />
+
+    <meta property="og:site_name" content="flaviocorpa.com" />
+    <meta property="og:title" content="Haskell for Elm developers: giving names to stuff (Part 1 - Functors)" />
+    <meta property="og:url" content="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-1-functors.html" />
+    <meta property="og:description" content="A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!" />
+    
+    <meta property="og:image" content="https://flaviocorpa.com./images/haskell-elm.png" />
+     
+    <meta property="og:type" content="article" />
+     
+    <meta name="twitter:image" content="https://flaviocorpa.com./images/haskell-elm.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <meta name="twitter:url" content="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-1-functors.html" />
+    <meta name="twitter:site" content="flaviocorpa.com" />
+    <meta name="twitter:title" content="Haskell for Elm developers: giving names to stuff (Part 1 - Functors)" />
+    <meta name="twitter:description" content="A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!" />
+    
+    <meta name="twitter:creator" content="@FlavioCorpa" />
+    
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>"
+    />
+    <link rel="canonical" href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-1-functors.html" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @custom-variant dark (&:where(.dark, .dark *));
+
+      @theme {
+        --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+        --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+      }
+
+      /* ---------------------------------------------------------------
+         Design tokens. The old variable names at the bottom of each block
+         are kept because <bsky-comments> and older posts read them.
+         --------------------------------------------------------------- */
+      body.light {
+        --bg: #fafaf8;
+        --surface: #f1f1ed;
+        --fg: #1b1e23;
+        --muted: #4f5562;
+        --faint: #6b7079;
+        --border: #dadad3;
+        --accent: #7c3aed;
+        --accent-soft: rgba(124, 58, 237, 0.08);
+        --code-bg: #0f131a;
+        --inline-code-bg: rgba(124, 58, 237, 0.08);
+        --selection: rgba(124, 58, 237, 0.18);
+      }
+      body.dark {
+        --bg: #0c0f14;
+        --surface: #141820;
+        --fg: #e4e7ed;
+        --muted: #a9b1be;
+        --faint: #808897;
+        --border: #20262f;
+        --accent: #c693ea;
+        --accent-soft: rgba(198, 147, 234, 0.09);
+        --code-bg: #0f131a;
+        --inline-code-bg: rgba(198, 147, 234, 0.1);
+        --selection: rgba(198, 147, 234, 0.25);
+      }
+      body.light,
+      body.dark {
+        --bgColor: var(--bg);
+        --textColor: var(--fg);
+        --textLinkColor: var(--accent);
+        --textLinkHoverColor: var(--fg);
+        --separatorColor: var(--border);
+        --btnBgColor: var(--surface);
+        --deepBgColor: var(--code-bg);
+        --authorTitleColor: var(--muted);
+      }
+
+      /* ---------------------------------------------------------------
+         Base
+         --------------------------------------------------------------- */
+      :root {
+        color-scheme: light dark;
+      }
+      html {
+        box-sizing: border-box;
+        -webkit-text-size-adjust: 100%;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
+      /* Mobile first: full width with a gutter. On larger screens the
+         layout uses a share of the window, not a fixed pixel width. */
+      .page {
+        width: 100%;
+        margin-inline: auto;
+        padding-inline: 1rem;
+      }
+      @media (min-width: 640px) {
+        .page {
+          padding-inline: 1.5rem;
+        }
+      }
+      @media (min-width: 1024px) {
+        html {
+          font-size: 106.25%;
+        }
+        .page {
+          width: 80%;
+          max-width: 72rem;
+          padding-inline: 0;
+        }
+      }
+      @media (min-width: 1536px) {
+        .page {
+          width: 66%;
+        }
+      }
+      /* Long-form reading keeps a comfortable line length. */
+      .page-read {
+        max-width: 46rem;
+      }
+      body {
+        margin: 0;
+        font-family: var(--font-sans);
+        background: var(--bg);
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        transition: background-color 0.2s ease, color 0.2s ease;
+      }
+      ::selection {
+        background: var(--selection);
+      }
+      input,
+      button {
+        font: inherit;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 2px;
+      }
+      img {
+        display: block;
+        height: auto;
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        border: 0;
+      }
+
+      /* Theme switch icon visibility rules */
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='dark'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='light'] {
+        display: block;
+      }
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='light'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='dark'] {
+        display: none;
+      }
+
+      /* Tags rendered by Hakyll come as "a, b, c": drop the commas. */
+      .tag-list {
+        font-size: 0;
+      }
+      .tag-list a {
+        display: inline-block;
+        margin: 0 0.4rem 0.4rem 0;
+        padding: 0.1rem 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        line-height: 1.5;
+        color: var(--muted);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        transition: color 0.15s, border-color 0.15s;
+      }
+      .tag-list a::before {
+        content: '#';
+        color: var(--faint);
+      }
+      .tag-list a:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      /* ---------------------------------------------------------------
+         Long-form content (post bodies)
+         --------------------------------------------------------------- */
+      .prose {
+        font-size: 1.0625rem;
+        line-height: 1.75;
+      }
+      .prose p {
+        margin: 0;
+      }
+      .prose p + p {
+        margin-top: 1.4em;
+      }
+      .prose a[href] {
+        color: var(--accent);
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+        text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+        word-wrap: break-word;
+        transition: text-decoration-color 0.15s;
+      }
+      .prose a[href]:hover {
+        text-decoration-color: var(--accent);
+      }
+      .prose a[href].footnote-ref,
+      .prose a[href].footnote-back {
+        text-decoration: none;
+      }
+      .prose h2,
+      .prose h3,
+      .prose h4 {
+        font-weight: 600;
+        line-height: 1.25;
+        letter-spacing: -0.015em;
+        margin: 2.2em 0 0.7em;
+        scroll-margin-top: 5rem;
+      }
+      .prose h2 {
+        font-size: 1.5rem;
+      }
+      .prose h3 {
+        font-size: 1.2rem;
+      }
+      .prose h2::before,
+      .prose h3::before {
+        font-family: var(--font-mono);
+        font-weight: 400;
+        color: var(--faint);
+        margin-right: 0.5ch;
+      }
+      .prose h2::before {
+        content: '##';
+      }
+      .prose h3::before {
+        content: '###';
+      }
+      .prose hr {
+        height: 0;
+        border: none;
+        border-top: 1px dashed var(--border);
+        margin: 2.5em 0;
+      }
+      .prose blockquote {
+        margin: 1.5em 0;
+        padding: 0.25em 0 0.25em 1.1em;
+        border-left: 2px solid var(--accent);
+        color: var(--muted);
+      }
+      .prose blockquote em {
+        font-size: 1.15em;
+      }
+      .prose ul,
+      .prose ol {
+        margin: 1em 0;
+        padding-left: 1.5em;
+      }
+      .prose ul {
+        list-style: disc outside;
+      }
+      .prose ol {
+        list-style: decimal outside;
+      }
+      .prose li {
+        margin: 0.3em 0;
+      }
+      .prose li::marker {
+        color: var(--faint);
+      }
+      .prose li > ul,
+      .prose li > ol {
+        margin: 0.4em 0;
+      }
+      .prose img {
+        border-radius: 10px;
+        margin-top: 1.75em;
+        margin-bottom: 1.75em;
+      }
+      .prose table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.92em;
+        margin: 1.5em 0;
+      }
+      .prose th,
+      .prose td {
+        text-align: left;
+        padding: 0.45em 0.75em;
+        border-bottom: 1px solid var(--border);
+      }
+      .prose th {
+        font-weight: 600;
+      }
+      .prose .footnotes {
+        margin-top: 3em;
+        font-size: 0.9em;
+        color: var(--muted);
+      }
+
+      /* Code */
+      code,
+      kbd,
+      pre,
+      samp {
+        font-family: var(--font-mono);
+        font-size: 0.88em;
+        font-feature-settings: normal;
+      }
+      pre code {
+        font-size: inherit;
+        line-height: 1.6;
+      }
+      .sourceCode:not(pre):not(code) {
+        position: relative;
+        background-color: var(--code-bg);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        margin: 1.5rem 0;
+        border-radius: 10px;
+      }
+      pre.sourceCode {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 1.1rem 1.25rem;
+        margin: 0;
+        color: #e4e7ed;
+        background: none;
+        font-size: 0.82rem;
+        line-height: 1.6;
+      }
+      pre.numberSource.sourceCode > code {
+        counter-reset: source-line 0;
+      }
+      pre.numberSource.sourceCode > code > span {
+        counter-increment: source-line;
+      }
+      code.sourceCode > a.sourceLine:before {
+        display: inline-block;
+        content: attr(title);
+        text-align: right;
+        border-right: 1px solid rgba(128, 147, 147, 0.4);
+        color: rgb(128, 147, 147);
+        width: 30px;
+        padding-right: 10px;
+        margin-right: 10px;
+      }
+      [data-copy] {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        padding: 0.15rem 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: #8a92a0;
+        background: #1a1f29;
+        border: 1px solid #2a313d;
+        border-radius: 6px;
+        opacity: 0;
+        cursor: pointer;
+        transition: opacity 0.15s, color 0.15s;
+      }
+      .sourceCode:hover [data-copy],
+      [data-copy]:focus-visible {
+        opacity: 1;
+      }
+      [data-copy]:hover {
+        color: #e4e7ed;
+      }
+      @media (max-width: 667px) {
+        .sourceCode:not(pre):not(code) {
+          border-radius: 0;
+          border-left: 0;
+          border-right: 0;
+          margin-left: -1rem;
+          margin-right: -1rem;
+        }
+        code.sourceCode > a.sourceLine:before {
+          display: none;
+        }
+      }
+      :not(pre) > code {
+        border-radius: 4px;
+        background-color: var(--inline-code-bg);
+        color: var(--fg);
+        padding: 0.1em 0.35em;
+        white-space: normal;
+      }
+      /* Syntax token colors (Pandoc) */
+      .co {
+        color: rgb(128, 147, 147);
+        font-style: italic;
+      }
+      .ch,
+      .st,
+      .vs {
+        color: rgb(236, 196, 141);
+      }
+      .va {
+        color: rgb(214, 222, 235);
+      }
+      .dv,
+      .bn,
+      .fl {
+        color: rgb(247, 140, 108);
+      }
+      .bu,
+      .cn,
+      .at,
+      .fu,
+      .dt {
+        color: rgb(130, 170, 255);
+      }
+      .im,
+      .op,
+      .kw,
+      .ot,
+      .cf {
+        color: #c693ea;
+      }
+
+      /* Media helpers */
+      iframe {
+        width: 100%;
+      }
+      .iframe--example {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      .pdf {
+        margin: 1rem -6rem;
+        height: 30rem;
+        width: calc(100% + 12rem);
+      }
+      .pdf-link {
+        display: none;
+      }
+      @media (max-width: 800px) {
+        .pdf {
+          margin: 1rem 0;
+          width: 100%;
+        }
+      }
+      @media (max-width: 667px) {
+        .pdf {
+          display: none;
+        }
+        .pdf-link {
+          display: inline;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="dark min-h-dvh flex flex-col leading-[1.65]">
+    <script>
+      ;(() => {
+        window.site = {
+          theme:
+            localStorage.getItem('theme') ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          setTheme: (name) => {
+            document.body.classList.add(name === 'light' ? 'light' : 'dark')
+            document.body.classList.remove(name === 'light' ? 'dark' : 'light')
+            localStorage.setItem('theme', name)
+            window.site.theme = name
+            window.site.refreshThemeSwitch()
+          },
+          refreshThemeSwitch: () => {
+            const isLight = window.site.theme === 'light'
+            const themeSwitch = document.querySelector('[data-theme-switch]')
+
+            themeSwitch?.setAttribute(
+              'aria-label',
+              isLight ? 'Switch to dark mode' : 'Switch to light mode'
+            )
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true')
+          },
+        }
+
+        window.site.setTheme(window.site.theme)
+      })()
+    </script>
+
+    <a
+  class="absolute left-[-10000px] focus:left-4 focus:top-4 z-50 px-3 py-1 rounded bg-[var(--accent)] text-[var(--bg)] font-mono text-sm"
+  href="#content"
+  >Skip to content</a
+>
+<nav
+  class="sticky top-0 z-40 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--bg)_82%,transparent)] backdrop-blur-md"
+>
+  <div
+    class="page h-14 flex items-center justify-between gap-4 font-mono text-[13px]"
+  >
+    <a href="/" class="group flex items-center gap-2 text-[var(--fg)]">
+      <span class="text-[var(--accent)] text-base leading-none">λ</span>
+      <span>flaviocorpa<span class="text-[var(--faint)] group-hover:text-[var(--accent)] transition-colors">.com</span></span>
+    </a>
+    <div class="flex items-center gap-4 sm:gap-5 text-[var(--muted)]">
+      <a class="hover:text-[var(--fg)] transition-colors" href="/#posts">posts</a>
+      <a class="hidden sm:inline hover:text-[var(--fg)] transition-colors" href="/#talks">talks</a>
+      <a class="hover:text-[var(--fg)] transition-colors" href="/atom.xml">rss</a>
+      <a
+        class="hidden sm:inline hover:text-[var(--fg)] transition-colors"
+        href="https://github.com/sponsors/kutyel"
+        >sponsor</a
+      >
+      <button
+        aria-label="Switch to light mode"
+        aria-checked="true"
+        data-theme-switch
+        role="switch"
+        type="button"
+        class="grid place-items-center w-8 h-8 -mr-1.5 rounded-md text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--surface)] transition-colors cursor-pointer"
+      >
+        <svg data-theme-switch-icon="dark" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg data-theme-switch-icon="light" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+
+<div
+  data-progress
+  aria-hidden="true"
+  class="fixed top-0 left-0 z-50 h-[2px] w-full origin-left scale-x-0 bg-[var(--accent)]"
+></div>
+
+<style>
+  bsky-comments {
+    --background-color: var(--bg);
+    --text-color: var(--fg);
+    --link-color: var(--accent);
+    --link-hover-color: var(--fg);
+    --comment-meta-color: var(--muted);
+    --error-color: #ff4d4d;
+    --reply-border-color: var(--border);
+    --button-background-color: var(--surface);
+    --button-hover-background-color: var(--accent-soft);
+    --author-avatar-border-radius: 50%;
+  }
+</style>
+
+<main class="flex-1" id="content" tabindex="-1">
+  <article class="page page-read">
+    <header class="pt-12 sm:pt-16 pb-8 mb-10 border-b border-[var(--border)]">
+      <a
+        href="/#posts"
+        class="font-mono text-xs text-[var(--faint)] hover:text-[var(--accent)] transition-colors"
+        >← cd ~/posts</a
+      >
+      <h1
+        class="mt-5 mb-5 text-[2rem] sm:text-[2.6rem] font-semibold leading-[1.12] tracking-[-0.025em] text-balance"
+      >
+        Haskell for Elm developers: giving names to stuff (Part 1 - Functors)
+      </h1>
+      <div
+        class="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-[var(--muted)] mb-4"
+      >
+        <time datetime="2023-01-27">2023-01-27</time>
+        <span class="text-[var(--faint)]">·</span>
+        <span>6 min read</span>
+         
+      </div>
+      <div class="tag-list"><a title="All pages tagged &#39;haskell&#39;." href="/tags/haskell.html" rel="tag">haskell</a>, <a title="All pages tagged &#39;elm&#39;." href="/tags/elm.html" rel="tag">elm</a>, <a title="All pages tagged &#39;fp&#39;." href="/tags/fp.html" rel="tag">fp</a></div>
+    </header>
+    <section class="prose"><p><img src="./images/haskell-elm.svg" alt="logo" width="300px"></p>
+<p>This post is targeted towards all those Elm developers (and functional programmers in general) who are curious about Haskell and would like to learn how what they already know and love from Elm maps directly to Haskell.</p>
+<p>Also, since Haskell’s feature set and syntax are wider than Elm’s, of course I’ll need to try and fill the gaps and explain certain things that just do not exist in Elm. 😉</p>
+<p>If this first post gets enough attention, I might consider adding more follow up posts and turn this into a series (hopefully).</p>
+<h2 id="lets-talk-about-functors">Let’s talk about <code>Functor</code>s!</h2>
+<p>If you have ever seen Haskell code before, you can really tell it has greatly influenced Elm syntax, one of the biggest differences is that in Haskell type declarations are preceded by <code>::</code>, whereas in Elm only by <code>:</code>.</p>
+<p>Another big difference is that in Haskell there is a concept called <strong>typeclasses</strong>, which we can explain more or less saying that they group a class of types and help us define interfaces that a certain data type need to fulfil to be considered “an instance of that specific typeclass”.</p>
+<p>For example, the Functor typeclass in Haskell is defined like this:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Functor</span> f <span class="kw">where</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  fmap ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span></code></pre></div>
+<p>This typeclass declaration in Haskell just means that for a general type <code>f</code>, it will “be a Functor” if it has a map function. As you can see, any map function (or fmap) needs to have the signature <code>(a -&gt; b) -&gt; f a -&gt; f b</code>. More accurately, we can say that any custom type that implements a function with this type signature <strong>does have an instance of the Functor typeclass</strong>.</p>
+<p>I probably do not need to explain what the (f)map function does, as you are already using Functors in Elm every single day! 🤯 To list some of them: <code>List</code>, <code>Maybe</code>, <code>Result</code>, <code>Dict</code>, <code>Task</code>, etc…</p>
+<p>Why is that typeclass called <strong>Functor</strong> instead of <strong>Mappable</strong>? 🤷🏼‍♂️</p>
+<p><strong>Why is this important?</strong> Well, I think one of the design decisions for Elm was to be simple from the beginning and not bother people with buzzwords, just let them use the code and gain intuition about how things work and that will do. But unfortunately if we want to learn Haskell after Elm we need to start putting random names on things! 😉</p>
+<h2 id="infix-operators-are-nice-actually">Infix operators are nice, actually</h2>
+<p>Yet another big difference between Haskell and Elm is obviously Haskellers love for <em>infix operators</em>. For example, instead of using fmap you could use the <code>&lt;$&gt;</code> operator. Consider the following mundane Elm code:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span><span class="op">,</span><span class="dv">2</span><span class="op">,</span><span class="dv">3</span><span class="op">,</span><span class="dv">4</span>] <span class="op">|&gt;</span> <span class="dt">List</span><span class="op">.</span><span class="fu">map</span> ((<span class="op">*</span>) <span class="dv">2</span>) <span class="co">-- &gt; [2,4,6,8] : List number</span></span></code></pre></div>
+<p>This would be possible to write in many different styles in Haskell:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> (<span class="op">*</span><span class="dv">2</span>) [<span class="dv">1</span><span class="op">..</span><span class="dv">4</span>]    <span class="co">-- &gt; [2,4,6,8]</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span> (<span class="op">*</span><span class="dv">2</span>) [<span class="dv">1</span><span class="op">..</span><span class="dv">4</span>]     <span class="co">-- &gt; [2,4,6,8]</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>(<span class="op">*</span><span class="dv">2</span>) <span class="op">&lt;$&gt;</span> [<span class="dv">1</span><span class="op">..</span><span class="dv">4</span>]     <span class="co">-- &gt; [2,4,6,8]</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span><span class="op">..</span><span class="dv">4</span>] <span class="op">&lt;&amp;&gt;</span> (<span class="op">*</span><span class="dv">2</span>)     <span class="co">-- &gt; [2,4,6,8]</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>(<span class="op">*</span><span class="dv">2</span>) <span class="ot">`fmap`</span> [<span class="dv">1</span><span class="op">..</span><span class="dv">4</span>]  <span class="co">-- &gt; [2,4,6,8]</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>(<span class="op">*</span><span class="dv">2</span>) <span class="ot">`map`</span> [<span class="dv">1</span><span class="op">..</span><span class="dv">4</span>]   <span class="co">-- &gt; [2,4,6,8]</span></span></code></pre></div>
+<p>There are quite a few things to learn from this snippet alone:</p>
+<ol>
+<li>Notice that <code>map</code> is just a more specific implementation of <code>fmap</code> that in Haskell only works with <code>List</code>s!</li>
+<li>In Haskell we have some nice syntax sugar for ranges of things, where <code>[1..4]</code> is equivalent to <code>List.range 1 4</code> in Elm.</li>
+<li>It is easier to work with infix operators and partially applied functions in Haskell generally speaking, where adding a parameter to either side of the operator would mean completely different things if that operation is not commutative (<code>2^</code> vs <code>^2</code>).</li>
+<li>Any function in Haskell can be used as an infix operator with backticks (like in lines 5 and 6 of the Haskell snippet, this feels weird at the beginning, but sometimes it actually helps readability!).</li>
+<li>If you need a flipped version of <code>&lt;$&gt;</code> for some reason, you can import it from <code>Data.Functor</code> and it is called <code>&lt;&amp;&gt;</code> 🙈.</li>
+</ol>
+<p><strong>Why is this nice?</strong> I won’t argue if this is better or worse, but at least we have more options in the language to express things!</p>
+<p>What you haven’t been told is that <strong>Elm does actually have typeclasses</strong>! 😱 Noticed that <code>number</code> type in the previous snippet? <code>comparable</code> and <code>appendable</code> are other examples of typeclasses used in <code>elm/core</code>, so typeclasses exist in the language but we as users of Elm can’t define them, only its creator… 😜</p>
+<h2 id="why-haskell-and-typeclasses-are-correct">Why Haskell and typeclasses are correct!</h2>
+<p>This part is a little rant and totally subjective to how I view programming, but some time ago I tweeted this:</p>
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Are you sure we don&#39;t need typeclasses? 😅 <a href="https://t.co/grL1GUH4K4">pic.twitter.com/grL1GUH4K4</a></p>&mdash; フラビオ🥷🏼 (@FlavioCorpa) <a href="https://twitter.com/FlavioCorpa/status/1570739010322169856?ref_src=twsrc%5Etfw">September 16, 2022</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p>Now it is the perfect time to explain myself in more detail! (And without trying to offend anyone 😉).</p>
+<p>I think the fact that we have to write such boilerplate code is a <em>mistake</em>, if <code>Result</code> is a functor, and <code>Cmd</code> too, <strong>we should not need to have to write</strong> that mapping function manually! In Haskell, you could achieve this easily like this:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# language DeriveFunctor #-}</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- ...</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">HttpCmd</span> err a</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">HttpCmd</span> (<span class="dt">Cmd</span> (<span class="dt">Result</span> (<span class="dt">Error</span> err) a))</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> (<span class="dt">Functor</span>)</span></code></pre></div>
+<p>By creating a <strong>newtype</strong> instead of a type alias and using some special Haskell magic, now we could just use <code>fmap</code> or <code>&lt;$&gt;</code> and never have to write such function by hand!</p>
+<p>Of course you could still write the <code>fmap</code> function for this custom type by hand, but one of the nicest things about Haskell in my opinion is that it provides <em>deriving mechanisms</em> to implement things for free for us. One such mechanism is the <code>DeriveFunctor</code> language extension.</p>
+<p>If we chose to keep the type alias approach we could have written the same function in Haskell this way:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">httpCmdMap ::</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  (<span class="dt">Functor</span> f1, <span class="dt">Functor</span> f2) <span class="ot">=&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  f1 (f2 a) <span class="ot">-&gt;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  f1 (f2 b)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>httpCmdMap f <span class="ot">=</span> <span class="fu">fmap</span> (<span class="fu">fmap</span> f)</span></code></pre></div>
+<p>This is another difference with Elm: whatever we see to the left of the fat arrow (<code>=&gt;</code>) in the type declaration, are called <strong>typeclass constraints</strong>, and what they mean in this specific case is that whatever type we use for <code>f1</code> and <code>f2</code>, they need to <em>have an instance of the <code>Functor</code> typeclass</em>.</p>
+<p>As you might have noticed, Haskell has a compiler extension system that allow us to toggle additional features to the language, this is exactly what <code>{-# language DeriveFunctor #-}</code> does.</p>
+<p>I am not saying we should have this in Elm (in fact, many complains about Haskell lie in the fact that we have probably <strong>too many language extensions</strong> already! 🙈) but, having types of classes that share common interfaces and being able to re-use functions and infix operators in many different types is a win-win from my perspective! 🚀</p>
+<h2 id="a-small-note-on-function-composition">A small note on function composition</h2>
+<p>I’ve seen many Elm developers (specially people learning the language, or new to functional programming in general) use the following pattern, which feels a bit wrong to me:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">someListOfAs</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">|&gt;</span> <span class="dt">List</span><span class="op">.</span><span class="fu">map</span> <span class="fu">turnAtoB</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|&gt;</span> <span class="dt">List</span><span class="op">.</span><span class="fu">map</span> <span class="fu">turnBtoC</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">|&gt;</span> <span class="dt">List</span><span class="op">.</span><span class="fu">map</span> <span class="fu">turnCtoD</span> <span class="co">-- &gt; List d</span></span></code></pre></div>
+<p>Whenever you map something multiple times, we can make use of the fact that we can always <em>map once</em>, and <strong>compose N functions</strong> together!</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- please do this instead 🙏🏻</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">someListOfAs</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|&gt;</span> <span class="dt">List</span><span class="op">.</span><span class="fu">map</span> (<span class="fu">turnAtoB</span> <span class="op">&gt;&gt;</span> <span class="fu">turnBtoC</span> <span class="op">&gt;&gt;</span> <span class="fu">turnCtoD</span>)</span></code></pre></div>
+<p>Since piping stuff with <code>|&gt;</code> is the bread and butter of Elm, people do not really stop and think that they can combine multiple operations at once, but hey! That’s why we have function composition and everything is curried by default in Elm, so let’s make use of it! 🤓</p>
+<p>And here is a mini point in favor of Elm, the operators chosen for the language are <strong>much more readable</strong> in my opinion than the ones in Haskell, mainly:</p>
+<ol>
+<li>left to right composition: <code>&gt;&gt;</code> in Elm, <code>Control.Arrow.&gt;&gt;&gt;</code> in Haskell (not even in the Prelude! 😭).</li>
+<li>right to left composition: <code>&lt;&lt;</code> in Elm, just <code>.</code> in Haskell, which is very weird for newcomers. 😕</li>
+<li>left to right function application: <code>|&gt;</code> in Elm (the beloved pipe), <code>&amp;</code> in Haskell, absolutely terrible, no wonder it is not as commonly used as in Elm. 🥲</li>
+<li>right to left function application: <code>&lt;|</code> in Elm, <code>$</code> in Haskell, which is probably one of the <a href="https://www.fpcomplete.com/haskell/tutorial/operators/">most widely used operators</a> and not very readable when you are learning Haskell at all! 🫢</li>
+</ol>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>I had the initial idea for this blogpost on a plane ✈️ back to Spain but what really motivated me was to try and share my love for Haskell with some very special Elm engineers that had to put up with me for some time and to which I would like to give special thanks: <a href="https://twitter.com/TomasLatal">@tomaslatal</a>, <a href="https://twitter.com/janiczek">@janiczek</a> and <a href="https://twitter.com/kurnick">@janjelinek</a>. 🙌🏻</p>
+<p>I hope you all enjoyed this post, learned a thing or two and enticed you to learn a little more of Haskell. 😉</p>
+<p>Also I want to give a huge kudos to <a href="https://twitter.com/trupill">@serras</a> for proofreading this post 😘.</p>
+<p>If you enjoyed this post and would like to see this turned into a series (<em>I have ideas in my head already for posts about Applicatives, Monads, IO, parser combinators, etc.</em>), please share it in your social networks and <strong>follow me on <a href="https://twitter.com/FlavioCorpa">Twitter</a>!</strong> 🙌🏻</p></section>
+  </article>
+
+  
+  <div class="page page-read mt-16">
+    <h2 class="font-mono text-xs uppercase tracking-[0.15em] text-[var(--faint)] mb-4">
+      // comments via bluesky
+    </h2>
+    <bsky-comments post="at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3lacoolte652w"></bsky-comments>
+  </div>
+  
+</main>
+
+<footer class="mt-24 border-t border-[var(--border)] shrink-0">
+  <div
+    class="page py-8 flex flex-col sm:flex-row gap-3 sm:items-center justify-between font-mono text-xs text-[var(--faint)]"
+  >
+    <p class="m-0">
+      built with
+      <a class="text-[var(--muted)] hover:text-[var(--accent)]" href="https://jaspervdj.be/hakyll/">hakyll</a>
+      +
+      <a class="text-[var(--muted)] hover:text-[var(--accent)]" href="https://nixos.org">nix</a>
+      · © Flavio Corpa
+    </p>
+    <ul class="flex gap-4 list-none m-0 p-0" role="list">
+      <li><a class="text-[var(--muted)] hover:text-[var(--accent)]" href="/">home</a></li>
+      <li><a class="text-[var(--muted)] hover:text-[var(--accent)]" href="/atom.xml">atom</a></li>
+      <li><a class="text-[var(--muted)] hover:text-[var(--accent)]" href="/rss.xml">rss</a></li>
+      <li><a class="text-[var(--muted)] hover:text-[var(--accent)]" href="https://github.com/sponsors/kutyel/">sponsor</a></li>
+      <li><a class="text-[var(--muted)] hover:text-[var(--accent)]" href="https://github.com/kutyel/kutyel-hakyll">source</a></li>
+    </ul>
+  </div>
+</footer>
+
+
+<script>
+  ;(() => {
+    const bar = document.querySelector('[data-progress]')
+    const update = () => {
+      const max = document.documentElement.scrollHeight - innerHeight
+      bar.style.transform = 'scaleX(' + (max > 0 ? scrollY / max : 0) + ')'
+    }
+    addEventListener('scroll', update, { passive: true })
+    update()
+  })()
+</script>
+<script src="https://gistcdn.githack.com/kutyel/41d12e099484fd390fb67168271fcdd9/raw/9be26e500525a2e4edacc53d3a8006aaddec0e15/bsky-comments.js"></script>
+
+
+    <script async>
+      ;(() => {
+        window.site.refreshThemeSwitch()
+        document.querySelector('[data-theme-switch]')?.addEventListener('click', () => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light')
+        })
+
+        // "copy" button on every code block
+        document.querySelectorAll('div.sourceCode').forEach((block) => {
+          const button = document.createElement('button')
+          button.type = 'button'
+          button.textContent = 'copy'
+          button.setAttribute('data-copy', '')
+          button.addEventListener('click', async () => {
+            try {
+              await navigator.clipboard.writeText(block.querySelector('pre').innerText)
+              button.textContent = 'copied'
+            } catch {
+              button.textContent = 'error'
+            }
+            setTimeout(() => (button.textContent = 'copy'), 1500)
+          })
+          block.appendChild(button)
+        })
+      })()
+    </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'
+    ></script>
+    <!-- End Cloudflare Web Analytics -->
+  </body>
+</html>

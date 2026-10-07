@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <title>Do not talk to your LLM, write to it!</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Why I write my prompts instead of dictating them to my coding agent, why the reason is not the keyboard, and the one case where talking is the better tool" />
+    
+    
+    <meta name="author" content="Flavio Corpa" />
+     
+    <meta name="keywords" content="llm,ai,prompting,writing,claude-code,specs" />
+    
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU" />
+    <meta
+      http-equiv="origin-trial"
+      content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ=="
+    />
+
+    <meta property="og:site_name" content="flaviocorpa.com" />
+    <meta property="og:title" content="Do not talk to your LLM, write to it!" />
+    <meta property="og:url" content="https://flaviocorpa.com/do-not-talk-to-your-llm-write-to-it.html" />
+    <meta property="og:description" content="Why I write my prompts instead of dictating them to my coding agent, why the reason is not the keyboard, and the one case where talking is the better tool" />
+    
+    <meta property="og:image" content="https://flaviocorpa.com./images/flavio-grok.jpg" />
+     
+    <meta property="og:type" content="article" />
+     
+    <meta name="twitter:image" content="https://flaviocorpa.com./images/flavio-grok.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <meta name="twitter:url" content="https://flaviocorpa.com/do-not-talk-to-your-llm-write-to-it.html" />
+    <meta name="twitter:site" content="flaviocorpa.com" />
+    <meta name="twitter:title" content="Do not talk to your LLM, write to it!" />
+    <meta name="twitter:description" content="Why I write my prompts instead of dictating them to my coding agent, why the reason is not the keyboard, and the one case where talking is the better tool" />
+    
+    <meta name="twitter:creator" content="@FlavioCorpa" />
+    
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>"
+    />
+    <link rel="canonical" href="https://flaviocorpa.com/do-not-talk-to-your-llm-write-to-it.html" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @custom-variant dark (&:where(.dark, .dark *));
+
+      @theme {
+        --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+        --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+      }
+
+      /* ---------------------------------------------------------------
+         Design tokens. The old variable names at the bottom of each block
+         are kept because <bsky-comments> and older posts read them.
+         --------------------------------------------------------------- */
+      body.light {
+        --bg: #fafaf8;
+        --surface: #f1f1ed;
+        --fg: #1b1e23;
+        --muted: #4f5562;
+        --faint: #6b7079;
+        --border: #dadad3;
+        --accent: #7c3aed;
+        --accent-soft: rgba(124, 58, 237, 0.08);
+        --code-bg: #0f131a;
+        --inline-code-bg: rgba(124, 58, 237, 0.08);
+        --selection: rgba(124, 58, 237, 0.18);
+      }
+      body.dark {
+        --bg: #0c0f14;
+        --surface: #141820;
+        --fg: #e4e7ed;
+        --muted: #a9b1be;
+        --faint: #808897;
+        --border: #20262f;
+        --accent: #c693ea;
+        --accent-soft: rgba(198, 147, 234, 0.09);
+        --code-bg: #0f131a;
+        --inline-code-bg: rgba(198, 147, 234, 0.1);
+        --selection: rgba(198, 147, 234, 0.25);
+      }
+      body.light,
+      body.dark {
+        --bgColor: var(--bg);
+        --textColor: var(--fg);
+        --textLinkColor: var(--accent);
+        --textLinkHoverColor: var(--fg);
+        --separatorColor: var(--border);
+        --btnBgColor: var(--surface);
+        --deepBgColor: var(--code-bg);
+        --authorTitleColor: var(--muted);
+      }
+
+      /* ---------------------------------------------------------------
+         Base
+         --------------------------------------------------------------- */
+      :root {
+        color-scheme: light dark;
+      }
+      html {
+        box-sizing: border-box;
+        -webkit-text-size-adjust: 100%;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
+      /* Mobile first: full width with a gutter. On larger screens the
+         layout uses a share of the window, not a fixed pixel width. */
+      .page {
+        width: 100%;
+        margin-inline: auto;
+        padding-inline: 1rem;
+      }
+      @media (min-width: 640px) {
+        .page {
+          padding-inline: 1.5rem;
+        }
+      }
+      @media (min-width: 1024px) {
+        html {
+          font-size: 106.25%;
+        }
+        .page {
+          width: 80%;
+          max-width: 72rem;
+          padding-inline: 0;
+        }
+      }
+      @media (min-width: 1536px) {
+        .page {
+          width: 66%;
+        }
+      }
+      /* Long-form reading keeps a comfortable line length. */
+      .page-read {
+        max-width: 46rem;
+      }
+      body {
+        margin: 0;
+        font-family: var(--font-sans);
+        background: var(--bg);
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        transition: background-color 0.2s ease, color 0.2s ease;
+      }
+      ::selection {
+        background: var(--selection);
+      }
+      input,
+      button {
+        font: inherit;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 2px;
+      }
+      img {
+        display: block;
+        height: auto;
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        border: 0;
+      }
+
+      /* Theme switch icon visibility rules */
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='dark'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='light'] {
+        display: block;
+      }
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='light'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='dark'] {
+        display: none;
+      }
+
+      /* Tags rendered by Hakyll come as "a, b, c": drop the commas. */
+      .tag-list {
+        font-size: 0;
+      }
+      .tag-list a {
+        display: inline-block;
+        margin: 0 0.4rem 0.4rem 0;
+        padding: 0.1rem 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        line-height: 1.5;
+        color: var(--muted);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        transition: color 0.15s, border-color 0.15s;
+      }
+      .tag-list a::before {
+        content: '#';
+        color: var(--faint);
+      }
+      .tag-list a:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      /* ---------------------------------------------------------------
+         Long-form content (post bodies)
+         --------------------------------------------------------------- */
+      .prose {
+        font-size: 1.0625rem;
+        line-height: 1.75;
+      }
+      .prose p {
+        margin: 0;
+      }
+      .prose p + p {
+        margin-top: 1.4em;
+      }
+      .prose a[href] {
+        color: var(--accent);
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+        text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+        word-wrap: break-word;
+        transition: text-decoration-color 0.15s;
+      }
+      .prose a[href]:hover {
+        text-decoration-color: var(--accent);
+      }
+      .prose a[href].footnote-ref,
+      .prose a[href].footnote-back {
+        text-decoration: none;
+      }
+      .prose h2,
+      .prose h3,
+      .prose h4 {
+        font-weight: 600;
+        line-height: 1.25;
+        letter-spacing: -0.015em;
+        margin: 2.2em 0 0.7em;
+        scroll-margin-top: 5rem;
+      }
+      .prose h2 {
+        font-size: 1.5rem;
+      }
+      .prose h3 {
+        font-size: 1.2rem;
+      }
+      .prose h2::before,
+      .prose h3::before {
+        font-family: var(--font-mono);
+        font-weight: 400;
+        color: var(--faint);
+        margin-right: 0.5ch;
+      }
+      .prose h2::before {
+        content: '##';
+      }
+      .prose h3::before {
+        content: '###';
+      }
+      .prose hr {
+        height: 0;
+        border: none;
+        border-top: 1px dashed var(--border);
+        margin: 2.5em 0;
+      }
+      .prose blockquote {
+        margin: 1.5em 0;
+        padding: 0.25em 0 0.25em 1.1em;
+        border-left: 2px solid var(--accent);
+        color: var(--muted);
+      }
+      .prose blockquote em {
+        font-size: 1.15em;
+      }
+      .prose ul,
+      .prose ol {
+        margin: 1em 0;
+        padding-left: 1.5em;
+      }
+      .prose ul {
+        list-style: disc outside;
+      }
+      .prose ol {
+        list-style: decimal outside;
+      }
+      .prose li {
+        margin: 0.3em 0;
+      }
+      .prose li::marker {
+        color: var(--faint);
+      }
+      .prose li > ul,
+      .prose li > ol {
+        margin: 0.4em 0;
+      }
+      .prose img {
+        border-radius: 10px;
+        margin-top: 1.75em;
+        margin-bottom: 1.75em;
+      }
+      .prose table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.92em;
+        margin: 1.5em 0;
+      }
+      .prose th,
+      .prose td {
+        text-align: left;
+        padding: 0.45em 0.75em;
+        border-bottom: 1px solid var(--border);
+      }
+      .prose th {
+        font-weight: 600;
+      }
+      .prose .footnotes {
+        margin-top: 3em;
+        font-size: 0.9em;
+        color: var(--muted);
+      }
+
+      /* Code */
+      code,
+      kbd,
+      pre,
+      samp {
+        font-family: var(--font-mono);
+        font-size: 0.88em;
+        font-feature-settings: normal;
+      }
+      pre code {
+        font-size: inherit;
+        line-height: 1.6;
+      }
+      .sourceCode:not(pre):not(code) {
+        position: relative;
+        background-color: var(--code-bg);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        margin: 1.5rem 0;
+        border-radius: 10px;
+      }
+      pre.sourceCode {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 1.1rem 1.25rem;
+        margin: 0;
+        color: #e4e7ed;
+        background: none;
+        font-size: 0.82rem;
+        line-height: 1.6;
+      }
+      pre.numberSource.sourceCode > code {
+        counter-reset: source-line 0;
+      }
+      pre.numberSource.sourceCode > code > span {
+        counter-increment: source-line;
+      }
+      code.sourceCode > a.sourceLine:before {
+        display: inline-block;
+        content: attr(title);
+        text-align: right;
+        border-right: 1px solid rgba(128, 147, 147, 0.4);
+        color: rgb(128, 147, 147);
+        width: 30px;
+        padding-right: 10px;
+        margin-right: 10px;
+      }
+      [data-copy] {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        padding: 0.15rem 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: #8a92a0;
+        background: #1a1f29;
+        border: 1px solid #2a313d;
+        border-radius: 6px;
+        opacity: 0;
+        cursor: pointer;
+        transition: opacity 0.15s, color 0.15s;
+      }
+      .sourceCode:hover [data-copy],
+      [data-copy]:focus-visible {
+        opacity: 1;
+      }
+      [data-copy]:hover {
+        color: #e4e7ed;
+      }
+      @media (max-width: 667px) {
+        .sourceCode:not(pre):not(code) {
+          border-radius: 0;
+          border-left: 0;
+          border-right: 0;
+          margin-left: -1rem;
+          margin-right: -1rem;
+        }
+        code.sourceCode > a.sourceLine:before {
+          display: none;
+        }
+      }
+      :not(pre) > code {
+        border-radius: 4px;
+        background-color: var(--inline-code-bg);
+        color: var(--fg);
+        padding: 0.1em 0.35em;
+        white-space: normal;
+      }
+      /* Syntax token colors (Pandoc) */
+      .co {
+        color: rgb(128, 147, 147);
+        font-style: italic;
+      }
+      .ch,
+      .st,
+      .vs {
+        color: rgb(236, 196, 141);
+      }
+      .va {
+        color: rgb(214, 222, 235);
+      }
+      .dv,
+      .bn,
+      .fl {
+        color: rgb(247, 140, 108);
+      }
+      .bu,
+      .cn,
+      .at,
+      .fu,
+      .dt {
+        color: rgb(130, 170, 255);
+      }
+      .im,
+      .op,
+      .kw,
+      .ot,
+      .cf {
+        color: #c693ea;
+      }
+
+      /* Media helpers */
+      iframe {
+        width: 100%;
+      }
+      .iframe--example {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      .pdf {
+        margin: 1rem -6rem;
+        height: 30rem;
+        width: calc(100% + 12rem);
+      }
+      .pdf-link {
+        display: none;
+      }
+      @media (max-width: 800px) {
+        .pdf {
+          margin: 1rem 0;
+          width: 100%;
+        }
+      }
+      @media (max-width: 667px) {
+        .pdf {
+          display: none;
+        }
+        .pdf-link {
+          display: inline;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="dark min-h-dvh flex flex-col leading-[1.65]">
+    <script>
+      ;(() => {
+        window.site = {
+          theme:
+            localStorage.getItem('theme') ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          setTheme: (name) => {
+            document.body.classList.add(name === 'light' ? 'light' : 'dark')
+            document.body.classList.remove(name === 'light' ? 'dark' : 'light')
+            localStorage.setItem('theme', name)
+            window.site.theme = name
+            window.site.refreshThemeSwitch()
+          },
+          refreshThemeSwitch: () => {
+            const isLight = window.site.theme === 'light'
+            const themeSwitch = document.querySelector('[data-theme-switch]')
+
+            themeSwitch?.setAttribute(
+              'aria-label',
+              isLight ? 'Switch to dark mode' : 'Switch to light mode'
+            )
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true')
+          },
+        }
+
+        window.site.setTheme(window.site.theme)
+      })()
+    </script>
+
+    <a
+  class="absolute left-[-10000px] focus:left-4 focus:top-4 z-50 px-3 py-1 rounded bg-[var(--accent)] text-[var(--bg)] font-mono text-sm"
+  href="#content"
+  >Skip to content</a
+>
+<nav
+  class="sticky top-0 z-40 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--bg)_82%,transparent)] backdrop-blur-md"
+>
+  <div
+    class="page h-14 flex items-center justify-between gap-4 font-mono text-[13px]"
+  >
+    <a href="/" class="group flex items-center gap-2 text-[var(--fg)]">
+      <span class="text-[var(--accent)] text-base leading-none">λ</span>
+      <span>flaviocorpa<span class="text-[var(--faint)] group-hover:text-[var(--accent)] transition-colors">.com</span></span>
+    </a>
+    <div class="flex items-center gap-4 sm:gap-5 text-[var(--muted)]">
+      <a class="hover:text-[var(--fg)] transition-colors" href="/#posts">posts</a>
+      <a class="hidden sm:inline hover:text-[var(--fg)] transition-colors" href="/#talks">talks</a>
+      <a class="hover:text-[var(--fg)] transition-colors" href="/atom.xml">rss</a>
+      <a
+        class="hidden sm:inline hover:text-[var(--fg)] transition-colors"
+        href="https://github.com/sponsors/kutyel"
+        >sponsor</a
+      >
+      <button
+        aria-label="Switch to light mode"
+        aria-checked="true"
+        data-theme-switch
+        role="switch"
+        type="button"
+        class="grid place-items-center w-8 h-8 -mr-1.5 rounded-md text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--surface)] transition-colors cursor-pointer"
+      >
+        <svg data-theme-switch-icon="dark" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg data-theme-switch-icon="light" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+
+<div
+  data-progress
+  aria-hidden="true"
+  class="fixed top-0 left-0 z-50 h-[2px] w-full origin-left scale-x-0 bg-[var(--accent)]"
+></div>
+
+<style>
+  bsky-comments {
+    --background-color: var(--bg);
+    --text-color: var(--fg);
+    --link-color: var(--accent);
+    --link-hover-color: var(--fg);
+    --comment-meta-color: var(--muted);
+    --error-color: #ff4d4d;
+    --reply-border-color: var(--border);
+    --button-background-color: var(--surface);
+    --button-hover-background-color: var(--accent-soft);
+    --author-avatar-border-radius: 50%;
+  }
+</style>
+
+<main class="flex-1" id="content" tabindex="-1">
+  <article class="page page-read">
+    <header class="pt-12 sm:pt-16 pb-8 mb-10 border-b border-[var(--border)]">
+      <a
+        href="/#posts"
+        class="font-mono text-xs text-[var(--faint)] hover:text-[var(--accent)] transition-colors"
+        >← cd ~/posts</a
+      >
+      <h1
+        class="mt-5 mb-5 text-[2rem] sm:text-[2.6rem] font-semibold leading-[1.12] tracking-[-0.025em] text-balance"
+      >
+        Do not talk to your LLM, write to it!
+      </h1>
+      <div
+        class="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-[var(--muted)] mb-4"
+      >
+        <time datetime="2026-08-21">2026-08-21</time>
+        <span class="text-[var(--faint)]">·</span>
+        <span>8 min read</span>
+         
+      </div>
+      <div class="tag-list"><a title="All pages tagged &#39;llm&#39;." href="/tags/llm.html" rel="tag">llm</a>, <a title="All pages tagged &#39;ai&#39;." href="/tags/ai.html" rel="tag">ai</a>, <a title="All pages tagged &#39;prompting&#39;." href="/tags/prompting.html" rel="tag">prompting</a>, <a title="All pages tagged &#39;writing&#39;." href="/tags/writing.html" rel="tag">writing</a>, <a title="All pages tagged &#39;tools&#39;." href="/tags/tools.html" rel="tag">tools</a></div>
+    </header>
+    <section class="prose"><p><img src="./images/flavio-grok.jpg" alt="logo" width="500px"></p>
+<p>Every other week someone tells me that the real unlock for agentic coding is voice. Get a dictation tool, get a decent microphone, stop typing, just <em>talk</em> to the agent while it works. The pitch is always the same: you speak at around 150 words per minute and you type at maybe half of that, so half of your bandwidth is going to waste.</p>
+<p>Voice-first is by now the dominant take, and I spent a couple of weeks living it: most of my prompts to <a href="https://claude.com/claude-code">Claude Code</a> dictated, while working on Haskell at my day job. Then I went back to typing, because my results were noticeably better.</p>
+<p>What I want to do in this post is defend that, but honestly, because when I went looking for <em>why</em> it worked better I found out that my first explanation was wrong. The interesting answer is not “typing beats talking”. It is that <strong>almost everyone in this argument, me included, was optimizing the wrong variable</strong>.</p>
+<h2 id="the-model-never-hears-your-voice">The model never hears your voice</h2>
+<p>Let me start with the part that I think gets lost in the discussion. Your LLM is not listening to you. Whatever you say goes through a speech-to-text model first, and what lands in the context window is a transcript. The choice was never “audio versus text”: it is <strong>text I wrote and read versus text a transcription engine wrote and nobody read</strong>.</p>
+<p>That distinction matters because of <em>who owns the last edit</em>. When I type a prompt, the last thing that happens before the model sees it is me rereading it. When I dictate and fire, the last thing that happens is a probabilistic model guessing at my phonemes.</p>
+<blockquote>
+<p>Dictation does not remove a step between you and the model. It inserts one, and hands it the final say.</p>
+</blockquote>
+<p>Hold on to the word <em>edit</em> there, because it turns out to be the whole ballgame.</p>
+<h2 id="code-is-a-written-language">Code is a written language</h2>
+<p>The most concrete failure is that transcription is good at prose and bad at identifiers. Prose is what the model behind it was trained to predict; our code is full of tokens that no reasonable prior expects.</p>
+<p>Say out loud “use <code>foldMap</code> over the <code>Data.Map.Strict</code> in <code>Domain.Signatory</code> and make sure it does not go through <code>traverse</code>” and see what comes back. In my experience: <code>foldmap</code>, <code>data map strict</code>, <code>domain signatory</code>, and my personal favourite, <code>travers</code>. Try it with a Japanese name, a Nix attribute path, or a branch called <code>flavio/fix-2847-utf8-boundary</code>, and it gets worse.</p>
+<p>The unpleasant part is that these are <strong>silent failures</strong>. A typo I can see before pressing enter; a mangled identifier goes into the context as a confident, well-formed, wrong instruction, and the agent does what agents do: assumes you meant something, picks the nearest plausible thing in the codebase, and gets to work.</p>
+<p>And then there is everything you cannot say at all. I cannot dictate a stack trace, a failing test, a JSON payload, the offending function, or a file path with an <code>@</code> in front of it. A large fraction of what makes a prompt work is pasted context, and paste is a keyboard operation.</p>
+<h2 id="the-best-argument-against-me">The best argument against me</h2>
+<p>Now let me make the other side’s case, because it is genuinely good and it deserves better than a straw man.</p>
+<p>The strongest version goes like this: typing friction does not make you clearer, it makes you <strong>terser</strong>. Every typed prompt gets unconsciously optimized for brevity — you skip the file path, you do not explain the tradeoff you already weighed and rejected, you do not mention the edge case, you trust the model to infer. Not because your thinking is muddy, but because typing five paragraphs of context <em>feels expensive</em>. On this account my problem is not a thinking failure but a <strong>transmission failure</strong>, and dictation fixes exactly that: it makes context cheap. Say the whole tradeoff out loud, because saying it costs you nothing.</p>
+<p>There is a second argument I find equally hard to dismiss, call it natural elaboration: in speech each sentence is triggered by the last one, so you end up covering aspects of the problem that would never have occurred to you staring at a blinking cursor. Fluency generates coverage.</p>
+<p>And there is a third, practical one: LLMs are unusually good at cleaning up messy input. A compiler will not forgive you a missing semicolon, but a model will happily reconstruct your intent from a rambling paragraph. Which is why the two-step pattern going around is so popular: <strong>dictate messily, then have the model restructure it into a clean prompt</strong>. Think at voice speed, ship structured output.</p>
+<p>I have to concede a lot of this. My typed prompts <em>are</em> terser than they should be. I have absolutely shipped a six-word prompt that deserved six sentences, and then blamed the agent for the diff.</p>
+<h2 id="it-was-never-the-keyboard">It was never the keyboard</h2>
+<p>So if terseness is real, why did going back to typing improve my results? Here is where I had to change my mind about the mechanism.</p>
+<p>What typing gave me was not speed, or friction, or hands-on-keys virtue. It was that I was <strong>composing</strong> instead of <strong>emitting</strong> — deciding what mattered before committing it, rather than producing words and letting the reader sort it out. Cognitive psychology has a name for the neighbouring effect, the <em>generation effect</em>: actively producing information beats passively receiving or emitting it. Writing researchers make the stronger claim that composition <em>is</em> reasoning, not the transcription of finished thoughts. The sentence refuses to end until I know the answer, and I have deleted more bad features with the backspace key than with any code review. As Leslie Lamport put it:</p>
+<blockquote>
+<p>If you’re thinking without writing, you only think you’re thinking.</p>
+</blockquote>
+<p>And the research on this is more sympathetic to voice than the slogan in my title suggests — which is exactly why it is worth reading. A computing-education study of 919 introductory students who could freely choose or switch modalities (<a href="https://arxiv.org/abs/2607.05808">Say What?, arXiv:2607.05808</a>) found that on two of three problems, typed prompts were more likely to succeed on the first attempt than <strong>unedited</strong> voice prompts. The detail that matters is the next sentence: there was <strong>no difference</strong> for students who edited their transcribed speech before submitting.</p>
+<p>The keyboard was not doing the work. The editing was.</p>
+<p>A second paper on typing’s displacement by AI (<a href="https://arxiv.org/pdf/2604.17023">The Instrumental Dissolution of Typing, arXiv:2604.17023</a>) reaches a compatible conclusion from the other direction: typing’s own cognitive advantages are real but <strong>bounded and modality-specific</strong> — visual working-memory buffering, rhythmic entrainment, motor efficiency for <em>convergent</em> thinking — while the benefits of the compositional act itself are largely <strong>medium-general</strong>, provided the deliberate effort survives the change of medium.</p>
+<p>Which reframes the whole debate. The axis everybody argues about is speed versus friction. The axis that actually predicts whether your prompt works is:</p>
+<blockquote>
+<p>Did you compose it, or did you just emit it?</p>
+</blockquote>
+<p>A dictated ramble you never reread is emission. A six-word typed one-liner that skips the file path and the tradeoff is <em>also</em> emission — same failure, quieter. And a dictated paragraph you reread and fixed is composition, which is why the two-step pattern works: not because the model tidies your grammar, but because it forces a text you then have to look at.</p>
+<p>My 150-versus-40 words per minute framing was wrong too, by the way. Adult silent reading of non-fiction runs around <strong>238 words per minute</strong> — I know because I cited the paper when I wrote about <a href="https://flaviocorpa.com/how-to-add-estimated-reading-time-to-your-hakyll-blog.html">adding estimated reading time to this blog</a>. Composition is the expensive side and reading is the cheap side, so you pay once and then the model reads it fast, you reread it fast, and your future self reads it fast six weeks later in a pull request.</p>
+<h2 id="why-i-still-write-by-default">Why I still write by default</h2>
+<p>If composition is medium-general, why keep the title? Because <strong>defaults decide behaviour</strong>, and the two media have opposite ones. When I type, composition is the default and emission takes a deliberate shortcut. When I dictate, emission is the default and composition takes a deliberate extra step — one that lives on the far side of a transcript I already feel finished with.</p>
+<p>There is also a set of advantages that survive independently of all this, because a prompt in agentic coding is not chat, it is a <strong>spec</strong>:</p>
+<ul>
+<li><strong>Structure.</strong> Numbered steps, nested bullets, an explicit “do this, do <strong>not</strong> do that”, fenced blocks showing the exact output shape. Speech is strictly linear and strictly flat, and intonation does not survive transcription.</li>
+<li><strong>Reuse.</strong> Good prompts graduate: they become a section of <code>CLAUDE.md</code>, a spec file in the repo, the body of the PR. A voice message is write-only.</li>
+<li><strong>Pronouns.</strong> Spoken English is full of “it”, “that”, “the other one”, “the thing we just did”. Those work between humans because we share a visual field and you will interrupt me the moment you lose the thread. An agent will resolve “it” to <em>something</em> and let you discover which something in the diff.</li>
+</ul>
+<h2 id="where-talking-wins">Where talking wins</h2>
+<p>All of the above assumes you know what you want. When you do not, the trade-off genuinely flips, and I think this deserves to be a thesis rather than a caveat:</p>
+<blockquote>
+<p>Voice for divergent thinking. Writing for convergent thinking.</p>
+</blockquote>
+<p>When I am not implementing a spec but <strong>iterating on a design</strong> — should this live in the domain layer or the handler, is this an <code>Either</code> or a proper error type, what are the three ways to model this state machine, what am I not seeing — talking is the better tool, and I use it.</p>
+<p>Everything I complained about above inverts in that mode. The looseness is the point: I want to say the half-formed thing my inner editor would have killed, and hear it argued with. There are no identifiers to mangle because the nouns are still concepts, not symbols. Natural elaboration is a feature when coverage is what you need. And being wrong is nearly free: a bad design conversation costs five minutes, whereas a bad implementation prompt costs a wrong diff, a review, a revert, and the temptation to keep the code because it already exists. Note that the typing advantage the second paper identifies is specifically for <em>convergent</em> work — the evidence splits along the same seam.</p>
+<p>It is also worth saying plainly that voice is not a lesser interface, just a differently-shaped one. Some of my best design thinking happens on a walk with a rubber duck that talks back, nowhere near a keyboard. And for anyone dealing with RSI or any other reason typing is expensive, dictation is not a compromise, it is access — the composition argument works fine at 150 words per minute, as long as the editing step is real.</p>
+<p>Which is the one habit I would insist on: <strong>end the divergent phase by having it written down</strong>. Ask the agent to produce the plan as text, then <em>edit that text yourself</em> before a single line is implemented. That edit pass is where you catch the thing you agreed to out loud without quite meaning it. The conversation was voice; the spec is still writing.</p>
+<h2 id="the-heuristic">The heuristic</h2>
+<p>Two lines, short enough to remember:</p>
+<blockquote>
+<p>Talk while the answer is still a shape. Write once the answer has names.</p>
+<p>And whichever one you pick: compose, do not emit.</p>
+</blockquote>
+<p>If your prompt contains a module path, a type signature, an identifier, a file, or the word “exactly”, type it. If your prompt is “here is what I am considering, poke holes in it”, say it and enjoy the walk. If you dictated it, read it back before you press enter — that is not pedantry, it is the entire measured effect.</p>
+<p>If you disagree, and given the state of the discourse I assume many of you will, I would genuinely like to hear why. Feel free to comment below or reach out on <a href="https://x.com/FlavioCorpa">Twitter</a>/<a href="https://bsky.app/profile/flaviocorpa.com">BlueSky</a>. And if you found this useful, consider <a href="https://github.com/sponsors/kutyel">sponsoring my work</a> 🙌🏻</p></section>
+  </article>
+
+  
+  <div class="page page-read mt-16">
+    <h2 class="font-mono text-xs uppercase tracking-[0.15em] text-[var(--faint)] mb-4">
+      // comments via bluesky
+    </h2>
+    <bsky-comments post="at://did:plc:dvrocvv5szl2evqiafsx4iyw/app.bsky.feed.post/3mtlvwzuvx226"></bsky-comments>
+  </div>
+  
+</main>
+
+<footer class="mt-24 border-t border-[var(--border)] shrink-0">
+  <div
+    class="page py-8 flex flex-col sm:flex-row gap-3 sm:items-center justify-between font-mono text-xs text-[var(--faint)]"
+  >
+    <p class="m-0">
+      built with
+      <a class="text-[var(--muted)] hover:text-[var(--accent)]" href="https://jaspervdj.be/hakyll/">hakyll</a>
+      +
+      <a class="text-[var(--muted)] hover:text-[var(--accent)]" href="https://nixos.org">nix</a>
+      · © Flavio Corpa
+    </p>
+    <ul class="flex gap-4 list-none m-0 p-0" role="list">
+      <li><a class="text-[var(--muted)] hover:text-[var(--accent)]" href="/">home</a></li>
+      <li><a class="text-[var(--muted)] hover:text-[var(--accent)]" href="/atom.xml">atom</a></li>
+      <li><a class="text-[var(--muted)] hover:text-[var(--accent)]" href="/rss.xml">rss</a></li>
+      <li><a class="text-[var(--muted)] hover:text-[var(--accent)]" href="https://github.com/sponsors/kutyel/">sponsor</a></li>
+      <li><a class="text-[var(--muted)] hover:text-[var(--accent)]" href="https://github.com/kutyel/kutyel-hakyll">source</a></li>
+    </ul>
+  </div>
+</footer>
+
+
+<script>
+  ;(() => {
+    const bar = document.querySelector('[data-progress]')
+    const update = () => {
+      const max = document.documentElement.scrollHeight - innerHeight
+      bar.style.transform = 'scaleX(' + (max > 0 ? scrollY / max : 0) + ')'
+    }
+    addEventListener('scroll', update, { passive: true })
+    update()
+  })()
+</script>
+<script src="https://gistcdn.githack.com/kutyel/41d12e099484fd390fb67168271fcdd9/raw/9be26e500525a2e4edacc53d3a8006aaddec0e15/bsky-comments.js"></script>
+
+
+    <script async>
+      ;(() => {
+        window.site.refreshThemeSwitch()
+        document.querySelector('[data-theme-switch]')?.addEventListener('click', () => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light')
+        })
+
+        // "copy" button on every code block
+        document.querySelectorAll('div.sourceCode').forEach((block) => {
+          const button = document.createElement('button')
+          button.type = 'button'
+          button.textContent = 'copy'
+          button.setAttribute('data-copy', '')
+          button.addEventListener('click', async () => {
+            try {
+              await navigator.clipboard.writeText(block.querySelector('pre').innerText)
+              button.textContent = 'copied'
+            } catch {
+              button.textContent = 'error'
+            }
+            setTimeout(() => (button.textContent = 'copy'), 1500)
+          })
+          block.appendChild(button)
+        })
+      })()
+    </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'
+    ></script>
+    <!-- End Cloudflare Web Analytics -->
+  </body>
+</html>

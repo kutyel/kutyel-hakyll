@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <title>Haskell for Elm developers: giving names to stuff (Part 6 - Foldable)</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!" />
+    
+    
+    <meta name="author" content="Flavio Corpa" />
+     
+    <meta name="keywords" content="haskell,elm,functional,programming" />
+    
+    <meta name="google-site-verification" content="QX4bn65yOXBfgnwxlO09yIBc1H8blur-Erx3lmsDVhU" />
+    <meta
+      http-equiv="origin-trial"
+      content="Am4BZ0c7GMyB72dgo/Ny2FfIFscXhYMoN+CVe4jduWh24FvsaCwf7kjZzHzfrJXtIilyZVAEKRxOItGLY7lvkAgAAABSeyJvcmlnaW4iOiJodHRwczovL3JvYmVydHdwZWFyY2UuY29tOjQ0MyIsImZlYXR1cmUiOiJQb3J0YWxzIiwiZXhwaXJ5IjoxNjAzNTQ2NDc3fQ=="
+    />
+
+    <meta property="og:site_name" content="flaviocorpa.com" />
+    <meta property="og:title" content="Haskell for Elm developers: giving names to stuff (Part 6 - Foldable)" />
+    <meta property="og:url" content="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-6-foldable.html" />
+    <meta property="og:description" content="A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!" />
+    
+    <meta property="og:image" content="https://flaviocorpa.com./images/haskell-elm.png" />
+     
+    <meta property="og:type" content="article" />
+     
+    <meta name="twitter:image" content="https://flaviocorpa.com./images/haskell-elm.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <meta name="twitter:url" content="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-6-foldable.html" />
+    <meta name="twitter:site" content="flaviocorpa.com" />
+    <meta name="twitter:title" content="Haskell for Elm developers: giving names to stuff (Part 6 - Foldable)" />
+    <meta name="twitter:description" content="A series of blog posts for explaining Haskell to Elm developers interested to learn the language that powers the compiler for their favourite language!" />
+    
+    <meta name="twitter:creator" content="@FlavioCorpa" />
+    
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥷🏻</text></svg>"
+    />
+    <link rel="canonical" href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-6-foldable.html" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @custom-variant dark (&:where(.dark, .dark *));
+
+      @theme {
+        --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+        --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+      }
+
+      /* ---------------------------------------------------------------
+         Design tokens. The old variable names at the bottom of each block
+         are kept because <bsky-comments> and older posts read them.
+         --------------------------------------------------------------- */
+      body.light {
+        --bg: #fafaf8;
+        --surface: #f1f1ed;
+        --fg: #1b1e23;
+        --muted: #4f5562;
+        --faint: #6b7079;
+        --border: #dadad3;
+        --accent: #7c3aed;
+        --accent-soft: rgba(124, 58, 237, 0.08);
+        --code-bg: #0f131a;
+        --inline-code-bg: rgba(124, 58, 237, 0.08);
+        --selection: rgba(124, 58, 237, 0.18);
+      }
+      body.dark {
+        --bg: #0c0f14;
+        --surface: #141820;
+        --fg: #e4e7ed;
+        --muted: #a9b1be;
+        --faint: #808897;
+        --border: #20262f;
+        --accent: #c693ea;
+        --accent-soft: rgba(198, 147, 234, 0.09);
+        --code-bg: #0f131a;
+        --inline-code-bg: rgba(198, 147, 234, 0.1);
+        --selection: rgba(198, 147, 234, 0.25);
+      }
+      body.light,
+      body.dark {
+        --bgColor: var(--bg);
+        --textColor: var(--fg);
+        --textLinkColor: var(--accent);
+        --textLinkHoverColor: var(--fg);
+        --separatorColor: var(--border);
+        --btnBgColor: var(--surface);
+        --deepBgColor: var(--code-bg);
+        --authorTitleColor: var(--muted);
+      }
+
+      /* ---------------------------------------------------------------
+         Base
+         --------------------------------------------------------------- */
+      :root {
+        color-scheme: light dark;
+      }
+      html {
+        box-sizing: border-box;
+        -webkit-text-size-adjust: 100%;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
+      /* Mobile first: full width with a gutter. On larger screens the
+         layout uses a share of the window, not a fixed pixel width. */
+      .page {
+        width: 100%;
+        margin-inline: auto;
+        padding-inline: 1rem;
+      }
+      @media (min-width: 640px) {
+        .page {
+          padding-inline: 1.5rem;
+        }
+      }
+      @media (min-width: 1024px) {
+        html {
+          font-size: 106.25%;
+        }
+        .page {
+          width: 80%;
+          max-width: 72rem;
+          padding-inline: 0;
+        }
+      }
+      @media (min-width: 1536px) {
+        .page {
+          width: 66%;
+        }
+      }
+      /* Long-form reading keeps a comfortable line length. */
+      .page-read {
+        max-width: 46rem;
+      }
+      body {
+        margin: 0;
+        font-family: var(--font-sans);
+        background: var(--bg);
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        transition: background-color 0.2s ease, color 0.2s ease;
+      }
+      ::selection {
+        background: var(--selection);
+      }
+      input,
+      button {
+        font: inherit;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 2px;
+      }
+      img {
+        display: block;
+        height: auto;
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        border: 0;
+      }
+
+      /* Theme switch icon visibility rules */
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='dark'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='light'] {
+        display: block;
+      }
+      [data-theme-switch][aria-checked='true'] [data-theme-switch-icon='light'],
+      [data-theme-switch][aria-checked='false'] [data-theme-switch-icon='dark'] {
+        display: none;
+      }
+
+      /* Tags rendered by Hakyll come as "a, b, c": drop the commas. */
+      .tag-list {
+        font-size: 0;
+      }
+      .tag-list a {
+        display: inline-block;
+        margin: 0 0.4rem 0.4rem 0;
+        padding: 0.1rem 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        line-height: 1.5;
+        color: var(--muted);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        transition: color 0.15s, border-color 0.15s;
+      }
+      .tag-list a::before {
+        content: '#';
+        color: var(--faint);
+      }
+      .tag-list a:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      /* ---------------------------------------------------------------
+         Long-form content (post bodies)
+         --------------------------------------------------------------- */
+      .prose {
+        font-size: 1.0625rem;
+        line-height: 1.75;
+      }
+      .prose p {
+        margin: 0;
+      }
+      .prose p + p {
+        margin-top: 1.4em;
+      }
+      .prose a[href] {
+        color: var(--accent);
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+        text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+        word-wrap: break-word;
+        transition: text-decoration-color 0.15s;
+      }
+      .prose a[href]:hover {
+        text-decoration-color: var(--accent);
+      }
+      .prose a[href].footnote-ref,
+      .prose a[href].footnote-back {
+        text-decoration: none;
+      }
+      .prose h2,
+      .prose h3,
+      .prose h4 {
+        font-weight: 600;
+        line-height: 1.25;
+        letter-spacing: -0.015em;
+        margin: 2.2em 0 0.7em;
+        scroll-margin-top: 5rem;
+      }
+      .prose h2 {
+        font-size: 1.5rem;
+      }
+      .prose h3 {
+        font-size: 1.2rem;
+      }
+      .prose h2::before,
+      .prose h3::before {
+        font-family: var(--font-mono);
+        font-weight: 400;
+        color: var(--faint);
+        margin-right: 0.5ch;
+      }
+      .prose h2::before {
+        content: '##';
+      }
+      .prose h3::before {
+        content: '###';
+      }
+      .prose hr {
+        height: 0;
+        border: none;
+        border-top: 1px dashed var(--border);
+        margin: 2.5em 0;
+      }
+      .prose blockquote {
+        margin: 1.5em 0;
+        padding: 0.25em 0 0.25em 1.1em;
+        border-left: 2px solid var(--accent);
+        color: var(--muted);
+      }
+      .prose blockquote em {
+        font-size: 1.15em;
+      }
+      .prose ul,
+      .prose ol {
+        margin: 1em 0;
+        padding-left: 1.5em;
+      }
+      .prose ul {
+        list-style: disc outside;
+      }
+      .prose ol {
+        list-style: decimal outside;
+      }
+      .prose li {
+        margin: 0.3em 0;
+      }
+      .prose li::marker {
+        color: var(--faint);
+      }
+      .prose li > ul,
+      .prose li > ol {
+        margin: 0.4em 0;
+      }
+      .prose img {
+        border-radius: 10px;
+        margin-top: 1.75em;
+        margin-bottom: 1.75em;
+      }
+      .prose table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.92em;
+        margin: 1.5em 0;
+      }
+      .prose th,
+      .prose td {
+        text-align: left;
+        padding: 0.45em 0.75em;
+        border-bottom: 1px solid var(--border);
+      }
+      .prose th {
+        font-weight: 600;
+      }
+      .prose .footnotes {
+        margin-top: 3em;
+        font-size: 0.9em;
+        color: var(--muted);
+      }
+
+      /* Code */
+      code,
+      kbd,
+      pre,
+      samp {
+        font-family: var(--font-mono);
+        font-size: 0.88em;
+        font-feature-settings: normal;
+      }
+      pre code {
+        font-size: inherit;
+        line-height: 1.6;
+      }
+      .sourceCode:not(pre):not(code) {
+        position: relative;
+        background-color: var(--code-bg);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        margin: 1.5rem 0;
+        border-radius: 10px;
+      }
+      pre.sourceCode {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 1.1rem 1.25rem;
+        margin: 0;
+        color: #e4e7ed;
+        background: none;
+        font-size: 0.82rem;
+        line-height: 1.6;
+      }
+      pre.numberSource.sourceCode > code {
+        counter-reset: source-line 0;
+      }
+      pre.numberSource.sourceCode > code > span {
+        counter-increment: source-line;
+      }
+      code.sourceCode > a.sourceLine:before {
+        display: inline-block;
+        content: attr(title);
+        text-align: right;
+        border-right: 1px solid rgba(128, 147, 147, 0.4);
+        color: rgb(128, 147, 147);
+        width: 30px;
+        padding-right: 10px;
+        margin-right: 10px;
+      }
+      [data-copy] {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        padding: 0.15rem 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: #8a92a0;
+        background: #1a1f29;
+        border: 1px solid #2a313d;
+        border-radius: 6px;
+        opacity: 0;
+        cursor: pointer;
+        transition: opacity 0.15s, color 0.15s;
+      }
+      .sourceCode:hover [data-copy],
+      [data-copy]:focus-visible {
+        opacity: 1;
+      }
+      [data-copy]:hover {
+        color: #e4e7ed;
+      }
+      @media (max-width: 667px) {
+        .sourceCode:not(pre):not(code) {
+          border-radius: 0;
+          border-left: 0;
+          border-right: 0;
+          margin-left: -1rem;
+          margin-right: -1rem;
+        }
+        code.sourceCode > a.sourceLine:before {
+          display: none;
+        }
+      }
+      :not(pre) > code {
+        border-radius: 4px;
+        background-color: var(--inline-code-bg);
+        color: var(--fg);
+        padding: 0.1em 0.35em;
+        white-space: normal;
+      }
+      /* Syntax token colors (Pandoc) */
+      .co {
+        color: rgb(128, 147, 147);
+        font-style: italic;
+      }
+      .ch,
+      .st,
+      .vs {
+        color: rgb(236, 196, 141);
+      }
+      .va {
+        color: rgb(214, 222, 235);
+      }
+      .dv,
+      .bn,
+      .fl {
+        color: rgb(247, 140, 108);
+      }
+      .bu,
+      .cn,
+      .at,
+      .fu,
+      .dt {
+        color: rgb(130, 170, 255);
+      }
+      .im,
+      .op,
+      .kw,
+      .ot,
+      .cf {
+        color: #c693ea;
+      }
+
+      /* Media helpers */
+      iframe {
+        width: 100%;
+      }
+      .iframe--example {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      .pdf {
+        margin: 1rem -6rem;
+        height: 30rem;
+        width: calc(100% + 12rem);
+      }
+      .pdf-link {
+        display: none;
+      }
+      @media (max-width: 800px) {
+        .pdf {
+          margin: 1rem 0;
+          width: 100%;
+        }
+      }
+      @media (max-width: 667px) {
+        .pdf {
+          display: none;
+        }
+        .pdf-link {
+          display: inline;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="dark min-h-dvh flex flex-col leading-[1.65]">
+    <script>
+      ;(() => {
+        window.site = {
+          theme:
+            localStorage.getItem('theme') ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+          setTheme: (name) => {
+            document.body.classList.add(name === 'light' ? 'light' : 'dark')
+            document.body.classList.remove(name === 'light' ? 'dark' : 'light')
+            localStorage.setItem('theme', name)
+            window.site.theme = name
+            window.site.refreshThemeSwitch()
+          },
+          refreshThemeSwitch: () => {
+            const isLight = window.site.theme === 'light'
+            const themeSwitch = document.querySelector('[data-theme-switch]')
+
+            themeSwitch?.setAttribute(
+              'aria-label',
+              isLight ? 'Switch to dark mode' : 'Switch to light mode'
+            )
+            themeSwitch?.setAttribute('aria-checked', isLight ? 'false' : 'true')
+          },
+        }
+
+        window.site.setTheme(window.site.theme)
+      })()
+    </script>
+
+    <a
+  class="absolute left-[-10000px] focus:left-4 focus:top-4 z-50 px-3 py-1 rounded bg-[var(--accent)] text-[var(--bg)] font-mono text-sm"
+  href="#content"
+  >Skip to content</a
+>
+<nav
+  class="sticky top-0 z-40 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--bg)_82%,transparent)] backdrop-blur-md"
+>
+  <div
+    class="page h-14 flex items-center justify-between gap-4 font-mono text-[13px]"
+  >
+    <a href="/" class="group flex items-center gap-2 text-[var(--fg)]">
+      <span class="text-[var(--accent)] text-base leading-none">λ</span>
+      <span>flaviocorpa<span class="text-[var(--faint)] group-hover:text-[var(--accent)] transition-colors">.com</span></span>
+    </a>
+    <div class="flex items-center gap-4 sm:gap-5 text-[var(--muted)]">
+      <a class="hover:text-[var(--fg)] transition-colors" href="/#posts">posts</a>
+      <a class="hidden sm:inline hover:text-[var(--fg)] transition-colors" href="/#talks">talks</a>
+      <a class="hover:text-[var(--fg)] transition-colors" href="/atom.xml">rss</a>
+      <a
+        class="hidden sm:inline hover:text-[var(--fg)] transition-colors"
+        href="https://github.com/sponsors/kutyel"
+        >sponsor</a
+      >
+      <button
+        aria-label="Switch to light mode"
+        aria-checked="true"
+        data-theme-switch
+        role="switch"
+        type="button"
+        class="grid place-items-center w-8 h-8 -mr-1.5 rounded-md text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--surface)] transition-colors cursor-pointer"
+      >
+        <svg data-theme-switch-icon="dark" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg data-theme-switch-icon="light" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+
+<div
+  data-progress
+  aria-hidden="true"
+  class="fixed top-0 left-0 z-50 h-[2px] w-full origin-left scale-x-0 bg-[var(--accent)]"
+></div>
+
+<style>
+  bsky-comments {
+    --background-color: var(--bg);
+    --text-color: var(--fg);
+    --link-color: var(--accent);
+    --link-hover-color: var(--fg);
+    --comment-meta-color: var(--muted);
+    --error-color: #ff4d4d;
+    --reply-border-color: var(--border);
+    --button-background-color: var(--surface);
+    --button-hover-background-color: var(--accent-soft);
+    --author-avatar-border-radius: 50%;
+  }
+</style>
+
+<main class="flex-1" id="content" tabindex="-1">
+  <article class="page page-read">
+    <header class="pt-12 sm:pt-16 pb-8 mb-10 border-b border-[var(--border)]">
+      <a
+        href="/#posts"
+        class="font-mono text-xs text-[var(--faint)] hover:text-[var(--accent)] transition-colors"
+        >← cd ~/posts</a
+      >
+      <h1
+        class="mt-5 mb-5 text-[2rem] sm:text-[2.6rem] font-semibold leading-[1.12] tracking-[-0.025em] text-balance"
+      >
+        Haskell for Elm developers: giving names to stuff (Part 6 - Foldable)
+      </h1>
+      <div
+        class="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-[var(--muted)] mb-4"
+      >
+        <time datetime="2026-02-13">2026-02-13</time>
+        <span class="text-[var(--faint)]">·</span>
+        <span>6 min read</span>
+         
+      </div>
+      <div class="tag-list"><a title="All pages tagged &#39;haskell&#39;." href="/tags/haskell.html" rel="tag">haskell</a>, <a title="All pages tagged &#39;elm&#39;." href="/tags/elm.html" rel="tag">elm</a>, <a title="All pages tagged &#39;fp&#39;." href="/tags/fp.html" rel="tag">fp</a></div>
+    </header>
+    <section class="prose"><p><img src="./images/haskell-elm.svg" alt="logo" width="300px"></p>
+<p>Welcome back! In my <a href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-5-semigroups-and-monoids.html">last post</a>, we talked about Semigroups and Monoids, and we even discovered the deep relationship between folds and Monoids. But we left something out: the <code>Foldable</code> typeclass itself! So today, let’s give it the attention it deserves. 😊</p>
+<h2 id="what-is-foldable">What is Foldable?</h2>
+<p>If you recall from the previous post, we used <code>foldr</code> and <code>foldl</code> on lists as if it were the most natural thing in the world. But in Haskell, folding is not limited to lists! The <code>Foldable</code> typeclass generalises the concept of folding to <em>any</em> data structure that can be collapsed into a summary value.</p>
+<p>Here is the (simplified) definition:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Foldable</span> t <span class="kw">where</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">{-# MINIMAL foldMap | foldr #-}</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  foldr  ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> t a <span class="ot">-&gt;</span> b</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ot">  foldl  ::</span> (b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> t a <span class="ot">-&gt;</span> b</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ot">  foldMap ::</span> <span class="dt">Monoid</span> m <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> m) <span class="ot">-&gt;</span> t a <span class="ot">-&gt;</span> m</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">foldMap</span> f <span class="ot">=</span> <span class="fu">foldr</span> (<span class="fu">mappend</span> <span class="op">.</span> f) <span class="fu">mempty</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ot">  fold ::</span> <span class="dt">Monoid</span> m <span class="ot">=&gt;</span> t m <span class="ot">-&gt;</span> m</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  fold <span class="ot">=</span> <span class="fu">foldMap</span> <span class="fu">id</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ot">  length  ::</span> t a <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ot">  null    ::</span> t a <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ot">  elem    ::</span> <span class="dt">Eq</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> t a <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ot">  maximum ::</span> <span class="dt">Ord</span> a <span class="ot">=&gt;</span> t a <span class="ot">-&gt;</span> a</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ot">  minimum ::</span> <span class="dt">Ord</span> a <span class="ot">=&gt;</span> t a <span class="ot">-&gt;</span> a</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ot">  sum     ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> t a <span class="ot">-&gt;</span> a</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ot">  product ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> t a <span class="ot">-&gt;</span> a</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="ot">  toList  ::</span> t a <span class="ot">-&gt;</span> [a]</span></code></pre></div>
+<p>That is a LOT of stuff for free! And the beautiful thing is: you only need to implement <strong>either</strong> <code>foldr</code> or <code>foldMap</code> to get all of these functions automatically 🤯 (as indicated by the MINIMAL pragma).</p>
+<h2 id="foldable-in-elm-sort-of">Foldable in Elm (sort of)</h2>
+<p>Now, Elm does not have typeclasses (well, not user-definable ones, as we discussed in <a href="https://flaviocorpa.com/haskell-for-elm-developers-giving-names-to-stuff-part-1-functors.html">Part 1</a>), so there is no <code>Foldable</code> typeclass. But that does not mean you have not been using foldable things all along!</p>
+<p>Let’s see what we have in <code>elm/core</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">List</span><span class="op">.</span><span class="fu">foldr</span>   : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">List</span><span class="op">.</span><span class="fu">foldl</span>   : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Array</span><span class="op">.</span><span class="fu">foldr</span>  : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">Array</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Array</span><span class="op">.</span><span class="fu">foldl</span>  : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">Array</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Dict</span><span class="op">.</span><span class="fu">foldr</span>   : (<span class="fu">k</span> <span class="op">-&gt;</span> <span class="fu">v</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">Dict</span> <span class="fu">k</span> <span class="fu">v</span> <span class="op">-&gt;</span> <span class="fu">b</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Dict</span><span class="op">.</span><span class="fu">foldl</span>   : (<span class="fu">k</span> <span class="op">-&gt;</span> <span class="fu">v</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">Dict</span> <span class="fu">k</span> <span class="fu">v</span> <span class="op">-&gt;</span> <span class="fu">b</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="dt">Set</span><span class="op">.</span><span class="fu">foldr</span>    : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">Set</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="dt">Set</span><span class="op">.</span><span class="fu">foldl</span>    : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">Set</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="dt">String</span><span class="op">.</span><span class="fu">foldr</span> : (<span class="dt">Char</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">String</span> <span class="op">-&gt;</span> <span class="fu">b</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="dt">String</span><span class="op">.</span><span class="fu">foldl</span> : (<span class="dt">Char</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">String</span> <span class="op">-&gt;</span> <span class="fu">b</span></span></code></pre></div>
+<p>Do you see the pattern? <code>List</code>, <code>Array</code>, <code>Dict</code>, <code>Set</code> and <code>String</code> all have <code>foldr</code> and <code>foldl</code>. In Haskell, they would all be instances of <code>Foldable</code>, and you could write <strong>one</strong> generic function that works on all of them. In Elm, you have to pick the specific module each time… but the concept is the same! ✨</p>
+<p>And then there are all the derived functions: <code>List.length</code>, <code>List.isEmpty</code>, <code>List.member</code>, <code>List.sum</code>, <code>List.product</code>, <code>List.maximum</code>, <code>List.minimum</code>… do they look familiar? They are <em>exactly</em> the functions that <code>Foldable</code> gives you for free in Haskell! 😉</p>
+<h2 id="how-easy-is-it-to-implement-foldable">How easy is it to implement Foldable?</h2>
+<p>Here is one of my favourite things about <code>Foldable</code>: implementing it is almost trivially easy. Suppose we have a simple binary tree type in Haskell:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Tree</span> a</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">Leaf</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Node</span> (<span class="dt">Tree</span> a) a (<span class="dt">Tree</span> a)</span></code></pre></div>
+<p>Making it <code>Foldable</code> is just this:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Foldable</span> <span class="dt">Tree</span> <span class="kw">where</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">foldMap</span> _ <span class="dt">Leaf</span>         <span class="ot">=</span> <span class="fu">mempty</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">foldMap</span> f (<span class="dt">Node</span> l x r) <span class="ot">=</span> <span class="fu">foldMap</span> f l <span class="op">&lt;&gt;</span> f x <span class="op">&lt;&gt;</span> <span class="fu">foldMap</span> f r</span></code></pre></div>
+<p>That’s it! Three lines. And now we get <code>foldr</code>, <code>foldl</code>, <code>length</code>, <code>sum</code>, <code>product</code>, <code>toList</code>, <code>elem</code>, <code>null</code>, <code>maximum</code>, <code>minimum</code> and more… all for free! 🎁</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="kw">let</span> tree <span class="ot">=</span> <span class="dt">Node</span> (<span class="dt">Node</span> <span class="dt">Leaf</span> <span class="dv">1</span> <span class="dt">Leaf</span>) <span class="dv">2</span> (<span class="dt">Node</span> <span class="dt">Leaf</span> <span class="dv">3</span> <span class="dt">Leaf</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> toList tree</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">sum</span> tree</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">product</span> tree</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">length</span> tree</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">elem</span> <span class="dv">2</span> tree</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="dt">True</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">null</span> tree</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="dt">False</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">maximum</span> tree</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span></code></pre></div>
+<p>If you use the <code>DeriveFoldable</code> language extension, you don’t even need to write the instance by hand:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# language DeriveFoldable #-}</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Tree</span> a</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">Leaf</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Node</span> (<span class="dt">Tree</span> a) a (<span class="dt">Tree</span> a)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> (<span class="dt">Foldable</span>)</span></code></pre></div>
+<p>And boom, you are done! Haskell literally writes the <code>Foldable</code> instance for you. 🪄</p>
+<h2 id="the-power-of-scanl">The power of <code>scanl</code></h2>
+<p>Now, there’s a function closely related to folds that I find incredibly useful and want to highlight: <code>scanl</code>. If <code>foldl</code> reduces a structure down to a single value, <code>scanl</code> is like <code>foldl</code> but it <em>keeps all the intermediate results</em>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scanl</span><span class="ot"> ::</span> <span class="dt">Foldable</span> f <span class="ot">=&gt;</span> (b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> <span class="dt">NonEmpty</span> b</span></code></pre></div>
+<p>Notice how <code>scanl</code> in Haskell takes any <code>Foldable</code> (not just a <code>List</code>!) and returns a <code>NonEmpty</code> list, because there will always be at least one element (the initial accumulator). Let’s see it in action:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="kw">import</span> <span class="dt">Data.List.NonEmpty</span> (scanl)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">scanl</span> (<span class="op">+</span>) <span class="dv">0</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="dv">0</span> <span class="op">:|</span> [<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">6</span>,<span class="dv">10</span>]</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">scanl</span> (<span class="op">*</span>) <span class="dv">1</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="op">:|</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">6</span>,<span class="dv">24</span>]</span></code></pre></div>
+<p>See how the last element of <code>scanl (+) 0 [1, 2, 3, 4]</code> is <code>10</code>, which is exactly what <code>foldl (+) 0 [1, 2, 3, 4]</code> would return? The <code>scanl</code> function gives you the <em>entire journey</em>, not just the destination! 🗺️</p>
+<p>There is also <code>scanl1</code>, which uses the first element as the starting value:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="kw">import</span> <span class="dt">Data.List.NonEmpty</span> (scanl1)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">scanl1</span> (<span class="op">+</span>) (<span class="dv">1</span> <span class="op">:|</span> [<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>])</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="op">:|</span> [<span class="dv">3</span>,<span class="dv">6</span>,<span class="dv">10</span>]</span></code></pre></div>
+<p>And of course, there are right-to-left variants too: <code>scanr</code> and <code>scanr1</code>.</p>
+<h2 id="scanl-in-elm"><code>scanl</code> in Elm!</h2>
+<p>Here is the nice surprise: even though Elm does not have a built-in <code>scanl</code>, the community has got you covered! The excellent <a href="https://package.elm-lang.org/packages/elmcraft/core-extra/latest/List-Extra#scanl"><code>elmcraft/core-extra</code></a> package provides: <code>scanl</code>, <code>scanl1</code>, <code>scanr</code> and <code>scanr1</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">List</span><span class="op">.</span><span class="dt">Extra</span> <span class="kw">exposing</span> (<span class="fu">scanl</span><span class="op">,</span> <span class="fu">scanl1</span><span class="op">,</span> <span class="fu">scanr</span><span class="op">,</span> <span class="fu">scanr1</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scanl</span> (<span class="op">+</span>) <span class="dv">0</span> [ <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span> ]</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">--&gt; [ 0, 1, 3, 6, 10 ]</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">scanl1</span> (<span class="op">+</span>) [ <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span> ]</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">--&gt; [ 1, 3, 6 ]</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">scanr</span> (<span class="op">+</span>) <span class="dv">0</span> [ <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span> ]</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">--&gt; [ 6, 5, 3, 0 ]</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="fu">scanr1</span> (<span class="op">+</span>) [ <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span> ]</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">--&gt; [ 6, 5, 3 ]</span></span></code></pre></div>
+<p>The type signatures are exactly what you would expect:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scanl</span>  : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">b</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">scanl1</span> : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">a</span>) <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">a</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scanr</span>  : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="fu">b</span>) <span class="op">-&gt;</span> <span class="fu">b</span> <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">b</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">scanr1</span> : (<span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="fu">a</span>) <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">a</span> <span class="op">-&gt;</span> <span class="dt">List</span> <span class="fu">a</span></span></code></pre></div>
+<h2 id="when-is-scanl-useful">When is <code>scanl</code> useful?</h2>
+<p>You might be wondering: ok that’s nice, but when would I actually <em>use</em> this? Here are some practical examples:</p>
+<p><strong>Running totals</strong> (think of a bank account balance):</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">transactions</span> <span class="op">=</span> [ <span class="dv">100</span><span class="op">,</span> <span class="op">-</span><span class="dv">50</span><span class="op">,</span> <span class="dv">200</span><span class="op">,</span> <span class="op">-</span><span class="dv">30</span><span class="op">,</span> <span class="op">-</span><span class="dv">80</span> ]</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scanl</span> (<span class="op">+</span>) <span class="dv">1000</span> <span class="fu">transactions</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">--&gt; [ 1000, 1100, 1050, 1250, 1220, 1140 ]</span></span></code></pre></div>
+<p><strong>Tracking state over time</strong> (building up a history):</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="fu">scanl</span> (<span class="fu">flip</span> (<span class="op">:</span>)) [] [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>[] <span class="op">:|</span> [[<span class="dv">1</span>],[<span class="dv">2</span>,<span class="dv">1</span>],[<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">1</span>]]</span></code></pre></div>
+<p><strong>Computing prefix maximums</strong>:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scanl1</span> <span class="fu">max</span> [ <span class="dv">3</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">4</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">5</span><span class="op">,</span> <span class="dv">9</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">6</span> ]</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">--&gt; [ 3, 3, 4, 4, 5, 9, 9, 9 ]</span></span></code></pre></div>
+<p>Anytime you need a fold but also care about the intermediate steps, <code>scanl</code> is your friend! 🤝</p>
+<h2 id="foldable--monoid--heart">Foldable + Monoid = ❤️</h2>
+<p>Before we wrap up, I want to circle back to the beautiful connection between <code>Foldable</code> and <code>Monoid</code> that we explored in the previous post. Remember <code>foldMap</code>?</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">foldMap</span><span class="ot"> ::</span> (<span class="dt">Foldable</span> t, <span class="dt">Monoid</span> m) <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> m) <span class="ot">-&gt;</span> t a <span class="ot">-&gt;</span> m</span></code></pre></div>
+<p>This is the heart of <code>Foldable</code>. It says: “give me a way to turn each element into a Monoid, and I will combine them all for you”. And since <code>foldMap</code> alone is enough to define a complete <code>Foldable</code> instance, we can confidently say:</p>
+<blockquote>
+<p><strong>Foldable is just the typeclass that lets you <code>foldMap</code> over a structure!</strong></p>
+</blockquote>
+<p>Which, if you think about it, is just a fancy way of saying: “I can visit all the elements and combine them”. Simple, powerful, and beautiful. ✨</p>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>Hope you learned something about <code>Foldable</code> and <code>scanl</code> today! As usual, these concepts are things you already use in Elm every day, we are just giving them a proper name. 😉</p>
+<p>If you found joy in this blogpost and would like me to continue the series (next up would be… <code>Traversable</code>!), please consider <a href="https://github.com/sponsors/kutyel">sponsoring my work</a>, share it in your social networks and <strong>follow me on <a href="https://twitter.com/FlavioCorpa">Twitter</a>/<a href="https://bsky.app/profile/flaviocorpa.com">BlueSky!</a> 🦋</strong> 🙌🏻</p></section>
+  </article>
+
+  
+</main>
+
+<footer class="mt-24 border-t border-[var(--border)] shrink-0">
+  <div
+    class="page py-8 flex flex-col sm:flex-row gap-3 sm:items-center justify-between font-mono text-xs text-[var(--faint)]"
+  >
+    <p class="m-0">
+      built with
+      <a class="text-[var(--muted)] hover:text-[var(--accent)]" href="https://jaspervdj.be/hakyll/">hakyll</a>
+      +
+      <a class="text-[var(--muted)] hover:text-[var(--accent)]" href="https://nixos.org">nix</a>
+      · © Flavio Corpa
+    </p>
+    <ul class="flex gap-4 list-none m-0 p-0" role="list">
+      <li><a class="text-[var(--muted)] hover:text-[var(--accent)]" href="/">home</a></li>
+      <li><a class="text-[var(--muted)] hover:text-[var(--accent)]" href="/atom.xml">atom</a></li>
+      <li><a class="text-[var(--muted)] hover:text-[var(--accent)]" href="/rss.xml">rss</a></li>
+      <li><a class="text-[var(--muted)] hover:text-[var(--accent)]" href="https://github.com/sponsors/kutyel/">sponsor</a></li>
+      <li><a class="text-[var(--muted)] hover:text-[var(--accent)]" href="https://github.com/kutyel/kutyel-hakyll">source</a></li>
+    </ul>
+  </div>
+</footer>
+
+
+<script>
+  ;(() => {
+    const bar = document.querySelector('[data-progress]')
+    const update = () => {
+      const max = document.documentElement.scrollHeight - innerHeight
+      bar.style.transform = 'scaleX(' + (max > 0 ? scrollY / max : 0) + ')'
+    }
+    addEventListener('scroll', update, { passive: true })
+    update()
+  })()
+</script>
+<script src="https://gistcdn.githack.com/kutyel/41d12e099484fd390fb67168271fcdd9/raw/9be26e500525a2e4edacc53d3a8006aaddec0e15/bsky-comments.js"></script>
+
+
+    <script async>
+      ;(() => {
+        window.site.refreshThemeSwitch()
+        document.querySelector('[data-theme-switch]')?.addEventListener('click', () => {
+          window.site.setTheme(window.site.theme === 'light' ? 'dark' : 'light')
+        })
+
+        // "copy" button on every code block
+        document.querySelectorAll('div.sourceCode').forEach((block) => {
+          const button = document.createElement('button')
+          button.type = 'button'
+          button.textContent = 'copy'
+          button.setAttribute('data-copy', '')
+          button.addEventListener('click', async () => {
+            try {
+              await navigator.clipboard.writeText(block.querySelector('pre').innerText)
+              button.textContent = 'copied'
+            } catch {
+              button.textContent = 'error'
+            }
+            setTimeout(() => (button.textContent = 'copy'), 1500)
+          })
+          block.appendChild(button)
+        })
+      })()
+    </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "28e4db2ab9bd4b7a802cf68450728e6b"}'
+    ></script>
+    <!-- End Cloudflare Web Analytics -->
+  </body>
+</html>
