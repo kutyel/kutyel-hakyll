@@ -10,7 +10,7 @@ import Data.Text.Slugger qualified as Slugger
 import Data.Time.Format qualified as Time
 import Hakyll
 import System.FilePath (takeFileName)
-import Text.HTML.TagSoup (Tag (..))
+import Text.HTML.TagSoup (Tag (..), parseTags)
 import Text.Pandoc
   ( Extension (..),
     Extensions,
@@ -49,6 +49,11 @@ myFeedRoot = mySiteRoot
 
 blogSnapshot :: String
 blogSnapshot = "content"
+
+-- | The bare Pandoc output of a post, before any template is applied. Reading
+-- time is computed from it, so listings and the post page always agree.
+bodySnapshot :: String
+bodySnapshot = "body"
 
 --------------------------------------------------------------------------------
 -- CONFIG
@@ -106,6 +111,7 @@ main = hakyllWith config $ do
     route $ metadataRoute titleRoute
     compile $
       pandocCompilerCustom
+        >>= saveSnapshot bodySnapshot
         >>= loadAndApplyTemplate "templates/post.html" ctx
         >>= saveSnapshot blogSnapshot
         >>= loadAndApplyTemplate "templates/default.html" ctx
@@ -249,15 +255,19 @@ titleCtx :: Context String
 titleCtx =
   field "title" updatedTitle
 
+-- | Listings load fully rendered posts (nav, inline CSS and JS included), so
+-- for any item other than the one being compiled we read the post's
+-- 'bodySnapshot' instead of its final body.
 readingTimeField :: String -> Context String
 readingTimeField key =
-  field key calculate
+  field key $ \item -> do
+    self <- getUnderlying
+    body <-
+      if itemIdentifier item == self
+        then pure (itemBody item)
+        else loadSnapshotBody (itemIdentifier item) bodySnapshot
+    pure . formatTime . time $ parseTags body
   where
-    calculate :: Item String -> Compiler String
-    calculate = pure . withTagList acc . itemBody
-
-    acc ts = [TagText . formatTime $ time ts]
-
     -- M. Brysbaert, Journal of Memory and Language (2009) vol 109.
     -- DOI: 10.1016/j.jml.2019.104047
     time ts = foldr count 0 ts `div` 238

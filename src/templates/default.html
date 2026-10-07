@@ -76,9 +76,9 @@
         --bg: #fafaf8;
         --surface: #f1f1ed;
         --fg: #1b1e23;
-        --muted: #636b78;
-        --faint: #a0a6b0;
-        --border: #e4e4df;
+        --muted: #4f5562;
+        --faint: #6b7079;
+        --border: #dadad3;
         --accent: #7c3aed;
         --accent-soft: rgba(124, 58, 237, 0.08);
         --code-bg: #0f131a;
@@ -89,8 +89,8 @@
         --bg: #0c0f14;
         --surface: #141820;
         --fg: #e4e7ed;
-        --muted: #8a92a0;
-        --faint: #565e6c;
+        --muted: #a9b1be;
+        --faint: #808897;
         --border: #20262f;
         --accent: #c693ea;
         --accent-soft: rgba(198, 147, 234, 0.09);
@@ -124,6 +124,37 @@
       *::before,
       *::after {
         box-sizing: inherit;
+      }
+      /* Mobile first: full width with a gutter. On larger screens the
+         layout uses a share of the window, not a fixed pixel width. */
+      .page {
+        width: 100%;
+        margin-inline: auto;
+        padding-inline: 1rem;
+      }
+      @media (min-width: 640px) {
+        .page {
+          padding-inline: 1.5rem;
+        }
+      }
+      @media (min-width: 1024px) {
+        html {
+          font-size: 106.25%;
+        }
+        .page {
+          width: 80%;
+          max-width: 72rem;
+          padding-inline: 0;
+        }
+      }
+      @media (min-width: 1536px) {
+        .page {
+          width: 66%;
+        }
+      }
+      /* Long-form reading keeps a comfortable line length. */
+      .page-read {
+        max-width: 46rem;
       }
       body {
         margin: 0;

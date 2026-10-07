@@ -1,0 +1,107 @@
+<canvas
+  data-particles
+  aria-hidden="true"
+  class="pointer-events-none fixed inset-0 -z-10 w-full h-full"
+></canvas>
+
+<script>
+  // Tiny starfield behind the home and tag pages: drifting, twinkling particles that
+  // link up when close and gently move away from the pointer.
+  ;(() => {
+    const canvas = document.querySelector('[data-particles]')
+    if (!canvas || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const ctx = canvas.getContext('2d')
+    const LINK = 110
+    const REPEL = 120
+    let w = 0
+    let h = 0
+    let particles = []
+    let pointer = null
+    let fg = '#fff'
+    let accent = '#c693ea'
+
+    const readColors = () => {
+      const style = getComputedStyle(document.body)
+      fg = style.getPropertyValue('--fg').trim() || fg
+      accent = style.getPropertyValue('--accent').trim() || accent
+    }
+
+    const resize = () => {
+      const dpr = Math.min(devicePixelRatio || 1, 2)
+      const widthChanged = innerWidth !== w
+      w = innerWidth
+      h = innerHeight
+      canvas.width = w * dpr
+      canvas.height = h * dpr
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      // Mobile browsers fire resize when the address bar hides; only
+      // reseed when the width really changed.
+      if (!widthChanged) return
+      const count = Math.round(Math.min(120, (w * h) / 8000))
+      particles = Array.from({ length: count }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.22,
+        vy: (Math.random() - 0.5) * 0.22,
+        r: Math.random() * 1.3 + 0.35,
+        phase: Math.random() * Math.PI * 2,
+        accent: Math.random() < 0.15,
+      }))
+    }
+
+    const frame = (t) => {
+      ctx.clearRect(0, 0, w, h)
+
+      for (const p of particles) {
+        if (pointer) {
+          const dx = p.x - pointer.x
+          const dy = p.y - pointer.y
+          const d = Math.hypot(dx, dy)
+          if (d < REPEL && d > 0) {
+            p.x += (dx / d) * (1 - d / REPEL) * 1.2
+            p.y += (dy / d) * (1 - d / REPEL) * 1.2
+          }
+        }
+        p.x = (p.x + p.vx + w) % w
+        p.y = (p.y + p.vy + h) % h
+
+        ctx.globalAlpha = 0.35 + 0.3 * Math.sin(t / 900 + p.phase)
+        ctx.fillStyle = p.accent ? accent : fg
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.accent ? p.r + 0.4 : p.r, 0, Math.PI * 2)
+        ctx.fill()
+      }
+
+      ctx.strokeStyle = fg
+      ctx.lineWidth = 0.6
+      for (let i = 0; i < particles.length; i++) {
+        const a = particles[i]
+        for (let j = i + 1; j < particles.length; j++) {
+          const b = particles[j]
+          const d = Math.hypot(a.x - b.x, a.y - b.y)
+          if (d < LINK) {
+            ctx.globalAlpha = (1 - d / LINK) * 0.16
+            ctx.beginPath()
+            ctx.moveTo(a.x, a.y)
+            ctx.lineTo(b.x, b.y)
+            ctx.stroke()
+          }
+        }
+      }
+
+      requestAnimationFrame(frame)
+    }
+
+    addEventListener('pointermove', (e) => (pointer = { x: e.clientX, y: e.clientY }))
+    document.addEventListener('pointerleave', () => (pointer = null))
+    addEventListener('resize', resize)
+    new MutationObserver(readColors).observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
+    readColors()
+    resize()
+    requestAnimationFrame(frame)
+  })()
+</script>
