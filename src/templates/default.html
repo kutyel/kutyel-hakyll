@@ -376,6 +376,32 @@
         font-size: 0.82rem;
         line-height: 1.6;
       }
+      /* Mermaid diagrams, rendered to SVG in the browser by Pele */
+      pre.mermaid {
+        --pele-bg: var(--bg);
+        --pele-fg: var(--fg);
+        --pele-muted: var(--muted);
+        --pele-line: var(--muted);
+        --pele-surface: var(--surface);
+        --pele-surface-alt: var(--accent-soft);
+        --pele-border: var(--border);
+        --pele-accent: var(--accent);
+        --pele-font: var(--font-sans);
+        --pele-font-mono: var(--font-mono);
+        --pele-radius: 6px;
+        margin: 2em 0;
+        white-space: pre;
+        overflow-x: auto;
+        font-family: var(--font-sans);
+        font-size: 0.85rem;
+        line-height: normal;
+      }
+      pre.mermaid svg {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        margin: 0 auto;
+      }
       pre.numberSource.sourceCode > code {
         counter-reset: source-line 0;
       }
@@ -560,6 +586,20 @@
           })
           block.appendChild(button)
         })
+
+        // render ```mermaid blocks to SVG, loading Pele only on pages that have one.
+        // A wide LR/RL flowchart is laid out top-down whenever it would not fit
+        // the reading column, instead of being shrunk until it is unreadable.
+        const diagrams = document.querySelectorAll('pre.mermaid')
+        if (diagrams.length) {
+          const script = document.createElement('script')
+          script.src = 'https://cdn.jsdelivr.net/npm/pele@1.7.0/dist/pele.global.js'
+          script.onload = () =>
+            diagrams.forEach((el) =>
+              pele.mount(el, el.textContent, { directionBreakpoint: Infinity })
+            )
+          document.head.appendChild(script)
+        }
       })()
     </script>
 
